@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EP | Checkout</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="css/styles.css"
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
+      <div class="container">
+        <img
+          src="img/logo2.png"
+          alt="EP Logo"
+          class="img-fluid"
+          style="max-height: 50px"
+        />
+        <a class="navbar-brand fw-bold text-teal" href="index.html"
+          >Every Photograph</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarScroll"
+          aria-controls="navbarScroll"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="navbarScroll" class="collapse navbar-collapse">
+          <div class="navbar-nav ms-auto">
+            <ul class="navbar-nav me-auto">
+              <li class="nav-item">
+                <a class="nav-link text-white" href="#">About</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle text-white"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Categories
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="#categories">Portrait</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#categories">Maternity</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#categories">Creatives</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#categories"
+                      >Pet Photography</a
+                    >
+                  </li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li>
+                    <a class="dropdown-item" href="#categories">Show more</a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" href="#photographers"
+                  >Photographers</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" href="#">Contact</a>
+              </li>
+            </ul>
+            <div class="d-flex flex-column flex-lg-row my-3 my-lg-0 mx-lg-3">
+              <div class="d-flex">
+                <input
+                  class="form-control form_input_search me-2"
+                  type="search"
+                  placeholder="Photographers, wedding, location..."
+                  aria-label="Search"
+                />
+                <button class="btn text-white p-2" type="submit">
+                  <i class="bi bi-search"></i>
+                </button>
+              </div>
+            </div>
+            <a class="nav-link px-3 rounded" href="admin_photographer.html"
+              >Sign In</a
+            >
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <section class="bg-light">
+      <div class="row item_section">
+        <div class="col-lg-7 mt-3">
+          <h2 class="fw-bolder">Checkout</h2>
+          <div class="location mb-4">
+            <a href="photographer_gallery.html"> <span>John Doe</span> </a
+            >Standard | Portrait Package
+          </div>
+          <!-- contact info -->
+          <div class="section_card">
+            <h3>Contact information</h3>
+            <form>
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">First Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Camila"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Last Name</label>
+                  <input type="text" class="form-control" placeholder="Shand" />
+                </div>
+              </div>
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Email</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    placeholder="camile@shand.com"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Phone Number</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    placeholder="0412 345678"
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="section_card">
+            <div>
+              <h4 class="mb-4">
+                <i class="bi bi-credit-card me-2"></i>Payment Information
+              </h4>
+
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label">Card Number</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="1234 5678 9012 3456"
+                    maxlength="19"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Expiry Date</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="MM/YY"
+                    maxlength="5"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">CVC</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="123"
+                    maxlength="4"
+                    required
+                  />
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Cardholder Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Name on card"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="security-info">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-shield-check text-success me-2"></i>
+                  <small class="text-muted">
+                    Your payment information is encrypted and secure.
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5 mt-5 mb-md-3 mb-5 booking_summary">
+          <div class="section_card mt-5 mb-0 mb-md-3">
+            <div>
+              <h5>Booking Summary</h5>
+              <div class="mb-3">
+                <div class="fw-semibold">
+                 <small><a href="photographer_gallery.html">John Doe</a></small> 
+                </div>
+
+                <div class="text-muted small">Brisbane, QLD</div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Standard Package</span>
+                  <span class="fw-bold">$500</span>
+                  <div class="btn-group">
+                    <button
+                      class="btn btn-sm btn-outline-secondary"
+                      title="Edit"
+                    >
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-outline-danger"
+                      title="Remove"
+                    >
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between mb-2 text-muted">
+                  <small>JD Brissy Studio 4000</small>
+                 
+                </div>
+                <div class="d-flex justify-content-between mb-2 text-muted">
+                  <small>2-hour session</small>
+                  <small>August 15, 2024</small>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Service Fee</span>
+                  <span>$500.00</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Processing Fee</span>
+                  <span>$50.00</span>
+                </div>
+              </div>
+              <hr />
+              <div class="d-flex justify-content-between">
+                <span class="fw-bold">Total</span>
+                <span class="fw-bold fs-5">$559.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-7 col-sm-12 col-md-7 pt-3 pb-5">
+          <div class="d-flex justify-content-end">
+            <a
+              href="photographer_gallery.html"
+              class="btn btn-outline-secondary flex-fill me-2"
+            >
+              Go back
+            </a>
+            <a
+              href="success_page.html"
+              class="btn btn-orange flex-fill bi-cart-plus"
+            >
+              Proceed to checkout
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="text-secondary footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-6 col-lg-3 footer_logo">
+            <img class="footer_logo_img" src="img/logo2.png" />
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <h6>EVERY PHOTOGRAPH</h6>
+            <ul class="list">
+              <li><a href="/">Home</a></li>
+              <li><a href="#">About</a></li>
+              <li><a href="#">Categories</a></li>
+              <li><a href="#">Photographers</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-3">
+            <h6>SOCIALS</h6>
+            <div class="social-icons d-flex justify-content-start gap-3">
+              <a href="#" class="social-icon">
+                <span class="bi bi-facebook"></span>
+              </a>
+              <a href="#" class="social-icon">
+                <span class="bi bi-instagram"></span>
+              </a>
+              <a href="#" class="social-icon">
+                <span class="bi bi-linkedin"></span>
+              </a>
+              <a href="#" class="social-icon">
+                <span class="bi bi-youtube"></span>
+              </a>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <h6>CONTACT</h6>
+            <p>111 ABC Street, Brisbane,<br />Australia</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
