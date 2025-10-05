@@ -1,12 +1,12 @@
-{% extends "layouts/customer_base.html" %} {% block content %}
+{% extends "layouts/customer_base.html" %}
+
+{% block content %}
 <section class="bg-light">
   <div class="row item_section">
     <div class="col-lg-7 mt-3">
       <h2 class="fw-bolder">Checkout</h2>
       <div class="location mb-4">
-        <a href="{{ url_for('photographer.gallery') }}">
-          <span>John Doe</span>
-        </a>
+        <a href="{{ url_for('photographer.gallery') }}"> <span>John Doe</span> </a>
         Standard | Portrait Package
       </div>
       <!-- contact info -->
@@ -16,7 +16,11 @@
           <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label class="form-label">First Name</label>
-              <input type="text" class="form-control" placeholder="Camila" />
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Camila"
+              />
             </div>
             <div class="col-md-6">
               <label class="form-label">Last Name</label>
@@ -108,11 +112,7 @@
           <h5>Booking Summary</h5>
           <div class="mb-3">
             <div class="fw-semibold">
-              <small
-                ><a href="{{ url_for('photographer.gallery') }}"
-                  >John Doe</a
-                ></small
-              >
+             <small><a href="{{ url_for('photographer.gallery') }}">John Doe</a></small>
             </div>
 
             <div class="text-muted small">Brisbane, QLD</div>
@@ -120,16 +120,23 @@
               <span>Standard Package</span>
               <span class="fw-bold">$500</span>
               <div class="btn-group">
-                <button class="btn btn-sm btn-outline-secondary" title="Edit">
+                <button
+                  class="btn btn-sm btn-outline-secondary"
+                  title="Edit"
+                >
                   <i class="bi bi-pencil"></i>
                 </button>
-                <button class="btn btn-sm btn-outline-danger" title="Remove">
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  title="Remove"
+                >
                   <i class="bi bi-trash"></i>
                 </button>
               </div>
             </div>
             <div class="d-flex justify-content-between mb-2 text-muted">
               <small>JD Brissy Studio 4000</small>
+
             </div>
             <div class="d-flex justify-content-between mb-2 text-muted">
               <small>2-hour session</small>

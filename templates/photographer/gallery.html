@@ -1,4 +1,6 @@
-{% extends "layouts/photographer_base.html" %} {% block content %}
+{% extends "layouts/photographer_base.html" %}
+
+{% block content %}
 <section class="portfolio_section">
   <!-- photog details-->
   <div class="container">
@@ -75,9 +77,7 @@
                 <span class="text-teal fw-bold">From $200</span>
                 <small class="text-muted">2 hours</small>
               </div>
-              <a
-                href="{{ url_for('customer.session_package') }}"
-                class="btn btn-orange mt-4"
+              <a href="{{ url_for('customer.session_package') }}" class="btn btn-orange mt-4"
                 >Book now</a
               >
             </div>
@@ -95,9 +95,7 @@
                 <span class="text-teal fw-bold">From $200</span>
                 <small class="text-muted">2 hours</small>
               </div>
-              <a
-                href="{{ url_for('customer.session_package') }}"
-                class="btn btn-orange mt-4"
+              <a href="{{ url_for('customer.session_package') }}" class="btn btn-orange mt-4"
                 >Book now</a
               >
             </div>

@@ -1,4 +1,6 @@
-{% extends "layouts/customer_base.html" %} {% block content %}
+{% extends "layouts/customer_base.html" %}
+
+{% block content %}
 <section class="bg-light py-2">
   <div class="container">
     <div class="row item_section">
@@ -9,11 +11,7 @@
         </div>
         <div class="card section_card mt-3">
           <div class="text-center">
-            <img
-              src="{{ url_for('static', filename='images/portraits/portrait_300.png') }}"
-              class="item_img"
-              alt="Portrait"
-            />
+            <img src="{{ url_for('static', filename='images/portraits/portrait_300.png') }}" class="item_img" alt="Portrait" />
           </div>
           <h4 class="package_font mt-3 mb-2">Select a package</h4>
           <div class="row g-3 mb-1">
@@ -125,10 +123,7 @@
             >
               Go back
             </a>
-            <a
-              href="{{ url_for('customer.checkout') }}"
-              class="btn btn-orange flex-fill"
-            >
+            <a href="{{ url_for('customer.checkout') }}" class="btn btn-orange flex-fill">
               Proceed to checkout
             </a>
           </div>

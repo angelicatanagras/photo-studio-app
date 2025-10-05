@@ -1,8 +1,8 @@
-{% extends "layouts/customer_base.html" %} {% block content %}
+{% extends "layouts/customer_base.html" %}
+
+{% block content %}
 <!-- success page -->
-<section
-  class="py-3 py-sm-4 py-md-5 px-2 px-sm-3 px-md-4 px-lg-5 px-xl-5 position-relative success-container"
->
+<section  class="py-3 py-sm-4 py-md-5 px-2 px-sm-3 px-md-4 px-lg-5 px-xl-5 position-relative success-container">
   <div class="container h-100">
     <div class="row h-100 align-items-center">
       <div class="col-lg-6">
@@ -13,10 +13,7 @@
           Order ID #AUS-01-01234
         </p>
         <div class="d-flex flex-column flex-sm-row gap-3">
-          <a
-            href="{{ url_for('customer.index') }}"
-            class="btn btn-outline-secondary"
-          >
+          <a href="{{ url_for('customer.index') }}" class="btn btn-outline-secondary">
             Continue
           </a>
         </div>

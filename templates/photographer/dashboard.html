@@ -1,4 +1,6 @@
-{% extends "base.html" %} {% block content %}
+{% extends "layouts/photographer_base.html" %}
+
+{% block content %}
 <section class="portfolio_section mt-4">
   <!-- photog details admin_photographer -->
   <div class="container">
@@ -10,7 +12,7 @@
           <div>
             <img
               class="profile_img rounded-circle"
-              src="{{ url_for('static', filename='img/photographers/photog-1.jpg') }}"
+              src="{{ url_for('static', filename='images/photographers/photog-1.jpg') }}"
               alt="photographer 1"
             />
           </div>
@@ -43,8 +45,7 @@
           class="summary_textarea form-control"
           placeholder="Summary"
           id="floatingTextarea"
-        >
-This is some information or bio about me.</textarea
+        >This is some information or bio about me.</textarea
         >
         <label for="floatingTextarea">Summary</label>
       </div>
@@ -271,7 +272,7 @@ This is some information or bio about me.</textarea
             <div class="col-md-6 col-lg-4">
               <div class="portfolio-item position-relative">
                 <img
-                  src="{{ url_for('static', filename='img/' + image) }}"
+                  src="{{ url_for('static', filename='images/' + image) }}"
                   alt="Portfolio"
                   class="portfolio-image w-100"
                   loading="lazy"
@@ -301,7 +302,7 @@ This is some information or bio about me.</textarea
             <div class="col-md-6 col-lg-4">
               <div class="portfolio-item position-relative">
                 <img
-                  src="{{ url_for('static', filename='img/pet/pet-5.jpeg') }}"
+                  src="{{ url_for('static', filename='images/pet/pet-5.jpeg') }}"
                   alt="Portfolio"
                   class="portfolio-image w-100"
                   loading="lazy"
@@ -311,7 +312,7 @@ This is some information or bio about me.</textarea
             <div class="col-md-6 col-lg-4">
               <div class="portfolio-item position-relative">
                 <img
-                  src="{{ url_for('static', filename='img/pet/pet-6.jpeg') }}"
+                  src="{{ url_for('static', filename='images/pet/pet-6.jpeg') }}"
                   alt="Portfolio"
                   class="portfolio-image w-100"
                   loading="lazy"
