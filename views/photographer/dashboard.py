@@ -1,6 +1,6 @@
 from flask import render_template
-from views.photographer import photographer_bp
-from services.auth_service import login_required, get_current_user
+from . import photographer_bp
+from ...services.auth_service import login_required, get_current_user
 
 
 @photographer_bp.route('/dashboard')

@@ -179,11 +179,12 @@
               {% for category in service_categories[:4] %}
                 <div class="col-lg-3 col-md-4 col-6">
                   <div class="w-100">
+                    {% set category_lower = category.category_name.lower().replace(' photography', '').replace(' ', '_') %}
                     <img
-                      src="{{ url_for('static', filename='images/categories/' + category.category_name.lower() + '.jpg') }}"
+                      src="{{ url_for('static', filename='images/' + category_lower + '.jpg') }}"
                       class="w-100 category-image"
                       alt="{{ category.category_name }}"
-                      onerror="this.src='{{ url_for('static', filename='images/categories/portrait.jpg') }}'"
+                      onerror="this.src='{{ url_for('static', filename='images/portrait.jpg') }}'"
                     />
                     <div class="mt-3">
                       <div class="text-dark">
@@ -204,11 +205,12 @@
                 {% for category in service_categories[4:8] %}
                   <div class="col-lg-3 col-md-4 col-6">
                     <div class="w-100">
+                      {% set category_lower = category.category_name.lower().replace(' photography', '').replace(' ', '_') %}
                       <img
-                        src="{{ url_for('static', filename='images/categories/' + category.category_name.lower() + '.jpg') }}"
+                        src="{{ url_for('static', filename='images/' + category_lower + '.jpg') }}"
                         class="w-100 category-image"
                         alt="{{ category.category_name }}"
-                        onerror="this.src='{{ url_for('static', filename='images/categories/portrait.jpg') }}'"
+                        onerror="this.src='{{ url_for('static', filename='images/portrait.jpg') }}'"
                       />
                       <div class="mt-3">
                         <div class="text-dark">

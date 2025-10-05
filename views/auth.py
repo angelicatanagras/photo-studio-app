@@ -1,10 +1,10 @@
 from flask import render_template, redirect, url_for, flash, request
 from urllib.parse import urlparse
-from views import auth_bp
-from models.user import User, Role
-from models.photographer import Customer, Photographer
-from forms.auth import LoginForm, RegistrationForm
-from services.auth_service import login_user, logout_user, is_authenticated, get_current_user
+from . import auth_bp
+from ..models.user import User, Role
+from ..models.photographer import Customer, Photographer
+from ..forms.auth import LoginForm, RegistrationForm
+from ..services.auth_service import login_user, logout_user, is_authenticated, get_current_user
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
@@ -16,6 +16,8 @@ def login():
             return redirect(url_for('customer.index'))
         elif user and user.get('role_name') == 'photographer':
             return redirect(url_for('photographer.dashboard'))
+        elif user and user.get('role_name') == 'admin':
+            return redirect(url_for('admin.dashboard'))
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -26,7 +28,10 @@ def login():
             role = Role.get_by_id(user.role_id)
 
             if role and role['name'] != 'customer':
-                flash('This login is for customers only. Please use the photographer login.', 'error')
+                if role['name'] == 'admin':
+                    flash('This login is for customers only. Please use the admin login.', 'error')
+                else:
+                    flash('This login is for customers only. Please use the photographer login.', 'error')
                 return render_template('auth/login.html', title='Customer Sign In', form=form)
 
             login_user(user.id, remember=form.remember_me.data)
@@ -48,6 +53,8 @@ def photographer_login():
             return redirect(url_for('photographer.dashboard'))
         elif user and user.get('role_name') == 'customer':
             return redirect(url_for('customer.index'))
+        elif user and user.get('role_name') == 'admin':
+            return redirect(url_for('admin.dashboard'))
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -57,7 +64,10 @@ def photographer_login():
             role = Role.get_by_id(user.role_id)
 
             if role and role['name'] != 'photographer':
-                flash('This login is for photographers only. Please use the customer login.', 'error')
+                if role['name'] == 'admin':
+                    flash('This login is for photographers only. Please use the admin login.', 'error')
+                else:
+                    flash('This login is for photographers only. Please use the customer login.', 'error')
                 return render_template('auth/photographer_login.html', title='Photographer Sign In', form=form)
 
             login_user(user.id, remember=form.remember_me.data)
@@ -79,6 +89,8 @@ def register():
             return redirect(url_for('customer.index'))
         elif user and user.get('role_name') == 'photographer':
             return redirect(url_for('photographer.dashboard'))
+        elif user and user.get('role_name') == 'admin':
+            return redirect(url_for('admin.dashboard'))
 
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -119,6 +131,8 @@ def photographer_register():
             return redirect(url_for('photographer.dashboard'))
         elif user and user.get('role_name') == 'customer':
             return redirect(url_for('customer.index'))
+        elif user and user.get('role_name') == 'admin':
+            return redirect(url_for('admin.dashboard'))
 
     form = RegistrationForm()
     if form.validate_on_submit():

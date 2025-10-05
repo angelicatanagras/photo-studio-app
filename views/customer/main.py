@@ -1,8 +1,8 @@
 from flask import render_template, request
-from views.customer import customer_bp
-from models.photographer import Photographer
-from models.booking import ServiceCategory
-from services.auth_service import login_required, get_current_user
+from . import customer_bp
+from ...models.photographer import Photographer
+from ...models.booking import ServiceCategory
+from ...services.auth_service import login_required, get_current_user
 
 
 @customer_bp.route('/')

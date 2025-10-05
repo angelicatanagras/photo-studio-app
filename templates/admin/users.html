@@ -1,0 +1,59 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<section class="portfolio_section mt-4">
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col-12">
+        <h2 class="text-charcoal">Manage Users</h2>
+        <p class="text-muted">View and manage all registered users</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in users %}
+                  <tr>
+                    <td>{{ item.user.id }}</td>
+                    <td>{{ item.user.full_name }}</td>
+                    <td>{{ item.user.email }}</td>
+                    <td>
+                      <span class="badge
+                        {% if item.role == 'admin' %}bg-danger
+                        {% elif item.role == 'photographer' %}bg-teal
+                        {% else %}bg-secondary{% endif %}">
+                        {{ item.role }}
+                      </span>
+                    </td>
+                    <td>{{ item.user.created_at.strftime('%Y-%m-%d') if item.user.created_at else 'N/A' }}</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                      <button class="btn btn-sm btn-outline-danger">Delete</button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

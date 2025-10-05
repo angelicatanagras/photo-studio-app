@@ -1,8 +1,8 @@
 import os
 from flask import Flask
 from flask_mysqldb import MySQL
-from config import config
-from services.auth_service import inject_current_user
+from .config import config
+from .services.auth_service import inject_current_user
 
 mysql = MySQL()
 
@@ -21,9 +21,11 @@ def create_app(config_name=None):
     app.context_processor(inject_current_user)
 
     # Register blueprints
-    from views import customer_bp, photographer_bp, auth_bp
+    from .views import customer_bp, photographer_bp, auth_bp
+    from .views.admin import admin_bp
     app.register_blueprint(customer_bp)
     app.register_blueprint(photographer_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(admin_bp)
 
     return app

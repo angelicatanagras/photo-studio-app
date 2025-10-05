@@ -4,7 +4,7 @@ Provides session-based authentication with login/logout functionality.
 """
 from functools import wraps
 from flask import session, redirect, url_for, flash, request
-from database import fetch_one
+from ..database import fetch_one
 
 
 def login_user(user_id, remember=False):
@@ -100,12 +100,24 @@ def role_required(*roles):
         def decorated_function(*args, **kwargs):
             if not is_authenticated():
                 flash('Please log in to access this page.', 'warning')
-                return redirect(url_for('auth.login', next=request.url))
+                # Redirect to appropriate login based on role
+                if 'admin' in roles:
+                    return redirect(url_for('admin.login', next=request.url))
+                elif 'photographer' in roles:
+                    return redirect(url_for('auth.photographer_login', next=request.url))
+                else:
+                    return redirect(url_for('auth.login', next=request.url))
 
             user = get_current_user()
             if user and user.get('role_name') not in roles:
                 flash('You do not have permission to access this page.', 'danger')
-                return redirect(url_for('main.index'))
+                # Redirect to user's appropriate dashboard
+                if user.get('role_name') == 'admin':
+                    return redirect(url_for('admin.dashboard'))
+                elif user.get('role_name') == 'photographer':
+                    return redirect(url_for('photographer.dashboard'))
+                else:
+                    return redirect(url_for('customer.index'))
 
             return f(*args, **kwargs)
         return decorated_function

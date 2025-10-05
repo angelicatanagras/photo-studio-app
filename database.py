@@ -4,7 +4,7 @@ from contextlib import contextmanager
 
 def get_db():
     """Get database connection from Flask-MySQLdb."""
-    from app import mysql
+    from .app import mysql
     return mysql
 
 

@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS service_categories (
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(120) NOT NULL UNIQUE,
-    password_hash VARCHAR(128) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     profile_image VARCHAR(200),
@@ -137,3 +137,81 @@ INSERT INTO roles (name) VALUES
     ('photographer'),
     ('admin')
 ON DUPLICATE KEY UPDATE name=name;
+
+
+-- Default credentials: admin@test.com / Admin123
+INSERT INTO users (email, password_hash, first_name, last_name, role_id, created_at)
+SELECT
+    'admin@test.com',
+    'scrypt:32768:8:1$vdVMI7dDENnBLjjC$135eaa86bef9cff49f048a3f83af83f173dde2ac5f8ba46ebd77d07cf51da93e26b1e991aa8eb82af13664d32ddfd4a1f0416a353675564bf5cc412d269f3791',
+    'Super',
+    'Admin',
+    (SELECT id FROM roles WHERE name = 'admin' LIMIT 1),
+    NOW()
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'admin@test.com'
+);
+
+
+-- Default credentials: customer@test.com / customer123
+INSERT INTO users (email, password_hash, first_name, last_name, role_id, created_at)
+SELECT
+    'customer@test.com',
+    'scrypt:32768:8:1$GRBu4CIvnxydSres$08f327db51930911c8b3dbd3a660fa37bb2e1eb5fa6379398769a1134859df281aa36932636eacaaf833a2b93f488a0071d5683b75bd9d3529f9008d0879f87f',
+    'Demo',
+    'Customer',
+    (SELECT id FROM roles WHERE name = 'customer' LIMIT 1),
+    NOW()
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'customer@test.com'
+);
+
+-- Create customer profile for demo customer
+INSERT INTO customers (user_id, phone, address, created_at)
+SELECT
+    u.id,
+    '614232323',
+    '123 Brisbane, Australia',
+    NOW()
+FROM users u
+WHERE u.email = 'customer@test.com'
+AND NOT EXISTS (
+    SELECT 1 FROM customers WHERE user_id = u.id
+);
+
+-- Insert demo photographer user
+-- Default credentials: photo@test.com / photo123
+INSERT INTO users (email, password_hash, first_name, last_name, role_id, created_at)
+SELECT
+    'photo@test.com',
+    'scrypt:32768:8:1$kcbZEKcIvveiBhDu$d423d2fd1be147a474a3f6eea71626328121576994123986afe1bb4e48059b2df6d902e2c932d2d507aa437ee025394329d0568ac3c55fbe62fc943e29fe24be',
+    'Demo',
+    'Photographer',
+    (SELECT id FROM roles WHERE name = 'photographer' LIMIT 1),
+    NOW()
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'photo@test.com'
+);
+
+-- Create photographer profile for demo photographer
+INSERT INTO photographers (user_id, bio, phone, location, social_link, created_at)
+SELECT
+    u.id,
+    'Professional photographer specializing in weddings, portraits, and events. Over 10 years of experience capturing precious moments.',
+    '+614253434',
+    'Brisbane, Australia',
+    'https://instagram.com/demophotographer',
+    NOW()
+FROM users u
+WHERE u.email = 'photo@test.com'
+AND NOT EXISTS (
+    SELECT 1 FROM photographers WHERE user_id = u.id
+);
+
+-- Insert sample service categories
+INSERT INTO service_categories (category_name, description) VALUES
+    ('Wedding Photography', 'Complete wedding photography services'),
+    ('Portrait Photography', 'Individual and family portrait sessions'),
+    ('Event Photography', 'Corporate and private event coverage'),
+    ('Product Photography', 'Commercial product photography')
+ON DUPLICATE KEY UPDATE category_name=category_name;

@@ -1,5 +1,5 @@
 from datetime import datetime
-from database import fetch_one, fetch_all, execute_query
+from ..database import fetch_one, fetch_all, execute_query
 
 
 class Photographer:

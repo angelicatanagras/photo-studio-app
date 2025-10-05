@@ -1,11 +1,3 @@
-from flask import Flask
+from .app import create_app
 
-
-def create_app():
-    app = Flask(__name__)
-    app.debug = True
-
-    from . import views
-    app.register_blueprint(views.views, url_prefix='/')
-
-    return app
+__all__ = ['create_app']

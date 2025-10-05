@@ -1,6 +1,6 @@
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-from database import fetch_one, fetch_all, execute_query
+from ..database import fetch_one, fetch_all, execute_query
 
 
 class Role:

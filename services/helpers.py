@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
-from models.booking import Booking
-from database import fetch_all
+from ..models.booking import Booking
+from ..database import fetch_all
 
 
 def format_currency(amount):
