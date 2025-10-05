@@ -1,0 +1,140 @@
+{% extends "layouts/customer_base.html" %} {% block content %}
+<section class="bg-light py-2">
+  <div class="container">
+    <div class="row item_section">
+      <div class="col-12 col-lg-8 col-md-12 col-sm-12 mb-lg-0">
+        <h2>Book session with John Doe</h2>
+        <div class="location">
+          <span>Brisbane, QLD 4000</span>
+        </div>
+        <div class="card section_card mt-3">
+          <div class="text-center">
+            <img
+              src="{{ url_for('static', filename='images/portraits/portrait_300.png') }}"
+              class="item_img"
+              alt="Portrait"
+            />
+          </div>
+          <h4 class="package_font mt-3 mb-2">Select a package</h4>
+          <div class="row g-3 mb-1">
+            <div class="col-12 col-sm-6 col-md-4">
+              <div class="package_card">
+                <h4 class="package_item_font">Standard</h4>
+                <p class="package_price">$200</p>
+                <p>2 hours</p>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4">
+              <div class="package_card selected">
+                <h4 class="package_item_font fw-bold">Standard</h4>
+                <p class="package_price">$500</p>
+                <p>2 hours</p>
+              </div>
+              <div class="mt-2">
+                <p class="short-detail">
+                  Some short details or overview on what to expect on this
+                  session
+                </p>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4">
+              <div class="package_card">
+                <h4 class="package_item_font">Standard</h4>
+                <p class="package_price">$999</p>
+                <p>2 hours</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card section_card">
+          <h2 class="package_font">Select Date and Time</h2>
+          <div
+            class="d-flex flex-column flex-md-row gap-2 justify-content-center"
+          >
+            <div class="flex-fill">
+              <label class="form-label">Choose Date:</label>
+              <input
+                type="date"
+                class="form-control"
+                placeholder="Pick a date"
+              />
+            </div>
+            <div class="flex-fill">
+              <label class="form-label">Choose Time:</label>
+              <select class="form-select">
+                <option selected>Select time</option>
+                <option value="9:00">9:00 AM</option>
+                <option value="10:00">10:00 AM</option>
+                <option value="11:00">11:00 AM</option>
+                <option value="12:00">12:00 PM</option>
+                <option value="13:00">1:00 PM</option>
+                <option value="14:00">2:00 PM</option>
+                <option value="15:00">3:00 PM</option>
+                <option value="16:00">4:00 PM</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="card section_card">
+          <h2 class="package_font">Event Details</h2>
+          <div class="mb-3">
+            <label class="form-label">Photography Session:</label>
+            <select class="form-select" disabled>
+              <option>Select type</option>
+              <option selected="portrait">Portrait</option>
+              <option value="product">Product shoot</option>
+              <option value="creative">Creatives</option>
+              <option value="maternity">Maternity</option>
+              <option value="pet">Pet</option>
+            </select>
+          </div>
+          <div class="d-flex flex-column flex-md-row gap-2">
+            <div class="mb-3 flex-fill">
+              <label class="form-label">Event Location:</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter postcode to check"
+              />
+            </div>
+            <div class="mb-3 flex-fill">
+              <label class="form-label">Event Number of Pax:</label>
+              <input
+                type="number"
+                class="form-control"
+                placeholder="1"
+                min="1"
+                max="50"
+              />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Event Notes:</label>
+            <textarea
+              class="form-control"
+              rows="4"
+              placeholder="Tell us more about your event, do you have special request that needs certain attention?"
+            ></textarea>
+          </div>
+          <div class="d-flex mt-4">
+            <a
+              href="{{ url_for('photographer.gallery') }}"
+              class="btn btn-outline-secondary flex-fill me-2"
+            >
+              Go back
+            </a>
+            <a
+              href="{{ url_for('customer.checkout') }}"
+              class="btn btn-orange flex-fill"
+            >
+              Proceed to checkout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

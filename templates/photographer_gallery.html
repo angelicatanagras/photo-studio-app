@@ -1,0 +1,217 @@
+{% extends "layouts/photographer_base.html" %} {% block content %}
+<section class="portfolio_section">
+  <!-- photog details-->
+  <div class="container">
+    <div class="row portfolio_section">
+      <div class="col-12 col-lg-8 col-md-12 col-sm-12 mb-lg-0">
+        <div
+          class="d-flex flex-column flex-sm-row justify-content-center justify-content-sm-center gap-3 align-items-center align-items-sm-center"
+        >
+          <div>
+            <img
+              class="profile_img rounded-circle"
+              src="{{ url_for('static', filename='images/photographers/photog-1.jpg') }}"
+              alt="photographer 1"
+            />
+          </div>
+          <div class="vendor-photog-details flex-grow-1 bg-white-95">
+            <div>
+              <h3>John Doe</h3>
+            </div>
+            <div>
+              📞 0424 121 1212 <br />
+              📍 Brisbane
+            </div>
+            <div>Pricing: Starts at $1500</div>
+            <br />
+            <p>Social media: IG@john_doe</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- tabs for services and portfolio gallery-->
+  <div class="container">
+    <ul id="photo-gallery" class="nav nav-tabs">
+      <li class="nav-item">
+        <button
+          class="nav-link active"
+          id="services-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#services"
+          type="button"
+          role="tab"
+        >
+          <i class="bi bi-camera me-2"></i>Services
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="portfolio-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#portfolio"
+          type="button"
+          role="tab"
+        >
+          <i class="bi bi-grid-3x3-gap me-2"></i>Portfolio
+        </button>
+      </li>
+    </ul>
+    <!-- gallery section -->
+    <div class="tab-content" id="photo-gallery-content">
+      <div class="tab-pane fade show active" id="services">
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-4 py-3">
+            <div class="text-center card shadow-sm p-3 mb-5 bg-body rounded">
+              <div class="service-icon mx-auto mb-3">
+                <i class="bi bi-star text-dark fs-4"></i>
+              </div>
+              <h5 class="fw-bold mb-3">Portrait Photography</h5>
+              <p class="text-muted mb-3">
+                Professional headshots, backdrops, corporate shots, etc.
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="text-teal fw-bold">From $200</span>
+                <small class="text-muted">2 hours</small>
+              </div>
+              <a
+                href="{{ url_for('customer.session_package') }}"
+                class="btn btn-orange mt-4"
+                >Book now</a
+              >
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4 py-3">
+            <div class="text-center card shadow-sm p-3 mb-5 bg-body rounded">
+              <div class="service-icon mx-auto mb-3">
+                <i class="bi bi-star text-dark fs-4"></i>
+              </div>
+              <h5 class="fw-bold mb-3">Pet Photography</h5>
+              <p class="text-muted mb-3">
+                Professional and creative photos with your pets
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="text-teal fw-bold">From $200</span>
+                <small class="text-muted">2 hours</small>
+              </div>
+              <a
+                href="{{ url_for('customer.session_package') }}"
+                class="btn btn-orange mt-4"
+                >Book now</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="portfolio">
+        <div class="d-flex flex-column mt-3 mb-5 py-3">
+          <div class="row g-3">
+            <div class="col-md-6 col-lg-4">
+              <div class="portfolio-item position-relative">
+                <img
+                  src="{{ url_for('static', filename='images/categories/portrait.jpg') }}"
+                  alt="Portraits"
+                  class="portfolio-image w-100"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="portfolio-item position-relative">
+                <img
+                  src="{{ url_for('static', filename='images/portraits/portrait-1.jpg') }}"
+                  alt="Portraits"
+                  class="portfolio-image w-100"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="portfolio-item position-relative">
+                <img
+                  src="{{ url_for('static', filename='images/portraits/portrait-2.jpg') }}"
+                  alt="Portraits"
+                  class="portfolio-image w-100"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="portfolio-item position-relative">
+                <img
+                  src="{{ url_for('static', filename='images/portraits/portrait-3.jpg') }}"
+                  alt="Portraits"
+                  class="portfolio-image w-100"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="portfolio-item position-relative">
+                <img
+                  src="{{ url_for('static', filename='images/pet/pet-1.jpeg') }}"
+                  alt="Portraits"
+                  class="portfolio-image w-100"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="portfolio-item position-relative">
+                <img
+                  src="{{ url_for('static', filename='images/pet/pet-2.jpeg') }}"
+                  alt="Portraits"
+                  class="portfolio-image w-100"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="portfolio-item position-relative">
+                <img
+                  src="{{ url_for('static', filename='images/pet/pet-3.jpeg') }}"
+                  alt="Portraits"
+                  class="portfolio-image w-100"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="portfolio-item position-relative">
+                <img
+                  src="{{ url_for('static', filename='images/pet/pet-4.jpeg') }}"
+                  alt="Portraits"
+                  class="portfolio-image w-100"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="portfolio-item position-relative">
+                <img
+                  src="{{ url_for('static', filename='images/pet/pet-5.jpeg') }}"
+                  alt="Portraits"
+                  class="portfolio-image w-100"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="portfolio-item position-relative">
+                <img
+                  src="{{ url_for('static', filename='images/pet/pet-6.jpeg') }}"
+                  alt="Portraits"
+                  class="portfolio-image w-100"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
