@@ -1,21 +1,16 @@
--- Initial Schema Migration
--- Created: 2025-09-26
--- Description: Create all initial tables for photostudio booking application
 
--- Create roles table
 CREATE TABLE IF NOT EXISTS roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create service_categories table
 CREATE TABLE IF NOT EXISTS service_categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     category_name VARCHAR(100) NOT NULL,
     description TEXT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create users table
+
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(120) NOT NULL UNIQUE,
@@ -29,7 +24,7 @@ CREATE TABLE IF NOT EXISTS users (
     FOREIGN KEY (role_id) REFERENCES roles(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create customers table
+
 CREATE TABLE IF NOT EXISTS customers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -39,7 +34,6 @@ CREATE TABLE IF NOT EXISTS customers (
     FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create photographers table
 CREATE TABLE IF NOT EXISTS photographers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -51,7 +45,7 @@ CREATE TABLE IF NOT EXISTS photographers (
     FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create bookings table
+
 CREATE TABLE IF NOT EXISTS bookings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT NOT NULL,
@@ -64,7 +58,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     FOREIGN KEY (customer_id) REFERENCES customers(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create portfolio_items table
+
 CREATE TABLE IF NOT EXISTS portfolio_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     photographer_id INT NOT NULL,
@@ -75,7 +69,7 @@ CREATE TABLE IF NOT EXISTS portfolio_items (
     FOREIGN KEY (photographer_id) REFERENCES photographers(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create services table
+
 CREATE TABLE IF NOT EXISTS services (
     id INT AUTO_INCREMENT PRIMARY KEY,
     photographer_id INT NOT NULL,
@@ -87,7 +81,7 @@ CREATE TABLE IF NOT EXISTS services (
     FOREIGN KEY (service_category_id) REFERENCES service_categories(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create payments table
+
 CREATE TABLE IF NOT EXISTS payments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     booking_id INT NOT NULL,
@@ -101,7 +95,7 @@ CREATE TABLE IF NOT EXISTS payments (
     FOREIGN KEY (booking_id) REFERENCES bookings(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create service_packages table
+
 CREATE TABLE IF NOT EXISTS service_packages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     service_id INT NOT NULL,
@@ -114,7 +108,7 @@ CREATE TABLE IF NOT EXISTS service_packages (
     FOREIGN KEY (service_id) REFERENCES services(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create booking_items table
+
 CREATE TABLE IF NOT EXISTS booking_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     booking_id INT NOT NULL,
@@ -131,7 +125,7 @@ CREATE TABLE IF NOT EXISTS booking_items (
     FOREIGN KEY (service_package_id) REFERENCES service_packages(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Insert default roles
+
 INSERT INTO roles (name) VALUES
     ('customer'),
     ('photographer'),

@@ -5,9 +5,7 @@ from email.mime.multipart import MIMEMultipart
 
 
 def send_email(to_email, subject, html_content, text_content=None):
-    """Send an email using SMTP configuration."""
     try:
-        # Get email configuration from app config
         smtp_server = current_app.config.get('MAIL_SERVER')
         smtp_port = current_app.config.get('MAIL_PORT', 587)
         smtp_username = current_app.config.get('MAIL_USERNAME')
@@ -18,22 +16,18 @@ def send_email(to_email, subject, html_content, text_content=None):
             current_app.logger.warning("Email configuration incomplete. Email not sent.")
             return False
 
-        # Create message
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
         msg['From'] = smtp_username
         msg['To'] = to_email
 
-        # Add text content
         if text_content:
             text_part = MIMEText(text_content, 'plain')
             msg.attach(text_part)
 
-        # Add HTML content
         html_part = MIMEText(html_content, 'html')
         msg.attach(html_part)
 
-        # Send email
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             if use_tls:
                 server.starttls()
@@ -48,7 +42,6 @@ def send_email(to_email, subject, html_content, text_content=None):
 
 
 def send_booking_confirmation(booking):
-    """Send booking confirmation email to user."""
     subject = f"Booking Confirmation - Studio {booking.studio.name}"
 
     html_content = f"""
@@ -110,7 +103,6 @@ def send_booking_confirmation(booking):
 
 
 def send_booking_cancellation(booking):
-    """Send booking cancellation email to user."""
     subject = f"Booking Cancelled - Studio {booking.studio.name}"
 
     html_content = f"""

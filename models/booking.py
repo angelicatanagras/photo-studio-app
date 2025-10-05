@@ -6,7 +6,6 @@ class ServiceCategory:
     """Service category model for grouping services."""
 
     def __init__(self, category_dict):
-        """Initialize service category from database dictionary."""
         if category_dict:
             self.id = category_dict.get('id')
             self.category_name = category_dict.get('category_name')
@@ -14,7 +13,6 @@ class ServiceCategory:
 
     @staticmethod
     def get_by_id(category_id):
-        """Get service category by ID."""
         category_data = fetch_one(
             "SELECT * FROM service_categories WHERE id = %s",
             (category_id,)
@@ -23,13 +21,11 @@ class ServiceCategory:
 
     @staticmethod
     def get_all():
-        """Get all service categories."""
         categories_data = fetch_all("SELECT * FROM service_categories")
         return [ServiceCategory(c) for c in categories_data]
 
     @staticmethod
     def create(category_name, description=None):
-        """Create a new service category."""
         category_id = execute_query(
             "INSERT INTO service_categories (category_name, description) VALUES (%s, %s)",
             (category_name, description)
@@ -44,7 +40,6 @@ class Service:
     """Service model for photographer services."""
 
     def __init__(self, service_dict):
-        """Initialize service from database dictionary."""
         if service_dict:
             self.id = service_dict.get('id')
             self.photographer_id = service_dict.get('photographer_id')
@@ -55,7 +50,6 @@ class Service:
 
     @staticmethod
     def get_by_id(service_id):
-        """Get service by ID."""
         service_data = fetch_one(
             "SELECT * FROM services WHERE id = %s",
             (service_id,)
@@ -64,7 +58,6 @@ class Service:
 
     @staticmethod
     def get_by_photographer(photographer_id):
-        """Get all services for a photographer."""
         services_data = fetch_all(
             "SELECT * FROM services WHERE photographer_id = %s",
             (photographer_id,)
@@ -73,7 +66,6 @@ class Service:
 
     @staticmethod
     def get_by_category(category_id):
-        """Get all services in a category."""
         services_data = fetch_all(
             "SELECT * FROM services WHERE service_category_id = %s",
             (category_id,)
@@ -82,13 +74,11 @@ class Service:
 
     @staticmethod
     def get_all():
-        """Get all services."""
         services_data = fetch_all("SELECT * FROM services")
         return [Service(s) for s in services_data]
 
     @staticmethod
     def create(photographer_id, name, service_category_id, description=None):
-        """Create a new service."""
         service_id = execute_query(
             """
             INSERT INTO services (photographer_id, name, description, service_category_id, created_at)
@@ -100,7 +90,6 @@ class Service:
 
     @staticmethod
     def update(service_id, **kwargs):
-        """Update service."""
         allowed_fields = ['name', 'description', 'service_category_id']
         updates = []
         values = []
@@ -119,7 +108,6 @@ class Service:
 
     @staticmethod
     def delete(service_id):
-        """Delete a service."""
         execute_query("DELETE FROM services WHERE id = %s", (service_id,))
 
     def __repr__(self):
@@ -130,7 +118,6 @@ class ServicePackage:
     """Service package model for service pricing and details."""
 
     def __init__(self, package_dict):
-        """Initialize service package from database dictionary."""
         if package_dict:
             self.id = package_dict.get('id')
             self.service_id = package_dict.get('service_id')
@@ -143,7 +130,6 @@ class ServicePackage:
 
     @staticmethod
     def get_by_id(package_id):
-        """Get service package by ID."""
         package_data = fetch_one(
             "SELECT * FROM service_packages WHERE id = %s",
             (package_id,)
@@ -152,7 +138,6 @@ class ServicePackage:
 
     @staticmethod
     def get_by_service(service_id):
-        """Get all packages for a service."""
         packages_data = fetch_all(
             "SELECT * FROM service_packages WHERE service_id = %s",
             (service_id,)
@@ -161,13 +146,11 @@ class ServicePackage:
 
     @staticmethod
     def get_all():
-        """Get all service packages."""
         packages_data = fetch_all("SELECT * FROM service_packages")
         return [ServicePackage(p) for p in packages_data]
 
     @staticmethod
     def create(service_id, package_name, price, details=None, location=None, duration=None):
-        """Create a new service package."""
         package_id = execute_query(
             """
             INSERT INTO service_packages (service_id, package_name, price, details, location, duration, created_at)
@@ -179,7 +162,6 @@ class ServicePackage:
 
     @staticmethod
     def update(package_id, **kwargs):
-        """Update service package."""
         allowed_fields = ['package_name', 'price', 'details', 'location', 'duration']
         updates = []
         values = []
@@ -198,7 +180,6 @@ class ServicePackage:
 
     @staticmethod
     def delete(package_id):
-        """Delete a service package."""
         execute_query("DELETE FROM service_packages WHERE id = %s", (package_id,))
 
     def __repr__(self):
@@ -209,7 +190,6 @@ class Booking:
     """Booking model for customer bookings."""
 
     def __init__(self, booking_dict):
-        """Initialize booking from database dictionary."""
         if booking_dict:
             self.id = booking_dict.get('id')
             self.customer_id = booking_dict.get('customer_id')
@@ -222,7 +202,6 @@ class Booking:
 
     @staticmethod
     def get_by_id(booking_id):
-        """Get booking by ID."""
         booking_data = fetch_one(
             "SELECT * FROM bookings WHERE id = %s",
             (booking_id,)
@@ -231,7 +210,6 @@ class Booking:
 
     @staticmethod
     def get_by_booking_number(booking_number):
-        """Get booking by booking number."""
         booking_data = fetch_one(
             "SELECT * FROM bookings WHERE booking_number = %s",
             (booking_number,)
@@ -240,7 +218,6 @@ class Booking:
 
     @staticmethod
     def get_by_customer(customer_id):
-        """Get all bookings for a customer."""
         bookings_data = fetch_all(
             "SELECT * FROM bookings WHERE customer_id = %s ORDER BY created_at DESC",
             (customer_id,)
@@ -249,13 +226,11 @@ class Booking:
 
     @staticmethod
     def get_all():
-        """Get all bookings."""
         bookings_data = fetch_all("SELECT * FROM bookings ORDER BY created_at DESC")
         return [Booking(b) for b in bookings_data]
 
     @staticmethod
     def create(customer_id, booking_number, service_fee, processing_fee, total_price, status='pending'):
-        """Create a new booking."""
         booking_id = execute_query(
             """
             INSERT INTO bookings (customer_id, booking_number, service_fee, processing_fee,
@@ -268,7 +243,6 @@ class Booking:
 
     @staticmethod
     def update_status(booking_id, status):
-        """Update booking status."""
         execute_query(
             "UPDATE bookings SET status = %s WHERE id = %s",
             (status, booking_id)
@@ -277,7 +251,6 @@ class Booking:
 
     @staticmethod
     def delete(booking_id):
-        """Delete a booking."""
         execute_query("DELETE FROM bookings WHERE id = %s", (booking_id,))
 
     def __repr__(self):
@@ -288,7 +261,6 @@ class BookingItem:
     """Booking item model for individual services in a booking."""
 
     def __init__(self, booking_item_dict):
-        """Initialize booking item from database dictionary."""
         if booking_item_dict:
             self.id = booking_item_dict.get('id')
             self.booking_id = booking_item_dict.get('booking_id')
@@ -303,7 +275,6 @@ class BookingItem:
 
     @staticmethod
     def get_by_id(booking_item_id):
-        """Get booking item by ID."""
         item_data = fetch_one(
             "SELECT * FROM booking_items WHERE id = %s",
             (booking_item_id,)
@@ -312,7 +283,6 @@ class BookingItem:
 
     @staticmethod
     def get_by_booking(booking_id):
-        """Get all items for a booking."""
         items_data = fetch_all(
             "SELECT * FROM booking_items WHERE booking_id = %s",
             (booking_id,)
@@ -321,7 +291,6 @@ class BookingItem:
 
     @staticmethod
     def get_by_photographer(photographer_id):
-        """Get all booking items for a photographer."""
         items_data = fetch_all(
             "SELECT * FROM booking_items WHERE photographer_id = %s ORDER BY event_start DESC",
             (photographer_id,)
@@ -331,7 +300,6 @@ class BookingItem:
     @staticmethod
     def create(booking_id, service_package_id, photographer_id, service_price,
                event_start, event_location=None, event_notes=None, event_pax=None):
-        """Create a new booking item."""
         item_id = execute_query(
             """
             INSERT INTO booking_items (booking_id, service_package_id, photographer_id,
@@ -346,7 +314,6 @@ class BookingItem:
 
     @staticmethod
     def update(booking_item_id, **kwargs):
-        """Update booking item."""
         allowed_fields = ['service_price', 'event_start', 'event_location', 'event_notes', 'event_pax']
         updates = []
         values = []
@@ -365,7 +332,6 @@ class BookingItem:
 
     @staticmethod
     def delete(booking_item_id):
-        """Delete a booking item."""
         execute_query("DELETE FROM booking_items WHERE id = %s", (booking_item_id,))
 
     def __repr__(self):
@@ -376,7 +342,6 @@ class Payment:
     """Payment model for booking payments."""
 
     def __init__(self, payment_dict):
-        """Initialize payment from database dictionary."""
         if payment_dict:
             self.id = payment_dict.get('id')
             self.booking_id = payment_dict.get('booking_id')
@@ -390,7 +355,6 @@ class Payment:
 
     @staticmethod
     def get_by_id(payment_id):
-        """Get payment by ID."""
         payment_data = fetch_one(
             "SELECT * FROM payments WHERE id = %s",
             (payment_id,)
@@ -399,7 +363,6 @@ class Payment:
 
     @staticmethod
     def get_by_booking(booking_id):
-        """Get all payments for a booking."""
         payments_data = fetch_all(
             "SELECT * FROM payments WHERE booking_id = %s ORDER BY created_at DESC",
             (booking_id,)
@@ -409,7 +372,6 @@ class Payment:
     @staticmethod
     def create(booking_id, total_price, card_last4=None, cardholder_name=None,
                card_expiry=None, status='pending', payment_date=None):
-        """Create a new payment."""
         payment_id = execute_query(
             """
             INSERT INTO payments (booking_id, total_price, card_last4, cardholder_name,
@@ -423,7 +385,6 @@ class Payment:
 
     @staticmethod
     def update_status(payment_id, status, payment_date=None):
-        """Update payment status."""
         if payment_date is None:
             payment_date = datetime.utcnow()
         execute_query(

@@ -9,7 +9,6 @@ from ..services.auth_service import login_user, logout_user, is_authenticated, g
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    """Customer login - only allows customer role"""
     if is_authenticated():
         user = get_current_user()
         if user and user.get('role_name') == 'customer':
@@ -46,7 +45,6 @@ def login():
 
 @auth_bp.route('/photographer/login', methods=['GET', 'POST'])
 def photographer_login():
-    """Photographer login - only allows photographer role"""
     if is_authenticated():
         user = get_current_user()
         if user and user.get('role_name') == 'photographer':
@@ -82,7 +80,6 @@ def photographer_login():
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    """Customer registration - creates customer role and profile"""
     if is_authenticated():
         user = get_current_user()
         if user and user.get('role_name') == 'customer':
@@ -124,7 +121,6 @@ def register():
 
 @auth_bp.route('/photographer/register', methods=['GET', 'POST'])
 def photographer_register():
-    """Photographer registration - creates photographer role and profile"""
     if is_authenticated():
         user = get_current_user()
         if user and user.get('role_name') == 'photographer':

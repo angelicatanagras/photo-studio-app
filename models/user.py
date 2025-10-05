@@ -8,22 +8,18 @@ class Role:
 
     @staticmethod
     def get_by_id(role_id):
-        """Get a role by ID."""
         return fetch_one("SELECT * FROM roles WHERE id = %s", (role_id,))
 
     @staticmethod
     def get_by_name(name):
-        """Get a role by name."""
         return fetch_one("SELECT * FROM roles WHERE name = %s", (name,))
 
     @staticmethod
     def get_all():
-        """Get all roles."""
         return fetch_all("SELECT * FROM roles")
 
     @staticmethod
     def create(name):
-        """Create a new role."""
         role_id = execute_query(
             "INSERT INTO roles (name) VALUES (%s)",
             (name,)
@@ -35,7 +31,6 @@ class User:
     """User model for authentication and user management."""
 
     def __init__(self, user_dict):
-        """Initialize user from database dictionary."""
         if user_dict:
             self.id = user_dict.get('id')
             self.email = user_dict.get('email')
@@ -48,39 +43,32 @@ class User:
 
     @property
     def full_name(self):
-        """Get user's full name."""
         return f'{self.first_name} {self.last_name}'
 
     def set_password(self, password):
-        """Hash and set password."""
         return generate_password_hash(password, method='pbkdf2:sha256')
 
     @staticmethod
     def check_password(password_hash, password):
-        """Check if password matches hash."""
         return check_password_hash(password_hash, password)
 
     @staticmethod
     def get_by_id(user_id):
-        """Get a user by ID."""
         user_data = fetch_one("SELECT * FROM users WHERE id = %s", (user_id,))
         return User(user_data) if user_data else None
 
     @staticmethod
     def get_by_email(email):
-        """Get a user by email."""
         user_data = fetch_one("SELECT * FROM users WHERE email = %s", (email,))
         return User(user_data) if user_data else None
 
     @staticmethod
     def get_all():
-        """Get all users."""
         users_data = fetch_all("SELECT * FROM users")
         return [User(user) for user in users_data]
 
     @staticmethod
     def create(email, password, first_name, last_name, role_id, profile_image=None):
-        """Create a new user."""
         password_hash = generate_password_hash(password, method='pbkdf2:sha256')
         user_id = execute_query(
             """
@@ -95,7 +83,6 @@ class User:
 
     @staticmethod
     def update(user_id, **kwargs):
-        """Update user fields."""
         allowed_fields = ['email', 'first_name', 'last_name', 'profile_image', 'role_id']
         updates = []
         values = []
@@ -114,7 +101,6 @@ class User:
 
     @staticmethod
     def update_password(user_id, new_password):
-        """Update user's password."""
         password_hash = generate_password_hash(new_password, method='pbkdf2:sha256')
         execute_query(
             "UPDATE users SET password_hash = %s WHERE id = %s",
@@ -123,7 +109,6 @@ class User:
 
     @staticmethod
     def delete(user_id):
-        """Delete a user."""
         execute_query("DELETE FROM users WHERE id = %s", (user_id,))
 
     def __repr__(self):

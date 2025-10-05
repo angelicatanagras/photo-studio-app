@@ -9,7 +9,6 @@ from ...services.auth_service import login_user, logout_user, is_authenticated, 
 @admin_bp.route('/', methods=['GET', 'POST'])
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    """Admin login - only allows admin role"""
     if is_authenticated():
         user = get_current_user()
         if user and user.get('role_name') == 'admin':
@@ -23,7 +22,6 @@ def login():
     if form.validate_on_submit():
         user = User.get_by_email(form.email.data)
         if user and User.check_password(user.password_hash, form.password.data):
-            # Check if user is an admin
             role = Role.get_by_id(user.role_id)
 
             if role and role['name'] != 'admin':
@@ -43,14 +41,15 @@ def login():
 @admin_bp.route('/dashboard')
 @role_required('admin')
 def dashboard():
-    """Admin dashboard - requires admin role"""
     user = get_current_user()
 
-    # Get statistics
     all_users = User.get_all()
-    customers = [u for u in all_users if Role.get_by_id(u.role_id)['name'] == 'customer']
-    photographers = [u for u in all_users if Role.get_by_id(u.role_id)['name'] == 'photographer']
-    admins = [u for u in all_users if Role.get_by_id(u.role_id)['name'] == 'admin']
+    customers = [u for u in all_users if Role.get_by_id(u.role_id)[
+        'name'] == 'customer']
+    photographers = [u for u in all_users if Role.get_by_id(
+        u.role_id)['name'] == 'photographer']
+    admins = [u for u in all_users if Role.get_by_id(u.role_id)[
+        'name'] == 'admin']
 
     return render_template(
         'admin/dashboard.html',
@@ -66,7 +65,6 @@ def dashboard():
 @admin_bp.route('/users')
 @role_required('admin')
 def users():
-    """List all users - requires admin role"""
     all_users = User.get_all()
     users_with_roles = []
 

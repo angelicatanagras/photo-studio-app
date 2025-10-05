@@ -6,7 +6,6 @@ class Photographer:
     """Photographer profile model."""
 
     def __init__(self, photographer_dict):
-        """Initialize photographer from database dictionary."""
         if photographer_dict:
             self.id = photographer_dict.get('id')
             self.user_id = photographer_dict.get('user_id')
@@ -16,7 +15,6 @@ class Photographer:
             self.social_link = photographer_dict.get('social_link')
             self.created_at = photographer_dict.get('created_at')
 
-            # Create user object if user data is present
             if 'user_first_name' in photographer_dict:
                 self.user = type('User', (), {
                     'id': photographer_dict.get('user_id'),
@@ -31,7 +29,6 @@ class Photographer:
 
     @staticmethod
     def get_by_id(photographer_id):
-        """Get photographer by ID with user information."""
         photographer_data = fetch_one(
             """
             SELECT p.*,
@@ -49,7 +46,6 @@ class Photographer:
 
     @staticmethod
     def get_by_user_id(user_id):
-        """Get photographer by user ID with user information."""
         photographer_data = fetch_one(
             """
             SELECT p.*,
@@ -67,7 +63,6 @@ class Photographer:
 
     @staticmethod
     def get_all():
-        """Get all photographers with their user information."""
         photographers_data = fetch_all(
             """
             SELECT p.*,
@@ -84,7 +79,6 @@ class Photographer:
 
     @staticmethod
     def create(user_id, bio=None, phone=None, location=None, social_link=None):
-        """Create a new photographer profile."""
         photographer_id = execute_query(
             """
             INSERT INTO photographers (user_id, bio, phone, location, social_link, created_at)
@@ -96,7 +90,6 @@ class Photographer:
 
     @staticmethod
     def update(photographer_id, **kwargs):
-        """Update photographer profile."""
         allowed_fields = ['bio', 'phone', 'location', 'social_link']
         updates = []
         values = []
@@ -115,8 +108,8 @@ class Photographer:
 
     @staticmethod
     def delete(photographer_id):
-        """Delete a photographer profile."""
-        execute_query("DELETE FROM photographers WHERE id = %s", (photographer_id,))
+        execute_query("DELETE FROM photographers WHERE id = %s",
+                      (photographer_id,))
 
     def __repr__(self):
         return f'<Photographer {self.id}>'
@@ -126,7 +119,6 @@ class Customer:
     """Customer profile model."""
 
     def __init__(self, customer_dict):
-        """Initialize customer from database dictionary."""
         if customer_dict:
             self.id = customer_dict.get('id')
             self.user_id = customer_dict.get('user_id')
@@ -134,7 +126,6 @@ class Customer:
             self.address = customer_dict.get('address')
             self.created_at = customer_dict.get('created_at')
 
-            # Create user object if user data is present
             if 'user_first_name' in customer_dict:
                 self.user = type('User', (), {
                     'id': customer_dict.get('user_id'),
@@ -149,7 +140,6 @@ class Customer:
 
     @staticmethod
     def get_by_id(customer_id):
-        """Get customer by ID with user information."""
         customer_data = fetch_one(
             """
             SELECT c.*,
@@ -167,7 +157,6 @@ class Customer:
 
     @staticmethod
     def get_by_user_id(user_id):
-        """Get customer by user ID with user information."""
         customer_data = fetch_one(
             """
             SELECT c.*,
@@ -185,7 +174,6 @@ class Customer:
 
     @staticmethod
     def get_all():
-        """Get all customers with their user information."""
         customers_data = fetch_all(
             """
             SELECT c.*,
@@ -202,7 +190,6 @@ class Customer:
 
     @staticmethod
     def create(user_id, phone=None, address=None):
-        """Create a new customer profile."""
         customer_id = execute_query(
             """
             INSERT INTO customers (user_id, phone, address, created_at)
@@ -214,7 +201,6 @@ class Customer:
 
     @staticmethod
     def update(customer_id, phone=None, address=None):
-        """Update customer profile."""
         execute_query(
             "UPDATE customers SET phone = %s, address = %s WHERE id = %s",
             (phone, address, customer_id)
@@ -223,7 +209,6 @@ class Customer:
 
     @staticmethod
     def delete(customer_id):
-        """Delete a customer profile."""
         execute_query("DELETE FROM customers WHERE id = %s", (customer_id,))
 
     def __repr__(self):
@@ -234,7 +219,6 @@ class PortfolioItem:
     """Portfolio item model for photographer portfolios."""
 
     def __init__(self, portfolio_dict):
-        """Initialize portfolio item from database dictionary."""
         if portfolio_dict:
             self.id = portfolio_dict.get('id')
             self.photographer_id = portfolio_dict.get('photographer_id')
@@ -245,7 +229,6 @@ class PortfolioItem:
 
     @staticmethod
     def get_by_id(portfolio_id):
-        """Get portfolio item by ID."""
         portfolio_data = fetch_one(
             "SELECT * FROM portfolio_items WHERE id = %s",
             (portfolio_id,)
@@ -254,7 +237,6 @@ class PortfolioItem:
 
     @staticmethod
     def get_by_photographer(photographer_id):
-        """Get all portfolio items for a photographer."""
         portfolio_data = fetch_all(
             "SELECT * FROM portfolio_items WHERE photographer_id = %s ORDER BY created_at DESC",
             (photographer_id,)
@@ -263,13 +245,12 @@ class PortfolioItem:
 
     @staticmethod
     def get_all():
-        """Get all portfolio items."""
-        portfolio_data = fetch_all("SELECT * FROM portfolio_items ORDER BY created_at DESC")
+        portfolio_data = fetch_all(
+            "SELECT * FROM portfolio_items ORDER BY created_at DESC")
         return [PortfolioItem(p) for p in portfolio_data]
 
     @staticmethod
     def create(photographer_id, title, image_path, caption=None):
-        """Create a new portfolio item."""
         portfolio_id = execute_query(
             """
             INSERT INTO portfolio_items (photographer_id, title, caption, image_path, created_at)
@@ -281,8 +262,8 @@ class PortfolioItem:
 
     @staticmethod
     def update(portfolio_id, title=None, caption=None, image_path=None):
-        """Update portfolio item."""
-        allowed_fields = {'title': title, 'caption': caption, 'image_path': image_path}
+        allowed_fields = {'title': title,
+                          'caption': caption, 'image_path': image_path}
         updates = []
         values = []
 
@@ -300,8 +281,8 @@ class PortfolioItem:
 
     @staticmethod
     def delete(portfolio_id):
-        """Delete a portfolio item."""
-        execute_query("DELETE FROM portfolio_items WHERE id = %s", (portfolio_id,))
+        execute_query(
+            "DELETE FROM portfolio_items WHERE id = %s", (portfolio_id,))
 
     def __repr__(self):
         return f'<PortfolioItem {self.title}>'

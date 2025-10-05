@@ -50,29 +50,29 @@
             <ul class="navbar-nav me-auto">
               <li class="nav-item">
                 <a class="nav-link text-white" href="{{ url_for('admin.dashboard') }}">
-                  <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                  Dashboard
                 </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link text-white" href="{{ url_for('admin.users') }}">
-                  <i class="bi bi-people me-1"></i>Users
+                  Users
                 </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link text-white" href="#">
-                  <i class="bi bi-calendar-check me-1"></i>Bookings
+                  Bookings
                 </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link text-white" href="#">
-                  <i class="bi bi-gear me-1"></i>Settings
+                  Settings
                 </a>
               </li>
             </ul>
             {% if is_authenticated %}
               <div class="dropdown">
                 <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="bi bi-shield-lock me-1"></i>{{ current_user.first_name }} (Admin)
+                  {{ current_user.first_name }} (Admin)
                 </a>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="#">Profile</a></li>
