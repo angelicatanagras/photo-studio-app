@@ -29,7 +29,21 @@ cd photostudio-booking-app
 
 ### 2. Create Virtual Environment
 
+#### Windows (CMD)
 ```bash
+python -m venv venv
+venv\Scripts\activate.bat
+```
+
+#### Windows (PowerShell / pwsh)
+
+```cmd
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+#### macOS / Linux
+```powershell
 python -m venv venv
 source venv/bin/activate
 ```
