@@ -1,0 +1,64 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>450</x><y>0</y><w>210</w><h>240</h></coordinates><panel_attributes>User
+--
+-id: String
++email: String
+-passwordHash: String
++firstName: String
++lastName: String
++profileImage: String
++mobile: String
++address: String
+--
++login(email,password): bool
++updateProfile(info): bool
++logout(): bool
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>310</y><w>210</w><h>120</h></coordinates><panel_attributes>Photographer
+--
+-id: User
+-bio: String
+-location: String
+-socialLink: String
+--
++updateProfile()
++uploadImage()
++updateImage()
++viewBookings()
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>610</x><y>310</y><w>210</w><h>120</h></coordinates><panel_attributes>Customer
+--
+-id: User
+-billingAddress: String
+--
++searchPhotographer()
++addToCart()
++placeOrder()
++viewOrderHistory()
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>570</x><y>230</y><w>160</w><h>100</h></coordinates><panel_attributes>lt=&lt;&lt;-
+m1=0..*
+m2=1</panel_attributes><additional_attributes>10;10;140;80</additional_attributes></element><element><id>Relation</id><coordinates><x>400</x><y>230</y><w>160</w><h>100</h></coordinates><panel_attributes>lt=&lt;&lt;-
+m1=0..*
+m2=1</panel_attributes><additional_attributes>140;10;10;80</additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>320</y><w>210</w><h>90</h></coordinates><panel_attributes>Category
+--
+-id: String
+-categoryName: String
+--
++getPhotographersInCategory()
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>200</x><y>340</y><w>130</w><h>50</h></coordinates><panel_attributes>lt=-
+m1=0..*
+m2=1..5
+</panel_attributes><additional_attributes>10;20;110;20</additional_attributes></element><element><id>UMLClass</id><coordinates><x>310</x><y>500</y><w>210</w><h>120</h></coordinates><panel_attributes>Packages
+--
+-id: String
+-packageName: String
+-price: Float
+-inclusions: String
+--
++updateProfile()
++uploadImage()
++updateImage()
++viewBookings()
+
+</panel_attributes><additional_attributes></additional_attributes></element></diagram>
