@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
-        {% if title %}
-            {{ title }} - Every Photograph
-        {% else %}
-            Every Photograph | Admin Dashboard
-        {% endif %}
+      {% if title %} {{ title }} - ClickConnect {% else %} ClickConnect | Admin
+      Dashboard {% endif %}
     </title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
@@ -20,20 +17,21 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
     />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+  </head>
+  <body>
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
-      <div class="container">
-        <img
-          src="{{ url_for('static', filename='images/logo2.png') }}"
-          alt="EP Logo"
-          class="img-fluid"
-          style="max-height: 50px"
-        />
-        <a class="navbar-brand fw-bold text-orange" href="{{ url_for('admin.dashboard') }}"
-          >Every Photograph - Admin</a
-        >
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('customer.index') }}">
+          <img
+            src="{{ url_for('static', filename='images/logo3.png') }}"
+            alt="CC Logo"
+            class="logo"
+          />
+        </a>
         <button
           class="navbar-toggler"
           type="button"
@@ -49,37 +47,49 @@
           <div class="navbar-nav ms-auto">
             <ul class="navbar-nav me-auto">
               <li class="nav-item">
-                <a class="nav-link text-white" href="{{ url_for('admin.dashboard') }}">
+                <a
+                  class="nav-link text-white"
+                  href="{{ url_for('admin.dashboard') }}"
+                >
                   Dashboard
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link text-white" href="{{ url_for('admin.users') }}">
+                <a
+                  class="nav-link text-white"
+                  href="{{ url_for('admin.users') }}"
+                >
                   Users
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link text-white" href="#">
-                  Bookings
-                </a>
+                <a class="nav-link text-white" href="#"> Bookings </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link text-white" href="#">
-                  Settings
-                </a>
+                <a class="nav-link text-white" href="#"> Settings </a>
               </li>
             </ul>
             {% if is_authenticated %}
-              <div class="dropdown">
-                <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  {{ current_user.first_name }} (Admin)
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Profile</a></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
-                </ul>
-              </div>
+            <div class="dropdown">
+              <a
+                class="nav-link dropdown-toggle text-white"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                {{ current_user.first_name }} (Admin)
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Profile</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="{{ url_for('auth.logout') }}"
+                    >Logout</a
+                  >
+                </li>
+              </ul>
+            </div>
             {% endif %}
           </div>
         </div>
@@ -87,27 +97,35 @@
     </nav>
 
     <main>
-        <div class="container mt-4">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+      <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %}
+        <div
+          class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
+          role="alert"
+        >
+          {{ message }}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+          ></button>
         </div>
+        {% endfor %} {% endif %} {% endwith %}
+      </div>
 
-        {% block content %}{% endblock %}
+      {% block content %}{% endblock %}
     </main>
 
     <footer class="text-secondary footer">
       <div class="container">
         <div class="row">
           <div class="col-12 col-md-6 col-lg-3 footer_logo">
-            <img class="footer_logo_img" src="{{ url_for('static', filename='images/logo2.png') }}" alt="Every Photograph Logo" />
+            <img
+              class="footer_logo_img"
+              src="{{ url_for('static', filename='images/logo3.png') }}"
+              alt="CC Logo"
+            />
           </div>
           <div class="col-12 col-md-6 col-lg-3">
             <h6>ADMIN PANEL</h6>
@@ -147,5 +165,5 @@
       integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
       crossorigin="anonymous"
     ></script>
-</body>
+  </body>
 </html>

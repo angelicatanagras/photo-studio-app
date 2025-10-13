@@ -37,6 +37,7 @@ h1 {
 }
 .text-charcoal {
   color: var(--charcoal) !important;
+ 
 }
 .btn-orange {
   background-color: var(--orange);
@@ -90,6 +91,13 @@ a {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
+
+.logo {
+    width: 140px;
+    max-height: 60px;
+    object-fit: cover
+ }
+
 
 .hero_banner {
   background-image: url("../images/hero_banner.jpg");
