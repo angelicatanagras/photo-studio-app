@@ -1,0 +1,54 @@
+{% extends "layouts/auth_base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center min-vh-100 align-items-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="section_card">
+                <div class="text-center mb-4">
+                    <img src="{{ url_for('static', filename='img/logo2.png') }}" alt="Every Photograph" class="img-fluid" style="max-height: 80px;">
+                    <h3 class="card-title text-charcoal mt-3">Welcome Back</h3>
+                    <p class="text-muted">Sign in to your account</p>
+                </div>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label text-charcoal") }}
+                        {{ form.email(class="form-control", placeholder="Enter your email") }}
+                        {% if form.email.errors %}
+                            {% for error in form.email.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label text-charcoal") }}
+                        {{ form.password(class="form-control", placeholder="Enter your password") }}
+                        {% if form.password.errors %}
+                            {% for error in form.password.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        {{ form.remember_me(class="form-check-input") }}
+                        {{ form.remember_me.label(class="form-check-label text-charcoal") }}
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        {{ form.submit(class="btn btn-orange", value="Sign In") }}
+                    </div>
+                </form>
+
+                <div class="text-center">
+                    <p class="text-muted">Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-teal">Register here</a></p>
+                    <p class="text-muted small">Photographer? <a href="{{ url_for('auth.photographer_login') }}" class="text-teal">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

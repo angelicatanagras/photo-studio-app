@@ -1,0 +1,284 @@
+{% extends "layouts/customer_base.html" %} {% block content %}
+<section
+  class="hero_banner text-white py-5 d-flex align-items-center justify-content-center"
+>
+  <div class="container text-center">
+    <h1 class="display-4 mb-5">Book Professional Photographers Near You</h1>
+    <div class="location-overlay mt-5">
+      <h4 class="text-dark mb-4">Let's find your photographers nearby</h4>
+      <form action="/" method="GET">
+        <div class="location-input mb-3">
+          <input
+            type="text"
+            name="location"
+            placeholder="Enter your postcode"
+            required
+          />
+          <i
+            class="bi bi-geo-alt location-icon position-absolute text-muted"
+          ></i>
+        </div>
+        <button type="submit" class="search-btn text-white">
+          <i class="bi bi-search me-2"></i>Search
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="photographers" class="category_section mt-5 mb-3">
+  <div class="container">
+    <div class="row align-items-center justify-content-between gap-3">
+      <div class="col-auto">
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+          <select class="form-select form-select-sm" style="width: 150px">
+            <option>All Categories</option>
+            {% for category in service_categories %}
+            <option value="{{ category.id }}">
+              {{ category.category_name }}
+            </option>
+            {% endfor %}
+          </select>
+
+          <select class="form-select form-select-sm" style="width: 120px">
+            <option>All Locations</option>
+            {% for location in photographer_locations %}
+            <option value="{{ location }}">{{ location }}</option>
+            {% endfor %}
+          </select>
+
+          <button class="btn btn-outline-secondary btn-sm">
+            <span class="bi bi-funnel"></span> Filter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="m-5">
+    <h2 class="text-center">Photographers for Every Season</h2>
+  </div>
+
+  <div class="row g-2 g-md-3 py-3 justify-content-center">
+    {% if photographers %} {% for photographer in photographers %}
+    <div class="col-10 col-sm-6 col-md-4 col-lg-3">
+      <div class="card border-0 photog-card">
+        <div class="image-container">
+          <img
+            src="{{ url_for('static', filename='img/photog-1.jpg') }}"
+            class="card-img-top photog-card-img"
+            alt="{{ photographer.user.full_name }}"
+          />
+          <div class="photog-location-overlay">
+            <p class="card-text">
+              📍 {{ photographer.location or 'Location not specified' }}
+            </p>
+          </div>
+        </div>
+        <div class="photog-card-body">
+          <h5 class="card-title">{{ photographer.user.full_name }}</h5>
+          <div class="card-tags">
+            <i class="bi bi-tag"></i>
+            {% if photographer.services %} {% for service in
+            photographer.services[:2] %} {{ service.category.category_name }}{%
+            if not loop.last %}, {% endif %} {% endfor %} {% else %} Services
+            available {% endif %}
+          </div>
+          <a class="icon-link icon-link-hover btn-gradient" href="#">
+            View Portfolio
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="bi"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
+              <path
+                d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"
+              />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %} {% else %}
+    <!-- Empty State for Photographers -->
+    <div class="col-12">
+      <div class="empty-state">
+        <i class="bi bi-camera empty-state-icon"></i>
+        <h3>No Photographers Available</h3>
+        <p>
+          We're currently building our network of professional photographers.
+          Please check back soon or contact us to learn about upcoming
+          photographers in your area.
+        </p>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-orange"
+          >Join as Photographer</a
+        >
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if photographers and photographers|length > 8 %}
+  <nav
+    class="mt-4 d-flex justify-content-center justify-content-md-start"
+    aria-label="Page navigation"
+  >
+    <ul class="pagination justify-content-end">
+      <li class="page-item disabled">
+        <a class="page-link" href="#" tabindex="-1">Previous</a>
+      </li>
+      <li class="page-item"><a class="page-link" href="#">1</a></li>
+      <li class="page-item"><a class="page-link" href="#">2</a></li>
+      <li class="page-item"><a class="page-link" href="#">3</a></li>
+      <li class="page-item">
+        <a class="page-link" href="#">Next</a>
+      </li>
+    </ul>
+  </nav>
+  {% endif %}
+</section>
+
+<!-- Category list section-->
+<section class="py-5 bg-light" id="categories">
+  <div class="container">
+    <h2 class="text-center mb-5 mb-5 text-charcoal">
+      Browse categories that suit your event
+    </h2>
+    {% if service_categories %}
+    <div id="category_carousel" class="carousel slide">
+      <div class="carousel-indicators">
+        <button
+          type="button"
+          data-bs-target="#category_carousel"
+          data-bs-slide-to="0"
+          class="active"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#category_carousel"
+          data-bs-slide-to="1"
+        ></button>
+      </div>
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <div class="row g-4 justify-content-center">
+            {% for category in service_categories[:4] %}
+            <div class="col-lg-3 col-md-4 col-6">
+              <div class="w-100">
+                {% set category_lower = category.category_name.lower().replace('
+                photography', '').replace(' ', '_') %}
+                <img
+                  src="{{ url_for('static', filename='img/' + category_lower + '.jpg') }}"
+                  class="w-100 category-image"
+                  alt="{{ category.category_name }}"
+                  onerror="this.src='{{ url_for('static', filename='img/portrait.jpg') }}'"
+                />
+                <div class="mt-3">
+                  <div class="text-dark">
+                    <span class="fw-bold">{{ category.category_name }}</span>
+                  </div>
+                  <div>
+                    <p>
+                      {{ category.description or 'Professional ' +
+                      category.category_name.lower() + ' photography services.'
+                      }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% if service_categories|length > 4 %}
+        <div class="carousel-item">
+          <div class="row g-4 justify-content-center">
+            {% for category in service_categories[4:8] %}
+            <div class="col-lg-3 col-md-4 col-6">
+              <div class="w-100">
+                {% set category_lower = category.category_name.lower().replace('
+                photography', '').replace(' ', '_') %}
+                <img
+                  src="{{ url_for('static', filename='img/' + category_lower + '.jpg') }}"
+                  class="w-100 category-image"
+                  alt="{{ category.category_name }}"
+                  onerror="this.src='{{ url_for('static', filename='img/portrait.jpg') }}'"
+                />
+                <div class="mt-3">
+                  <div class="text-dark">
+                    <span class="fw-bold">{{ category.category_name }}</span>
+                  </div>
+                  <div>
+                    <p>
+                      {{ category.description or 'Professional ' +
+                      category.category_name.lower() + ' photography services.'
+                      }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#category_carousel"
+        data-bs-slide="prev"
+      >
+        <span
+          class="carousel-control-prev-icon bg-charcoal rounded-circle p-3"
+        ></span>
+      </button>
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#category_carousel"
+        data-bs-slide="next"
+      >
+        <span
+          class="carousel-control-next-icon bg-charcoal rounded-circle p-3"
+        ></span>
+      </button>
+    </div>
+    {% else %}
+    <!-- Empty State for Categories -->
+    <div class="empty-state">
+      <i class="bi bi-grid empty-state-icon"></i>
+      <h3>No Categories Available</h3>
+      <p>
+        We're setting up our photography categories. Please check back soon for
+        a variety of professional photography services.
+      </p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Contact us section-->
+<section id="contact" class="py-5 position-relative">
+  <div class="container h-100">
+    <div class="row h-100 align-items-center">
+      <div class="col-lg-6">
+        <h2 class="display-4 fw-bold text-charcoal mb-3">
+          Create your stories in the most memorable way
+        </h2>
+        <p class="text-charcoal mb-4">
+          Book talented photographers for birthdays, life events, and
+          professional branding
+        </p>
+        <div class="d-flex flex-column flex-sm-row gap-3">
+          <a href="#photographers" class="btn btn-orange"
+            >Browse Photographers</a
+          >
+          <a href="#contact" class="btn btn-outline-secondary"> Contact us </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
