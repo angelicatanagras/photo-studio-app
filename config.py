@@ -14,7 +14,8 @@ if os.path.exists(env_file):
 
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+    SECRET_KEY = os.environ.get(
+        'SECRET_KEY') or 'dev-secret-key-change-in-production'
 
     # Flask-MySQLdb Configuration
     MYSQL_HOST = os.environ.get('DB_HOST') or 'localhost'
@@ -23,13 +24,6 @@ class Config:
     MYSQL_USER = os.environ.get('DB_USER') or 'root'
     MYSQL_PASSWORD = os.environ.get('DB_PASSWORD') or ''
     MYSQL_CURSORCLASS = 'DictCursor'
-
-    # Email Configuration
-    MAIL_SERVER = os.environ.get('MAIL_SERVER')
-    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)
-    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
 
 class DevelopmentConfig(Config):
