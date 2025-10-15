@@ -5,9 +5,40 @@ from database import fetch_one  # root-level database.py
 
 from .models import User, Photographer, Customer, Category
 from .forms import LoginForm, RegistrationForm
-from services.helpers import (
-    add_to_cart, get_cart_items, remove_from_cart, update_cart, clear_cart
-)
+
+# Cart helper functions
+def get_cart_items():
+    return session.get('cart', {})
+
+def add_to_cart(item_id, title, price, qty=1):
+    cart = session.get('cart', {})
+    if item_id in cart:
+        cart[item_id]['qty'] += qty
+    else:
+        cart[item_id] = {'title': title, 'price': price, 'qty': qty}
+    session['cart'] = cart
+    session.modified = True
+
+def remove_from_cart(item_id):
+    cart = session.get('cart', {})
+    if item_id in cart:
+        del cart[item_id]
+        session['cart'] = cart
+        session.modified = True
+
+def update_cart(item_id, qty):
+    cart = session.get('cart', {})
+    if item_id in cart:
+        if qty > 0:
+            cart[item_id]['qty'] = qty
+        else:
+            del cart[item_id]
+        session['cart'] = cart
+        session.modified = True
+
+def clear_cart():
+    session.pop('cart', None)
+    session.modified = True
 
 # Auth service functions
 

@@ -1,10 +1,10 @@
 import os
 from flask import Flask
 from flask_mysqldb import MySQL
-from config import config  # root-level config.py
-from services.helpers import inject_cart  # root-level services/
+from config import config
 
 mysql = MySQL()
+
 
 def create_app(config_name=None):
     if config_name is None:
@@ -18,7 +18,6 @@ def create_app(config_name=None):
     # context processors
     from .views import inject_current_user
     app.context_processor(inject_current_user)
-    app.context_processor(inject_cart)
 
     # blueprints
     from .views import customer_bp, photographer_bp, auth_bp, admin_bp
