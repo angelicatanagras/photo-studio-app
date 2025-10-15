@@ -3,7 +3,7 @@ from contextlib import contextmanager
 
 
 def get_db():
-    from .app import mysql
+    from project import mysql
     return mysql
 
 
