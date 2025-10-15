@@ -32,6 +32,7 @@
             class="logo"
           />
         </a>
+
         <button
           class="navbar-toggler"
           type="button"
@@ -43,12 +44,15 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
+
         <div id="navbarScroll" class="collapse navbar-collapse">
+          <!-- Left & center nav links -->
           <div class="navbar-nav ms-auto">
             <ul class="navbar-nav me-auto">
               <li class="nav-item">
                 <a class="nav-link text-white" href="#about">About</a>
               </li>
+
               <li class="nav-item dropdown">
                 <a
                   class="nav-link dropdown-toggle text-white"
@@ -60,35 +64,23 @@
                   Categories
                 </a>
                 <ul class="dropdown-menu">
-                  <li>
-                    <a class="dropdown-item" href="#categories">Portrait</a>
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="#categories">Maternity</a>
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="#categories">Creatives</a>
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="#categories"
-                      >Pet Photography</a
-                    >
-                  </li>
+                  <li><a class="dropdown-item" href="#categories">Portrait</a></li>
+                  <li><a class="dropdown-item" href="#categories">Maternity</a></li>
+                  <li><a class="dropdown-item" href="#categories">Creatives</a></li>
+                  <li><a class="dropdown-item" href="#categories">Pet Photography</a></li>
                   <li><hr class="dropdown-divider" /></li>
-                  <li>
-                    <a class="dropdown-item" href="#categories">Show more</a>
-                  </li>
+                  <li><a class="dropdown-item" href="#categories">Show more</a></li>
                 </ul>
               </li>
+
               <li class="nav-item">
-                <a class="nav-link text-white" href="#photographers"
-                  >Photographers</a
-                >
+                <a class="nav-link text-white" href="#photographers">Photographers</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link text-white" href="#contact">Contact</a>
               </li>
             </ul>
+
             <div class="d-flex flex-column flex-lg-row my-3 my-lg-0 mx-lg-3">
               <div class="d-flex">
                 <input
@@ -102,7 +94,9 @@
                 </button>
               </div>
             </div>
+
             {% if is_authenticated %}
+            <!-- Keep user dropdown in center area when logged in -->
             <div class="dropdown">
               <a
                 class="nav-link dropdown-toggle text-white"
@@ -117,39 +111,57 @@
                 <li><a class="dropdown-item" href="#">Profile</a></li>
                 <li><a class="dropdown-item" href="#">My Bookings</a></li>
                 <li><hr class="dropdown-divider" /></li>
-                <li>
-                  <a class="dropdown-item" href="{{ url_for('auth.logout') }}"
-                    >Logout</a
-                  >
-                </li>
+                <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
               </ul>
             </div>
-            {% else %}
-            <a class="nav-link px-3 rounded" href="{{ url_for('auth.login') }}"
-              >Sign In</a
-            >
             {% endif %}
+            <!-- NOTE: removed the old "else Sign In" from here -->
           </div>
+
+          <!-- Right-side group: Sign In (when logged out) + Cart -->
+          <ul class="navbar-nav ms-lg-auto align-items-center pe-3">
+            {% if not is_authenticated %}
+            <li class="nav-item me-2">
+              <a class="nav-link px-3 rounded" href="{{ url_for('auth.login') }}">
+                Sign In
+              </a>
+            </li>
+            {% endif %}
+            <li class="nav-item me-3">
+              <a
+                class="nav-link position-relative"
+                href="{{ url_for('customer.checkout') }}"
+                aria-label="Cart"
+              >
+                <i class="bi bi-cart" style="font-size:1.2rem;"></i>
+                <span
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                >
+                  {{ cart_count|default(0) }}
+                </span>
+              </a>
+            </li>
+          </ul>
+          <!-- /Right-side group -->
         </div>
       </div>
     </nav>
 
     <main>
       <div class="container mt-4">
-        {% with messages = get_flashed_messages(with_categories=true) %} {% if
-        messages %} {% for category, message in messages %}
-        <div
-          class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
-          role="alert"
-        >
-          {{ message }}
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="alert"
-          ></button>
-        </div>
-        {% endfor %} {% endif %} {% endwith %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+          <div
+            class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
+            role="alert"
+          >
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          {% endfor %}
+        {% endif %}
+        {% endwith %}
       </div>
 
       {% block content %}{% endblock %}
@@ -169,28 +181,19 @@
             <h6>ClickConnect</h6>
             <ul class="list">
               <li><a href="{{ url_for('customer.index') }}">Home</a></li>
-              <li><a href="#about">About</a></li>
+              <li><a href="{{ url_for('customer.about') }}">About</a></li>
               <li><a href="#categories">Categories</a></li>
               <li><a href="#photographers">Photographers</a></li>
-              <li><a href="#contact">Contact</a></li>
+              <li><a href="{{ url_for('customer.contact') }}">Contact</a></li>
             </ul>
           </div>
-
           <div class="col-12 col-md-6 col-lg-3">
             <h6>SOCIALS</h6>
             <div class="social-icons d-flex justify-content-start gap-3">
-              <a href="#" class="social-icon">
-                <span class="bi bi-facebook"></span>
-              </a>
-              <a href="#" class="social-icon">
-                <span class="bi bi-instagram"></span>
-              </a>
-              <a href="#" class="social-icon">
-                <span class="bi bi-linkedin"></span>
-              </a>
-              <a href="#" class="social-icon">
-                <span class="bi bi-youtube"></span>
-              </a>
+              <a href="#" class="social-icon"><span class="bi bi-facebook"></span></a>
+              <a href="#" class="social-icon"><span class="bi bi-instagram"></span></a>
+              <a href="#" class="social-icon"><span class="bi bi-linkedin"></span></a>
+              <a href="#" class="social-icon"><span class="bi bi-youtube"></span></a>
             </div>
           </div>
           <div class="col-12 col-md-6 col-lg-3">

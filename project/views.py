@@ -1,105 +1,84 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from urllib.parse import urlparse
 from functools import wraps
-from flask import session
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from database import fetch_one
+from database import fetch_one  # root-level database.py
 
 from .models import User, Photographer, Customer, Category
 from .forms import LoginForm, RegistrationForm
-
+from services.helpers import (
+    add_to_cart, get_cart_items, remove_from_cart, update_cart, clear_cart
+)
 
 # Auth service functions
+
 def login_user(user_id, remember=False):
     session['user_id'] = user_id
     session.permanent = remember
 
-
 def logout_user():
     session.clear()
 
-
 def get_current_user():
     user_id = session.get('user_id')
-    if user_id is None:
+    if not user_id:
         return None
-
-    user = fetch_one(
-        "SELECT * FROM users WHERE id = %s",
-        (user_id,)
-    )
-    return user
-
+    return fetch_one("SELECT * FROM users WHERE id = %s", (user_id,))
 
 def is_authenticated():
     return 'user_id' in session
 
-
 def login_required(f):
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated(*args, **kwargs):
         if not is_authenticated():
             flash('Please log in to access this page.', 'warning')
             return redirect(url_for('auth.login', next=request.url))
         return f(*args, **kwargs)
-    return decorated_function
-
+    return decorated
 
 def role_required(*roles):
     def decorator(f):
         @wraps(f)
-        def decorated_function(*args, **kwargs):
+        def decorated(*args, **kwargs):
             if not is_authenticated():
                 flash('Please log in to access this page.', 'warning')
                 if 'Admin' in roles:
                     return redirect(url_for('admin.login', next=request.url))
                 elif 'Photographer' in roles:
                     return redirect(url_for('auth.photographer_login', next=request.url))
-                else:
-                    return redirect(url_for('auth.login', next=request.url))
-
+                return redirect(url_for('auth.login', next=request.url))
             user = get_current_user()
             if user and user.get('role') not in roles:
                 flash('You do not have permission to access this page.', 'danger')
                 if user.get('role') == 'Admin':
                     return redirect(url_for('admin.dashboard'))
-                elif user.get('role') == 'Photographer':
+                if user.get('role') == 'Photographer':
                     return redirect(url_for('photographer.dashboard'))
-                else:
-                    return redirect(url_for('customer.index'))
-
+                return redirect(url_for('customer.index'))
             return f(*args, **kwargs)
-        return decorated_function
+        return decorated
     return decorator
 
-
 def inject_current_user():
-    return dict(
-        current_user=get_current_user(),
-        is_authenticated=is_authenticated()
-    )
-
+    return dict(current_user=get_current_user(), is_authenticated=is_authenticated())
 
 # Create Blueprints
+
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 customer_bp = Blueprint('customer', __name__)
 photographer_bp = Blueprint('photographer', __name__, url_prefix='/photographer')
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
-
 # ===== AUTH ROUTES =====
-
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if is_authenticated():
         user = get_current_user()
         if user and user.get('role') == 'Customer':
             return redirect(url_for('customer.index'))
-        elif user and user.get('role') == 'Photographer':
+        if user and user.get('role') == 'Photographer':
             return redirect(url_for('photographer.dashboard'))
-        elif user and user.get('role') == 'Admin':
+        if user and user.get('role') == 'Admin':
             return redirect(url_for('admin.dashboard'))
 
     form = LoginForm()
@@ -112,16 +91,13 @@ def login():
                 else:
                     flash('This login is for customers only. Please use the photographer login.', 'error')
                 return render_template('auth/login.html', title='Customer Sign In', form=form)
-
             login_user(user.id, remember=form.remember_me.data)
             next_page = request.args.get('next')
             if not next_page or urlparse(next_page).netloc != '':
                 next_page = url_for('customer.index')
             return redirect(next_page)
         flash('Invalid email or password', 'error')
-
     return render_template('auth/login.html', title='Customer Sign In', form=form)
-
 
 @auth_bp.route('/photographer/login', methods=['GET', 'POST'])
 def photographer_login():
@@ -129,9 +105,9 @@ def photographer_login():
         user = get_current_user()
         if user and user.get('role') == 'Photographer':
             return redirect(url_for('photographer.dashboard'))
-        elif user and user.get('role') == 'Customer':
+        if user and user.get('role') == 'Customer':
             return redirect(url_for('customer.index'))
-        elif user and user.get('role') == 'Admin':
+        if user and user.get('role') == 'Admin':
             return redirect(url_for('admin.dashboard'))
 
     form = LoginForm()
@@ -144,16 +120,13 @@ def photographer_login():
                 else:
                     flash('This login is for photographers only. Please use the customer login.', 'error')
                 return render_template('auth/photographer_login.html', title='Photographer Sign In', form=form)
-
             login_user(user.id, remember=form.remember_me.data)
             next_page = request.args.get('next')
             if not next_page or urlparse(next_page).netloc != '':
                 next_page = url_for('photographer.dashboard')
             return redirect(next_page)
         flash('Invalid email or password', 'error')
-
     return render_template('auth/photographer_login.html', title='Photographer Sign In', form=form)
-
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -161,9 +134,9 @@ def register():
         user = get_current_user()
         if user and user.get('role') == 'Customer':
             return redirect(url_for('customer.index'))
-        elif user and user.get('role') == 'Photographer':
+        if user and user.get('role') == 'Photographer':
             return redirect(url_for('photographer.dashboard'))
-        elif user and user.get('role') == 'Admin':
+        if user and user.get('role') == 'Admin':
             return redirect(url_for('admin.dashboard'))
 
     form = RegistrationForm()
@@ -176,19 +149,14 @@ def register():
                 last_name=form.last_name.data,
                 role='Customer'
             )
-
             if user:
                 # Customer needs a postcode, using a default for now
                 Customer.create(user_id=user.id, postcode='0000')
-
             flash('Registration successful! You can now log in.', 'success')
             return redirect(url_for('auth.login'))
         except Exception as e:
             flash(f'Registration failed: {str(e)}', 'error')
-            return render_template('auth/register.html', title='Customer Registration', form=form)
-
     return render_template('auth/register.html', title='Customer Registration', form=form)
-
 
 @auth_bp.route('/photographer/register', methods=['GET', 'POST'])
 def photographer_register():
@@ -196,16 +164,15 @@ def photographer_register():
         user = get_current_user()
         if user and user.get('role') == 'Photographer':
             return redirect(url_for('photographer.dashboard'))
-        elif user and user.get('role') == 'Customer':
+        if user and user.get('role') == 'Customer':
             return redirect(url_for('customer.index'))
-        elif user and user.get('role') == 'Admin':
+        if user and user.get('role') == 'Admin':
             return redirect(url_for('admin.dashboard'))
 
     form = RegistrationForm()
     if form.validate_on_submit():
         try:
             from datetime import datetime
-
             user = User.create(
                 email=form.email.data,
                 password=form.password.data,
@@ -213,15 +180,12 @@ def photographer_register():
                 last_name=form.last_name.data,
                 role='Photographer'
             )
-
             if user:
                 # Photographer needs category_id, location, social_link, and availability
                 # Using defaults for now - should be collected in a more detailed form
-                default_category = Category.get_by_name('Portrait Photography')
-                if not default_category:
-                    # If no categories exist, create a default one
-                    default_category = Category.create('Portrait Photography', 'Professional portrait photography')
-
+                # If no categories exist, create a default one
+                default_category = Category.get_by_name('Portrait Photography') or \
+                                   Category.create('Portrait Photography', 'Professional portrait photography')
                 Photographer.create(
                     user_id=user.id,
                     category_id=default_category.id,
@@ -229,15 +193,11 @@ def photographer_register():
                     social_link='',
                     availability=datetime.utcnow()
                 )
-
             flash('Registration successful! You can now log in as a photographer.', 'success')
             return redirect(url_for('auth.photographer_login'))
         except Exception as e:
             flash(f'Registration failed: {str(e)}', 'error')
-            return render_template('auth/photographer_register.html', title='Photographer Registration', form=form)
-
     return render_template('auth/photographer_register.html', title='Photographer Registration', form=form)
-
 
 @auth_bp.route('/logout')
 def logout():
@@ -245,74 +205,90 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('customer.index'))
 
-
 # ===== CUSTOMER ROUTES =====
-
 @customer_bp.route('/')
 @customer_bp.route('/index')
 def index():
     photographers = Photographer.get_all()
     service_categories = Category.get_all()
-
     photographer_locations = []
-    for photographer in photographers:
-        if photographer.location and photographer.location not in photographer_locations:
-            photographer_locations.append(photographer.location)
+    for p in photographers:
+        if p.location and p.location not in photographer_locations:
+            photographer_locations.append(p.location)
+    return render_template(
+        'customer/index.html',
+        title='Home',
+        photographers=photographers,
+        service_categories=service_categories,
+        photographer_locations=photographer_locations
+    )
 
-    return render_template('customer/index.html',
-                           title='Home',
-                           photographers=photographers,
-                           service_categories=service_categories,
-                           photographer_locations=photographer_locations)
+# Basket actions
+@customer_bp.route('/basket/add', methods=['POST'])
+def basket_add():
+    item_id = request.form.get('id')
+    title = request.form.get('title')
+    price = request.form.get('price')
+    qty = int(request.form.get('qty', 1))
+    add_to_cart(item_id, title, price, qty)
+    return redirect(url_for('customer.checkout'))
 
+@customer_bp.route('/basket/remove/<item_id>')
+def basket_remove(item_id):
+    remove_from_cart(item_id)
+    return redirect(url_for('customer.checkout'))
 
-@customer_bp.route('/session/package')
-def session_package():
-    return render_template('customer/session_package.html',
-                           title='Select Package')
+@customer_bp.route('/basket/update/<item_id>', methods=['POST'])
+def basket_update(item_id):
+    qty = int(request.form.get('qty', 1))
+    update_cart(item_id, qty)
+    return redirect(url_for('customer.checkout'))
 
+@customer_bp.route('/basket/clear')
+def basket_clear():
+    clear_cart()
+    return redirect(url_for('customer.checkout'))
 
 @customer_bp.route('/checkout')
 def checkout():
-    return render_template('customer/checkout.html',
-                           title='Checkout')
-
+    cart = get_cart_items()
+    total = sum(float(i['price']) * int(i['qty']) for i in cart.values()) if cart else 0.0
+    return render_template('customer/checkout.html', title='Checkout', cart=cart, total=total)
 
 @customer_bp.route('/success')
 def success_page():
-    return render_template('customer/success_page.html',
-                           title='Booking Success')
+    return render_template('customer/success_page.html', title='Booking Success')
 
+# Simple pages if you added them
+@customer_bp.route('/about')
+def about():
+    return render_template('customer/about.html', title='About')
+
+@customer_bp.route('/contact')
+def contact():
+    return render_template('customer/contact.html', title='Contact')
 
 # ===== PHOTOGRAPHER ROUTES =====
-
 @photographer_bp.route('/dashboard')
 @photographer_bp.route('/admin')
 def dashboard():
-    """Photographer dashboard/admin page"""
-    return render_template('photographer/dashboard.html',
-                         title='Photographer Dashboard')
-
+    return render_template('photographer/dashboard.html', title='Photographer Dashboard')
 
 @photographer_bp.route('/gallery')
 def gallery():
-    """View photographer portfolio/gallery page"""
-    return render_template('photographer/gallery.html',
-                         title='My Gallery')
-
+    return render_template('photographer/gallery.html', title='My Gallery')
 
 # ===== ADMIN ROUTES =====
-
 @admin_bp.route('/', methods=['GET', 'POST'])
 @admin_bp.route('/login', methods=['GET', 'POST'])
-def login():
+def login():  # admin login
     if is_authenticated():
         user = get_current_user()
         if user and user.get('role') == 'Admin':
             return redirect(url_for('admin.dashboard'))
-        elif user and user.get('role') == 'Photographer':
+        if user and user.get('role') == 'Photographer':
             return redirect(url_for('photographer.dashboard'))
-        elif user and user.get('role') == 'Customer':
+        if user and user.get('role') == 'Customer':
             return redirect(url_for('customer.index'))
 
     form = LoginForm()
@@ -322,27 +298,22 @@ def login():
             if user.role != 'Admin':
                 flash('This login is for administrators only.', 'error')
                 return render_template('admin/login.html', title='Admin Sign In', form=form)
-
             login_user(user.id, remember=form.remember_me.data)
             next_page = request.args.get('next')
             if not next_page or urlparse(next_page).netloc != '':
                 next_page = url_for('admin.dashboard')
             return redirect(next_page)
         flash('Invalid email or password', 'error')
-
     return render_template('admin/login.html', title='Admin Sign In', form=form)
-
 
 @admin_bp.route('/dashboard')
 @role_required('Admin')
-def dashboard():
+def dashboard_admin():
     user = get_current_user()
-
     all_users = User.get_all()
     customers = [u for u in all_users if u.role == 'Customer']
     photographers = [u for u in all_users if u.role == 'Photographer']
     admins = [u for u in all_users if u.role == 'Admin']
-
     return render_template(
         'admin/dashboard.html',
         title='Admin Dashboard',
@@ -353,21 +324,9 @@ def dashboard():
         total_admins=len(admins)
     )
 
-
 @admin_bp.route('/users')
 @role_required('Admin')
 def users():
     all_users = User.get_all()
-    users_with_roles = []
-
-    for user in all_users:
-        users_with_roles.append({
-            'user': user,
-            'role': user.role
-        })
-
-    return render_template(
-        'admin/users.html',
-        title='Manage Users',
-        users=users_with_roles
-    )
+    users_with_roles = [{'user': u, 'role': u.role} for u in all_users]
+    return render_template('admin/users.html', title='Manage Users', users=users_with_roles)

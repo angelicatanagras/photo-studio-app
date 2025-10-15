@@ -166,8 +166,7 @@
             {% for category in service_categories[:4] %}
             <div class="col-lg-3 col-md-4 col-6">
               <div class="w-100">
-                {% set category_lower = category.category_name.lower().replace('
-                photography', '').replace(' ', '_') %}
+                {% set category_lower = category.category_name.lower().replace(' photography', '').replace(' ', '_') %}
                 <img
                   src="{{ url_for('static', filename='img/' + category_lower + '.jpg') }}"
                   class="w-100 category-image"
@@ -197,8 +196,7 @@
             {% for category in service_categories[4:8] %}
             <div class="col-lg-3 col-md-4 col-6">
               <div class="w-100">
-                {% set category_lower = category.category_name.lower().replace('
-                photography', '').replace(' ', '_') %}
+                {% set category_lower = category.category_name.lower().replace(' photography', '').replace(' ', '_') %}
                 <img
                   src="{{ url_for('static', filename='img/' + category_lower + '.jpg') }}"
                   class="w-100 category-image"
@@ -259,11 +257,13 @@
   </div>
 </section>
 
+
+
 <!-- Contact us section-->
 <section id="contact" class="py-5 position-relative">
   <div class="container h-100">
     <div class="row h-100 align-items-center">
-      <div class="col-lg-6">
+      <div class="col-12 col-lg-6">
         <h2 class="display-4 fw-bold text-charcoal mb-3">
           Create your stories in the most memorable way
         </h2>
@@ -281,4 +281,6 @@
     </div>
   </div>
 </section>
+
+
 {% endblock %}

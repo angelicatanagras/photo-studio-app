@@ -1,0 +1,30 @@
+{% extends "layouts/customer_base.html" %}
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <h1 class="display-5 fw-bold text-charcoal mb-3">About Every Photograph</h1>
+    <p class="mb-4 text-charcoal">
+      Every Photograph connects people with passionate photographers across styles and occasions.
+      Explore portfolios, compare packages, and book sessions that capture every moment beautifully.
+      Designed for ease and inspiration, it helps both customers and photographers thrive with a
+      clean, responsive experience.
+    </p>
+
+    <div class="row g-4 align-items-center">
+      <div class="col-12 col-lg-6">
+        <h3 class="h4 fw-bold mb-3">What you can do</h3>
+        <ul class="mb-4">
+          <li>Browse photographers by category and location</li>
+          <li>View curated portfolios and sample work</li>
+          <li>Compare clear, upfront packages</li>
+          <li>Book sessions with simple checkout</li>
+        </ul>
+      </div>
+      <div class="col-12 col-lg-6">
+        <img src="{{ url_for('static', filename='images/about_placeholder.jpg') }}"
+             alt="Every Photograph" class="img-fluid rounded-3">
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
