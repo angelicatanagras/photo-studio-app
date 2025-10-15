@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 from functools import wraps
 from database import fetch_one  # root-level database.py
 
-from .models import User, Photographer, Customer, Category
+from .models import User, Photographer, Customer, Category, Booking
 from .forms import LoginForm, RegistrationForm
 
 # Cart helper functions
@@ -279,6 +279,26 @@ def basket_update(item_id):
 def basket_clear():
     clear_cart()
     return redirect(url_for('customer.checkout'))
+@customer_bp.route('/bookings')
+@login_required
+def booking_history():
+    user = get_current_user()
+    
+    customer = Customer.get_by_user_id(user.get('id'))
+    if not customer:
+        flash("Customer profile not found.")
+        return redirect(url_for('customer.index'))
+    
+    bookings = Booking.get_by_customer_with_details(customer.id)
+    
+    return render_template(
+        'customer/booking_history.html',
+        title='My Bookings',
+        bookings=bookings
+    )
+
+
+    
 
 @customer_bp.route('/checkout')
 def checkout():

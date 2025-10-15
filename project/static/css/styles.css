@@ -434,28 +434,233 @@ a {
   align-items: center;
 }
 
-/* Empty state styles */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
+
+.booking-card {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.booking-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.booking-card-header {
+  background: black;
+  color: white;
+  padding: 1.25rem 1.5rem;
+  border: none;
+}
+
+.booking-number {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.booking-date {
+  font-size: 0.9rem;
+  opacity: 0.95;
+  margin: 0;
+}
+
+.status-badge {
+  padding: 0.5rem 1.25rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-completed {
+  background: #10b981;
+  color: white;
+}
+
+.status-pending {
+  background: #f59e0b;
+  color: white;
+}
+
+.status-cancelled {
+  background: #ef4444;
+  color: white;
+}
+
+.detail-section {
+  padding: 1.5rem;
+  background: white;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   color: #6c757d;
+  margin-bottom: 0.5rem;
 }
 
-.empty-state-icon {
-  font-size: 4rem;
-  color: var(--teal);
-  margin-bottom: 1rem;
+.detail-value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #212529;
 }
 
-.empty-state h3 {
-  color: var(--charcoal);
-  margin-bottom: 1rem;
+.photographer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
 }
 
-.empty-state p {
-  max-width: 500px;
-  margin: 0 auto 2rem;
-  line-height: 1.6;
+.photographer-avatar {
+  width: 40px;
+  height: 40px;
+  background: black;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.package-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: black;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  border: 2px solid #e0e7ff;
+}
+
+.package-badge i {
+  margin-right: 0.25rem;
+}
+
+.booking-total-section {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 1.5rem;
+  border-top: 2px dashed #dee2e6;
+}
+
+.total-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: black;
+}
+
+.payment-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: white;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.payment-status.paid {
+  color: #10b981;
+  border: 2px solid #10b981;
+}
+
+.payment-status.pending {
+  color: #f59e0b;
+  border: 2px solid #f59e0b;
+}
+
+.filter-pill {
+  border-radius: 50px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  border: 2px solid #e9ecef;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.filter-pill:hover,
+.filter-pill.active {
+  background: black;
+  color: white;
+  border-color: black;
+}
+
+.empty-state-card {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.empty-icon {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.7;
+}
+
+.btn-gradient {
+  background: #ffa726;
+  border: none;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 140, 0, 0.4);
+  color: black;
+}
+
+.stats-card {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-top: 4px solid black;
+}
+
+.stats-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: black;
+}
+
+.stats-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+@media (max-width: 576px) {
+  .stats-number {
+    font-size: 1.4rem; 
+  }
+
+  .stats-label {
+    font-size: 0.75rem; 
+    letter-spacing: 0.3px;
+  }
 }
 
 /** media query for checkout page **/

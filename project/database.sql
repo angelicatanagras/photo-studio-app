@@ -29,13 +29,6 @@ CREATE TABLE IF NOT EXISTS category (
     description VARCHAR(100)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS packages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    package_name VARCHAR(25),
-    price FLOAT NOT NULL,
-    inclusions TEXT NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS photographers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -45,6 +38,17 @@ CREATE TABLE IF NOT EXISTS photographers (
     social_link VARCHAR(200) NOT NULL,
     availability DATETIME NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (category_id) REFERENCES category(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS packages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    package_name ENUM('Basic', 'Standard', 'Premium') NOT NULL,
+    photographer_id INT NOT NULL,
+    category_id INT NOT NULL,
+    price FLOAT NOT NULL,
+    inclusions TEXT NOT NULL,
+    FOREIGN KEY (photographer_id) REFERENCES photographers(id),
     FOREIGN KEY (category_id) REFERENCES category(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -91,12 +95,6 @@ CREATE TABLE IF NOT EXISTS bookings (
     FOREIGN KEY (cart_id) REFERENCES cart(id),
     FOREIGN KEY (customer_id) REFERENCES customers(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Insert sample packages
-INSERT INTO packages (package_name, price, inclusions) VALUES
-    ('Basic', 250.00, '1-hour photo session, 10 edited digital images'),
-    ('Premium', 600.00, '3-hour session, 40 edited images, and prints')
-ON DUPLICATE KEY UPDATE package_name=package_name;
 
 -- Default credentials: admin@test.com / Admin123
 INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone, created_at)
@@ -181,3 +179,11 @@ WHERE u.email = 'photo@test.com'
 AND NOT EXISTS (
     SELECT 1 FROM photographers WHERE user_id = u.id
 );
+
+-- Insert sample packages
+INSERT INTO packages (package_name, photographer_id, category_id, price, inclusions) VALUES
+    ('Basic', 1, 1, 250.00, '1-hour photo session, 10 edited digital images'),
+    ('Standard', 1, 1, 350.00, '2-hour photo session, 25 edited digital images'),
+    ('Premium', 1, 1, 600.00, '3-hour session, 40 edited images, and prints')
+ON DUPLICATE KEY UPDATE package_name=package_name;
+
