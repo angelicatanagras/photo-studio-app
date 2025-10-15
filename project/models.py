@@ -732,6 +732,10 @@ class Booking:
             self.payment_date = booking_dict.get('payment_date')
             self.total_amount = booking_dict.get('total_amount')
             self.status = booking_dict.get('status')
+            self.cart_items = []
+            self.photographer_name = booking_dict.get('photographer_name')
+            self.package_name = booking_dict.get('package_name')
+            self.package_inclusions = booking_dict.get('package_inclusions')
 
     @staticmethod
     def get_by_id(booking_id):
@@ -740,7 +744,40 @@ class Booking:
             (booking_id,)
         )
         return Booking(booking_data) if booking_data else None
-
+    
+    @staticmethod
+    def get_by_customer_with_details(customer_id):
+        """Gets all bookings for a customer with related cart items and photographer details."""
+        bookings_data = fetch_all(
+            """
+            SELECT DISTINCT
+                b.id,
+                b.cart_id,
+                b.customer_id,
+                b.created_at,
+                b.updated_at,
+                b.payment_date,
+                b.total_amount,
+                b.status,
+                GROUP_CONCAT(DISTINCT CONCAT(u.first_name, ' ', u.last_name) SEPARATOR ', ') as photographer_name,
+                GROUP_CONCAT(DISTINCT pkg.package_name SEPARATOR ', ') as package_name,
+                GROUP_CONCAT(DISTINCT pkg.inclusions SEPARATOR '; ') as package_inclusions
+            FROM bookings b
+            LEFT JOIN cart c ON c.id = b.cart_id
+            LEFT JOIN cart_item ci ON ci.cart_id = c.id
+            LEFT JOIN photographers ph ON ph.id = ci.photographer_id
+            LEFT JOIN users u ON u.id = ph.user_id
+            LEFT JOIN packages pkg ON pkg.id = ci.package_id
+            WHERE b.customer_id = %s
+            GROUP BY b.id, b.cart_id, b.customer_id, b.created_at, b.updated_at, 
+                     b.payment_date, b.total_amount, b.status
+            ORDER BY b.created_at DESC
+            """,
+            (customer_id,)
+        )
+        return [Booking(b) for b in bookings_data]
+    
+    
     @staticmethod
     def get_by_customer(customer_id):
         bookings_data = fetch_all(
@@ -811,3 +848,5 @@ class Booking:
 
     def __repr__(self):
         return f'<Booking {self.id}>'
+    
+    

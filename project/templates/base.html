@@ -116,7 +116,7 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#">Profile</a></li>
                 {% if current_user.role_name == 'customer' %}
-                <li><a class="dropdown-item" href="#">My Bookings</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('customer.booking_history') }}">My Bookings</a></li>
                 {% elif current_user.role_name == 'photographer' %}
                 <li>
                   <a

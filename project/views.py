@@ -7,7 +7,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import fetch_one
 
-from .models import User, Photographer, Customer, Category
+from .models import User, Photographer, Customer, Category, Booking
 from .forms import LoginForm, RegistrationForm
 
 
@@ -271,6 +271,26 @@ def session_package():
     return render_template('customer/session_package.html',
                            title='Select Package')
 
+@customer_bp.route('/bookings')
+@login_required
+def booking_history():
+    user = get_current_user()
+    
+    customer = Customer.get_by_user_id(user.get('id'))
+    if not customer:
+        flash("Customer profile not found.")
+        return redirect(url_for('customer.index'))
+    
+    bookings = Booking.get_by_customer_with_details(customer.id)
+    
+    return render_template(
+        'customer/booking_history.html',
+        title='My Bookings',
+        bookings=bookings
+    )
+
+
+    
 
 @customer_bp.route('/checkout')
 def checkout():
