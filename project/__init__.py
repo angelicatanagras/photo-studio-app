@@ -15,15 +15,23 @@ def create_app(config_name=None):
 
     mysql.init_app(app)
 
-    # context processors
     from .views import inject_current_user
     app.context_processor(inject_current_user)
 
-    # blueprints
     from .views import customer_bp, photographer_bp, auth_bp, admin_bp
     app.register_blueprint(customer_bp)
     app.register_blueprint(photographer_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
+
+    from flask import render_template
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return render_template("404.html"), 404
+
+    @app.errorhandler(500)
+    def internal_error(e):
+        return render_template("500.html"), 500
 
     return app

@@ -1,12 +1,10 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from urllib.parse import urlparse
 from functools import wraps
-from database import fetch_one  # root-level database.py
+from database import fetch_one
 
 from .models import User, Photographer, Customer, Category, Booking
 from .forms import LoginForm, RegistrationForm
-
-# Cart helper functions
 def get_cart_items():
     return session.get('cart', {})
 
@@ -39,8 +37,6 @@ def update_cart(item_id, qty):
 def clear_cart():
     session.pop('cart', None)
     session.modified = True
-
-# Auth service functions
 
 def login_user(user_id, remember=False):
     session['user_id'] = user_id
@@ -93,14 +89,11 @@ def role_required(*roles):
 def inject_current_user():
     return dict(current_user=get_current_user(), is_authenticated=is_authenticated())
 
-# Create Blueprints
-
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 customer_bp = Blueprint('customer', __name__)
 photographer_bp = Blueprint('photographer', __name__, url_prefix='/photographer')
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
-# ===== AUTH ROUTES =====
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if is_authenticated():
@@ -173,21 +166,34 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         try:
+            selected_role = form.role.data
             user = User.create(
                 email=form.email.data,
                 password=form.password.data,
                 first_name=form.first_name.data,
                 last_name=form.last_name.data,
-                role='Customer'
+                role=selected_role
             )
             if user:
-                # Customer needs a postcode, using a default for now
-                Customer.create(user_id=user.id, postcode='0000')
-            flash('Registration successful! You can now log in.', 'success')
+                if selected_role == 'Customer':
+                    Customer.create(user_id=user.id, postcode='0000')
+                    flash('Registration successful! You can now log in as a customer.', 'success')
+                elif selected_role == 'Photographer':
+                    from datetime import datetime
+                    default_category = Category.get_by_name('Portrait Photography') or \
+                                       Category.create('Portrait Photography', 'Professional portrait photography')
+                    Photographer.create(
+                        user_id=user.id,
+                        category_id=default_category.id,
+                        location='Location not set',
+                        social_link='',
+                        availability=datetime.utcnow()
+                    )
+                    flash('Registration successful! You can now log in as a photographer.', 'success')
             return redirect(url_for('auth.login'))
         except Exception as e:
             flash(f'Registration failed: {str(e)}', 'error')
-    return render_template('auth/register.html', title='Customer Registration', form=form)
+    return render_template('auth/register.html', title='Registration', form=form)
 
 @auth_bp.route('/photographer/register', methods=['GET', 'POST'])
 def photographer_register():
@@ -212,9 +218,6 @@ def photographer_register():
                 role='Photographer'
             )
             if user:
-                # Photographer needs category_id, location, social_link, and availability
-                # Using defaults for now - should be collected in a more detailed form
-                # If no categories exist, create a default one
                 default_category = Category.get_by_name('Portrait Photography') or \
                                    Category.create('Portrait Photography', 'Professional portrait photography')
                 Photographer.create(
@@ -236,7 +239,6 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('customer.index'))
 
-# ===== CUSTOMER ROUTES =====
 @customer_bp.route('/')
 @customer_bp.route('/index')
 def index():
@@ -254,7 +256,6 @@ def index():
         photographer_locations=photographer_locations
     )
 
-# Basket actions
 @customer_bp.route('/basket/add', methods=['POST'])
 def basket_add():
     item_id = request.form.get('id')
@@ -279,6 +280,7 @@ def basket_update(item_id):
 def basket_clear():
     clear_cart()
     return redirect(url_for('customer.checkout'))
+
 @customer_bp.route('/bookings')
 @login_required
 def booking_history():
@@ -297,10 +299,8 @@ def booking_history():
         bookings=bookings
     )
 
-
-    
-
 @customer_bp.route('/checkout')
+@login_required
 def checkout():
     cart = get_cart_items()
     total = sum(float(i['price']) * int(i['qty']) for i in cart.values()) if cart else 0.0
@@ -310,7 +310,6 @@ def checkout():
 def success_page():
     return render_template('customer/success_page.html', title='Booking Success')
 
-# Simple pages if you added them
 @customer_bp.route('/about')
 def about():
     return render_template('customer/about.html', title='About')
@@ -319,20 +318,20 @@ def about():
 def contact():
     return render_template('customer/contact.html', title='Contact')
 
-# ===== PHOTOGRAPHER ROUTES =====
 @photographer_bp.route('/dashboard')
 @photographer_bp.route('/admin')
+@role_required('Photographer')
 def dashboard():
     return render_template('photographer/dashboard.html', title='Photographer Dashboard')
 
 @photographer_bp.route('/gallery')
+@role_required('Photographer')
 def gallery():
     return render_template('photographer/gallery.html', title='My Gallery')
 
-# ===== ADMIN ROUTES =====
 @admin_bp.route('/', methods=['GET', 'POST'])
 @admin_bp.route('/login', methods=['GET', 'POST'])
-def login():  # admin login
+def login():
     if is_authenticated():
         user = get_current_user()
         if user and user.get('role') == 'Admin':
