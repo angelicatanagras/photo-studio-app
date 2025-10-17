@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 from functools import wraps
 from database import fetch_one  # root-level database.py
 
-from .models import User, Photographer, Customer, Category, Booking
+from .models import User, Photographer, Customer, Category, Booking, Cart, CartItem, Package
 from .forms import LoginForm, RegistrationForm
 
 # Cart helper functions
@@ -254,31 +254,32 @@ def index():
         photographer_locations=photographer_locations
     )
 
-# Basket actions
-@customer_bp.route('/basket/add', methods=['POST'])
-def basket_add():
-    item_id = request.form.get('id')
-    title = request.form.get('title')
-    price = request.form.get('price')
-    qty = int(request.form.get('qty', 1))
-    add_to_cart(item_id, title, price, qty)
-    return redirect(url_for('customer.checkout'))
+# # Basket actions
+# @customer_bp.route('/basket/add', methods=['POST'])
+# def basket_add():
+#     item_id = request.form.get('id')
+#     title = request.form.get('title')
+#     price = request.form.get('price')
+#     qty = int(request.form.get('qty', 1))
+#     add_to_cart(item_id, title, price, qty)
+#     return redirect(url_for('customer.checkout'))
 
-@customer_bp.route('/basket/remove/<item_id>')
-def basket_remove(item_id):
-    remove_from_cart(item_id)
-    return redirect(url_for('customer.checkout'))
+# @customer_bp.route('/basket/remove/<item_id>')
+# def basket_remove(item_id):
+#     remove_from_cart(item_id)
+#     return redirect(url_for('customer.checkout'))
 
-@customer_bp.route('/basket/update/<item_id>', methods=['POST'])
-def basket_update(item_id):
-    qty = int(request.form.get('qty', 1))
-    update_cart(item_id, qty)
-    return redirect(url_for('customer.checkout'))
+# @customer_bp.route('/basket/update/<item_id>', methods=['POST'])
+# def basket_update(item_id):
+#     qty = int(request.form.get('qty', 1))
+#     update_cart(item_id, qty)
+#     return redirect(url_for('customer.checkout'))
 
-@customer_bp.route('/basket/clear')
-def basket_clear():
-    clear_cart()
-    return redirect(url_for('customer.checkout'))
+# @customer_bp.route('/basket/clear')
+# def basket_clear():
+#     clear_cart()
+#     return redirect(url_for('customer.checkout'))
+
 @customer_bp.route('/bookings')
 @login_required
 def booking_history():
@@ -297,8 +298,139 @@ def booking_history():
         bookings=bookings
     )
 
+# View session packages for a photographer
+@customer_bp.route('/session/<int:photographer_id>', methods=['GET'])
+@login_required
+@role_required('Customer')
+def view_session(photographer_id):
+    photographer = Photographer.get_by_id(photographer_id)
+    packages = Package.get_by_photographer(photographer_id) if hasattr(Photographer, 'get_by_photographer') else []
+    return render_template(
+        'customer/session_package.html',
+        title='Book a Session',
+        photographer=photographer,
+        packages=packages
+    )
 
+# cart operations
+@customer_bp.route('/cart/add', methods=['POST'])
+@login_required
+@role_required('Customer')
+def add_to_cart_db():
+    package_id = request.form.get('package_id')
+    photographer_id = request.form.get('photographer_id')
+    user = get_current_user()
+    customer = Customer.get_by_user_id(user.get('id'))
+
+    if not (package_id and photographer_id and customer):
+        flash('Invalid request.', 'error')
+        return redirect(url_for('customer.index'))
     
+    package = Package.get_by_id(package_id)
+    price = package.price if package else 0.0
+    cart = Cart.get_by_customer(customer.id)
+    
+    if not cart:
+        cart = Cart.create(customer_id=customer.id, subtotal=0.0)
+
+    CartItem.create(cart.id, photographer_id, package_id, price)
+    Cart.update(cart.id, subtotal=cart.subtotal + price)
+
+    flash('Item added to your cart.', 'success')
+    return redirect(url_for('customer.view_cart'))
+
+@customer_bp.route('/cart')
+@login_required
+@role_required('Customer')
+def view_cart():
+    user = get_current_user()
+    customer = Customer.get_by_user_id(user.get('id'))
+    cart = Cart.get_by_customer(customer.id)
+    items = CartItem.get_by_cart(cart.id) if cart else []
+
+    cart_dict = {item.id: {
+        'title': f'Package #{item.package_id}',
+        'price': item.price,
+        'qty': 1
+    } for item in items}
+
+    total = sum(i['price'] * i['qty'] for i in cart_dict.values())
+
+    return render_template(
+        'customer/checkout.html',
+        title='Your Basket',
+        cart=cart_dict,
+        total=total
+    )
+
+#======== TEST ========
+
+@customer_bp.route('/test_booking')
+def test_booking():
+    Booking.create(customer_id=1, photographer_id=1, package_id=1)
+    return "Booking created successfully"
+
+@customer_bp.route('/test_cart')
+def test_cart():
+    from project.models import Cart, CartItem
+    customer_id = 1
+    photographer_id = 1
+    package_id = 1
+    price = 350.0
+
+    cart = Cart.get_by_customer(customer_id)
+    if not cart:
+        cart = Cart.create(customer_id=customer_id, subtotal=0.0)
+    CartItem.create(cart.id, photographer_id, package_id, price)
+    Cart.update(cart.id, subtotal=cart.subtotal + price)
+
+    return f"Added package {package_id} to cart {cart.id}"
+
+@customer_bp.route('/test_cart_update')
+def test_cart_update():
+    cart = Cart.get_by_customer(1)
+    if not cart:
+        return "No cart found"
+    Cart.update(cart.id, subtotal=999.99)
+    return f"Cart {cart.id} updated to subtotal 999.99"
+
+@customer_bp.route('/test_cart_delete')
+def test_cart_delete():
+    cart = Cart.get_by_customer(1)
+    if not cart:
+        return "No cart found"
+    Cart.delete(cart.id)
+    return f"Cart {cart.id} deleted"
+
+@customer_bp.route('/test_cartitem_delete')
+def test_cartitem_delete():
+    from project.models import CartItem
+    items = CartItem.get_by_cart(1)
+    if not items:
+        return "No items in cart"
+    CartItem.delete(items[0].id)
+    return f"Deleted item {items[0].id}"
+
+
+#========= TEST END ========
+
+# Submit a booking
+@customer_bp.route('/book', methods=['POST'])
+@login_required
+@role_required('Customer')
+def create_booking():
+    package_id = request.form.get('package_id')
+    photographer_id = request.form.get('photographer_id')
+    user = get_current_user()
+    customer = Customer.get_by_user_id(user.get('id'))
+
+    if not (package_id and photographer_id and customer):
+        flash('Invalid booking request.', 'error')
+        return redirect(url_for('customer.index'))
+
+    Booking.create(customer_id=customer.id, photographer_id=photographer_id, package_id=package_id)
+    flash('Your booking was successful!', 'success')
+    return redirect(url_for('customer.success_page'))
 
 @customer_bp.route('/checkout')
 def checkout():
@@ -310,6 +442,7 @@ def checkout():
 def success_page():
     return render_template('customer/success_page.html', title='Booking Success')
 
+
 # Simple pages if you added them
 @customer_bp.route('/about')
 def about():
@@ -318,6 +451,9 @@ def about():
 @customer_bp.route('/contact')
 def contact():
     return render_template('customer/contact.html', title='Contact')
+
+
+
 
 # ===== PHOTOGRAPHER ROUTES =====
 @photographer_bp.route('/dashboard')
