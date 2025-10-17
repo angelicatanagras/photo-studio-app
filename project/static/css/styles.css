@@ -61,6 +61,28 @@ img {
   border-color: var(--charcoal);
 }
 
+.btn-outline-teal {
+  color: var(--teal);
+  border-color: var(--teal);
+  background-color: white;
+}
+
+.btn-outline-teal:hover {
+  color: white;
+  background-color: var(--teal);
+  border-color: var(--teal);
+}
+
+.btn-check:checked + .btn-outline-teal {
+  color: white;
+  background-color: var(--teal);
+  border-color: var(--teal);
+}
+
+.btn-check:focus + .btn-outline-teal {
+  box-shadow: 0 0 0 0.25rem rgba(82, 182, 204, 0.25);
+}
+
 input::placeholder {
   font-size: 14px;
 }

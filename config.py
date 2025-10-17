@@ -2,7 +2,6 @@ import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-# Manual environment variable loading (replacement for python-dotenv)
 env_file = os.path.join(basedir, '.env')
 if os.path.exists(env_file):
     with open(env_file) as f:

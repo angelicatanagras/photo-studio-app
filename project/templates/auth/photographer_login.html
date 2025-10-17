@@ -6,8 +6,7 @@
         <div class="col-md-5 col-lg-4">
             <div class="section_card">
                 <div class="text-center mb-4">
-                    <img src="{{ url_for('static', filename='img/logo2.png') }}" alt="Every Photograph" class="img-fluid" style="max-height: 80px;">
-                    <h3 class="card-title text-charcoal mt-3">Photographer Portal</h3>
+                    <h3 class="card-title text-charcoal">Photographer Portal</h3>
                     <p class="text-muted">Sign in to manage your bookings</p>
                 </div>
                 <form method="POST">
@@ -44,8 +43,9 @@
                 </form>
 
                 <div class="text-center">
-                    <p class="text-muted">Not a photographer yet? <a href="{{ url_for('auth.photographer_register') }}" class="text-teal">Register here</a></p>
+                    <p class="text-muted">Not a photographer yet? <a href="{{ url_for('auth.register') }}" class="text-teal">Register here</a></p>
                     <p class="text-muted small">Customer? <a href="{{ url_for('auth.login') }}" class="text-teal">Login here</a></p>
+                    <p class="text-muted small"><a href="{{ url_for('admin.login') }}" class="text-charcoal" style="font-size: 12px;">Admin login</a></p>
                 </div>
             </div>
         </div>

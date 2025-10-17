@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
-      {% if title %} {{ title }} - Every Photograph {% else %} Every Photograph
-      | Professional Photography Booking {% endif %}
+      {% if title %} {{ title }} {% else %} Professional Photography Booking {% endif %}
     </title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
@@ -183,7 +182,7 @@
             />
           </div>
           <div class="col-12 col-md-6 col-lg-3">
-            <h6>EVERY PHOTOGRAPH</h6>
+            <h6>NAVIGATION</h6>
             <ul class="list">
               <li><a href="{{ url_for('customer.index') }}">Home</a></li>
               <li><a href="#about">About</a></li>
