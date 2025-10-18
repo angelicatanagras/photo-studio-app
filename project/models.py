@@ -823,14 +823,32 @@ class Booking:
         return [Booking(b) for b in bookings_data]
 
     @staticmethod
-    def create(cart_id, customer_id, total_amount, status='Pending', payment_date=None):
+    def create(customer_id, photographer_id, package_id):
+        cart_id = execute_query(
+            "INSERT INTO cart (customer_id, subtotal, created_at) VALUES (%s, %s, %s)",
+            (customer_id, 0.0, datetime.utcnow())
+        )
+
+        package = fetch_one("SELECT price FROM packages WHERE id = %s", (package_id,))
+        price = package['price'] if package else 0.0
+
+        execute_query(
+            """
+            INSERT INTO cart_item (cart_id, photographer_id, package_id, price, created_at)
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (cart_id, photographer_id, package_id, price, datetime.utcnow())
+        )
+
         booking_id = execute_query(
             """
-            INSERT INTO bookings (cart_id, customer_id, total_amount, status, payment_date, created_at)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO bookings (cart_id, customer_id, total_amount, status, created_at)
+            VALUES (%s, %s, %s, %s, %s)
             """,
-            (cart_id, customer_id, total_amount, status, payment_date, datetime.utcnow())
+            (cart_id, customer_id, price, 'Pending', datetime.utcnow())
         )
+        Cart.update(cart_id, subtotal=price, status='Completed')
+
         return Booking.get_by_id(booking_id)
 
     @staticmethod
