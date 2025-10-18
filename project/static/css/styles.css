@@ -771,3 +771,10 @@ a {
 .contact-dark .support-panel { background:#111; border-color:#222; }
 .contact-dark .social-icons-lg a { color:#fff !important; }
 .contact-dark a:hover { color: var(--teal) !important; }
+
+.footer {
+  background-color: #000;   /* black */
+  color: #bbb;              /* light text so it’s readable */
+}
+.footer a { color: #ddd; }
+.footer a:hover { color: #52b6cc; }

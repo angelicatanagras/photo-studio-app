@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, render_template
 from flask_mysqldb import MySQL
 from config import config
 
@@ -24,14 +24,12 @@ def create_app(config_name=None):
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
 
-    from flask import render_template
-
     @app.errorhandler(404)
     def not_found(e):
-        return render_template("404.html"), 404
+        return render_template("404.html", title="Not Found"), 404
 
     @app.errorhandler(500)
     def internal_error(e):
-        return render_template("500.html"), 500
+        return render_template("500.html", title="Server Error"), 500
 
     return app
