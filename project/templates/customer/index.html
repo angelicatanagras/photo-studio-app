@@ -84,7 +84,7 @@
             if not loop.last %}, {% endif %} {% endfor %} {% else %} Services
             available {% endif %}
           </div>
-          <a class="icon-link icon-link-hover btn-gradient" href="#">
+          <a class="icon-link icon-link-hover btn-gradient" href="{{ url_for('photographer.gallery', photographer_id=photographer.id) }}">
             View Portfolio
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -119,25 +119,92 @@
     {% endif %}
   </div>
 
-  {% if photographers and photographers|length > 8 %}
-  <nav
-    class="mt-4 d-flex justify-content-center justify-content-md-start"
-    aria-label="Page navigation"
-  >
-    <ul class="pagination justify-content-end">
-      <li class="page-item disabled">
-        <a class="page-link" href="#" tabindex="-1">Previous</a>
+  {% if total_pages > 1 %}
+  <nav class="mt-4 d-flex justify-content-end" aria-label="Page navigation">
+    <ul class="custom-pagination">
+      <li class="{% if page == 1 %}disabled{% endif %}">
+        <a href="?page={{ page - 1 }}" {% if page == 1 %}onclick="return false"{% endif %}>
+          <i class="bi bi-chevron-left"></i>
+        </a>
       </li>
-      <li class="page-item"><a class="page-link" href="#">1</a></li>
-      <li class="page-item"><a class="page-link" href="#">2</a></li>
-      <li class="page-item"><a class="page-link" href="#">3</a></li>
-      <li class="page-item">
-        <a class="page-link" href="#">Next</a>
+      {% for p in range(1, total_pages + 1) %}
+      <li class="{% if p == page %}active{% endif %}">
+        <a href="?page={{ p }}">{{ p }}</a>
+      </li>
+      {% endfor %}
+      <li class="{% if page == total_pages %}disabled{% endif %}">
+        <a href="?page={{ page + 1 }}" {% if page == total_pages %}onclick="return false"{% endif %}>
+          <i class="bi bi-chevron-right"></i>
+        </a>
       </li>
     </ul>
   </nav>
   {% endif %}
 </section>
+
+<!-- Divider -->
+<div class="container my-5">
+  <hr class="border-2 opacity-25">
+</div>
+
+<!-- Featured Photographers Section -->
+{% if featured_photographers %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="text-center mb-5 text-charcoal">Featured Photographers</h2>
+    <div class="row g-4">
+      {% for photographer in featured_photographers %}
+      <div class="col-12">
+        <div class="featured-card">
+          <div class="row g-0">
+            <div class="col-md-3">
+              <div class="featured-image-container">
+                <img
+                  src="{{ url_for('static', filename='img/photog-1.jpg') }}"
+                  class="featured-image"
+                  alt="{{ photographer.user.full_name }}"
+                />
+              </div>
+            </div>
+            <div class="col-md-9">
+              <div class="featured-content">
+                <h3 class="featured-name">{{ photographer.user.full_name }}</h3>
+                <div class="featured-specialty">
+                  <i class="bi bi-camera"></i>
+                  {{ photographer.category.category_name if photographer.category else 'Photography' }}
+                </div>
+                <p class="featured-bio">
+                  {{ photographer.bio or 'Professional photographer specializing in creating stunning visual stories.' }}
+                </p>
+                <div class="featured-location">
+                  <i class="bi bi-geo-alt"></i>
+                  {{ photographer.location or 'Location not specified' }}
+                </div>
+                {% if photographer.portfolio_items %}
+                <div class="featured-gallery">
+                  {% for item in photographer.portfolio_items[:3] %}
+                  <img
+                    src="{{ url_for('static', filename='img/photog-1.jpg') }}"
+                    alt="{{ item.title }}"
+                    class="gallery-thumb"
+                  />
+                  {% endfor %}
+                </div>
+                {% endif %}
+                <a href="{{ url_for('photographer.gallery', photographer_id=photographer.id) }}" class="btn-gradient mt-3">
+                  View Full Portfolio
+                  <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
 
 <!-- Category list section-->
 <section class="py-5 bg-light" id="categories">

@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 from functools import wraps
 from database import fetch_one
 
-from .models import User, Photographer, Customer, Category, Booking
+from .models import User, Photographer, Customer, Category, Booking, Package
 from .forms import LoginForm, RegistrationForm
 def get_cart_items():
     return session.get('cart', {})
@@ -242,27 +242,52 @@ def logout():
 @customer_bp.route('/')
 @customer_bp.route('/index')
 def index():
-    photographers = Photographer.get_all()
+    # Pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 8
+
+    all_photographers = Photographer.get_all()
+    total = len(all_photographers)
+    total_pages = (total + per_page - 1) // per_page
+
+    start = (page - 1) * per_page
+    end = start + per_page
+    photographers = all_photographers[start:end]
+
+    # Get featured photographers with portfolio
+    from project.models import PortfolioItem
+    featured_photographers = Photographer.get_featured()
+    for photographer in featured_photographers:
+        photographer.portfolio_items = PortfolioItem.get_by_photographer(photographer.id)
+
     service_categories = Category.get_all()
     photographer_locations = []
-    for p in photographers:
+    for p in all_photographers:
         if p.location and p.location not in photographer_locations:
             photographer_locations.append(p.location)
+
     return render_template(
         'customer/index.html',
         title='Home',
         photographers=photographers,
+        featured_photographers=featured_photographers,
         service_categories=service_categories,
-        photographer_locations=photographer_locations
+        photographer_locations=photographer_locations,
+        page=page,
+        total_pages=total_pages,
+        total=total
     )
 
 @customer_bp.route('/basket/add', methods=['POST'])
 def basket_add():
-    item_id = request.form.get('id')
-    title = request.form.get('title')
-    price = request.form.get('price')
+    package_id = request.form.get('package_id')
     qty = int(request.form.get('qty', 1))
-    add_to_cart(item_id, title, price, qty)
+
+    if package_id:
+        package = Package.get_by_id(package_id)
+        if package:
+            add_to_cart(str(package.id), package.package_name, str(package.price), qty)
+
     return redirect(url_for('customer.checkout'))
 
 @customer_bp.route('/basket/remove/<item_id>')
@@ -300,7 +325,6 @@ def booking_history():
     )
 
 @customer_bp.route('/checkout')
-@login_required
 def checkout():
     cart = get_cart_items()
     total = sum(float(i['price']) * int(i['qty']) for i in cart.values()) if cart else 0.0
@@ -325,9 +349,46 @@ def dashboard():
     return render_template('photographer/dashboard.html', title='Photographer Dashboard')
 
 @photographer_bp.route('/gallery')
-@role_required('Photographer')
-def gallery():
-    return render_template('photographer/gallery.html', title='My Gallery')
+@photographer_bp.route('/gallery/<int:photographer_id>')
+def gallery(photographer_id=None):
+    if photographer_id:
+        photographer = Photographer.get_by_id(photographer_id)
+    else:
+        # Default to first photographer if no ID provided
+        photographers = Photographer.get_all()
+        photographer = photographers[0] if photographers else None
+
+    if not photographer:
+        flash('Photographer not found.', 'error')
+        return redirect(url_for('customer.index'))
+
+    from project.models import PortfolioItem
+    portfolio_items = PortfolioItem.get_by_photographer(photographer.id)
+
+    return render_template(
+        'photographer/gallery.html',
+        title='Gallery',
+        photographer=photographer,
+        portfolio_items=portfolio_items
+    )
+
+@customer_bp.route('/session-package/<int:photographer_id>')
+def session_package(photographer_id):
+    from project.models import Package
+
+    photographer = Photographer.get_by_id(photographer_id)
+    if not photographer:
+        flash('Photographer not found.', 'error')
+        return redirect(url_for('customer.index'))
+
+    packages = Package.get_all()
+
+    return render_template(
+        'customer/session_package.html',
+        title='Book Session',
+        photographer=photographer,
+        packages=packages
+    )
 
 @admin_bp.route('/', methods=['GET', 'POST'])
 @admin_bp.route('/login', methods=['GET', 'POST'])
