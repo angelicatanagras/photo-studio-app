@@ -357,6 +357,7 @@ class Photographer:
             self.location = photographer_dict.get('location')
             self.social_link = photographer_dict.get('social_link')
             self.availability = photographer_dict.get('availability')
+            self.featured = photographer_dict.get('featured', False)
 
             if 'user_first_name' in photographer_dict:
                 self.user = type('User', (), {
@@ -459,6 +460,28 @@ class Photographer:
             WHERE p.category_id = %s
             """,
             (category_id,)
+        )
+        return [Photographer(p) for p in photographers_data]
+
+    @staticmethod
+    def get_featured():
+        """Get featured photographers."""
+        photographers_data = fetch_all(
+            """
+            SELECT p.*,
+                   u.first_name as user_first_name,
+                   u.last_name as user_last_name,
+                   u.email as user_email,
+                   u.phone as user_phone,
+                   u.profile_image as user_profile_image,
+                   c.category_name as category_name,
+                   c.description as category_description
+            FROM photographers p
+            JOIN users u ON p.user_id = u.id
+            LEFT JOIN category c ON p.category_id = c.id
+            WHERE p.featured = TRUE
+            LIMIT 3
+            """
         )
         return [Photographer(p) for p in photographers_data]
 

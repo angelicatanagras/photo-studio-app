@@ -370,7 +370,7 @@ a {
 }
 
 .item_section > div {
-  padding-top: 5rem;
+  padding-top: 0;
 }
 
 .item_img {
@@ -403,32 +403,49 @@ a {
   cursor: pointer;
   transition: all 0.3s ease;
   background: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .package_card:hover {
   border-color: var(--orange);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(255, 167, 38, 0.2);
 }
 
+.package-radio:checked ~ .package_card,
 .package_card.selected {
-  border-color: #ffc107;
-  background-color: #fff8e1;
+  border-color: var(--orange);
+  background: linear-gradient(135deg, #fff8e1 0%, #ffe9b8 100%);
+  box-shadow: 0 4px 12px rgba(255, 167, 38, 0.3);
+}
+
+.package-selector {
+  cursor: pointer;
+  width: 100%;
+  display: block;
 }
 
 .package_font {
   font-size: 1.5em;
+  font-weight: 600;
+  color: var(--charcoal);
 }
 
 .package_item_font {
   font-size: 18px;
-  font-weight: 300;
+  font-weight: 600;
+  color: var(--charcoal);
+  margin-bottom: 0.5rem;
 }
 
 .package_price {
   font-size: 2em;
-  font-weight: 500;
-  color: #ff9800;
+  font-weight: 700;
+  color: var(--orange);
+  margin: 0.5rem 0;
 }
 
 .summary_photog_loc_font {
@@ -774,7 +791,158 @@ a {
 
 .footer {
   background-color: #000;   /* black */
-  color: #bbb;              /* light text so it’s readable */
+  color: #bbb;              /* light text so it's readable */
 }
 .footer a { color: #ddd; }
 .footer a:hover { color: #52b6cc; }
+
+/* Custom Pagination Styles */
+.custom-pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 8px;
+  align-items: center;
+}
+
+.custom-pagination li {
+  display: inline-block;
+}
+
+.custom-pagination li a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  color: var(--charcoal);
+  background-color: transparent;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.custom-pagination li a:hover {
+  background-color: rgba(82, 182, 204, 0.1);
+  color: var(--teal);
+  transform: translateY(-2px);
+}
+
+.custom-pagination li.active a {
+  background-color: var(--orange);
+  color: white;
+  font-weight: 600;
+}
+
+.custom-pagination li.active a:hover {
+  background-color: #ff9800;
+  transform: translateY(-2px);
+}
+
+.custom-pagination li.disabled a {
+  color: #ccc;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.custom-pagination li.disabled a:hover {
+  background-color: transparent;
+  transform: none;
+}
+
+.custom-pagination i {
+  font-size: 16px;
+}
+
+/* Featured Photographers Section */
+.featured-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.featured-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+}
+
+.featured-image-container {
+  height: 100%;
+  min-height: 180px;
+  overflow: hidden;
+}
+
+.featured-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.featured-content {
+  padding: 1.5rem;
+}
+
+.featured-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 0.5rem;
+}
+
+.featured-specialty {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: transparent;
+  color: var(--charcoal);
+  padding: 6px 16px;
+  border: 1px solid #dee2e6;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.featured-bio {
+  color: #6c757d;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.featured-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--charcoal);
+  font-size: 14px;
+  margin-bottom: 1rem;
+}
+
+.featured-gallery {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.gallery-thumb {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.gallery-thumb:hover {
+  transform: scale(1.1);
+  border-color: var(--orange);
+}
