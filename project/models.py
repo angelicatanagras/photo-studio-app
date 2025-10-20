@@ -5,7 +5,6 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import fetch_one, fetch_all, execute_query
 
-
 class User:
     """User model for authentication and user management."""
 
@@ -287,13 +286,30 @@ class Package:
         if package_dict:
             self.id = package_dict.get('id')
             self.package_name = package_dict.get('package_name')
+            self.photographer_id = package_dict.get('photographer_id')
+            self.category_id = package_dict.get('category_id')
             self.price = package_dict.get('price')
             self.inclusions = package_dict.get('inclusions')
+            
+            # Adding category information if available
+            if 'category_name' in package_dict:
+                self.category = type('Category', (), {
+                    'id': package_dict.get('category_id'),
+                    'category_name': package_dict.get('category_name'),
+                    'description': package_dict.get('category_description')
+                })()
+            else:
+                self.category = None
 
     @staticmethod
     def get_by_id(package_id):
         package_data = fetch_one(
-            "SELECT * FROM packages WHERE id = %s",
+            """
+            SELECT p.*, c.category_name, c.description as category_description
+            FROM packages p
+            LEFT JOIN category c ON p.category_id = c.id
+            WHERE p.id = %s
+            """,
             (package_id,)
         )
         return Package(package_data) if package_data else None
@@ -301,27 +317,75 @@ class Package:
     @staticmethod
     def get_by_name(package_name):
         package_data = fetch_one(
-            "SELECT * FROM packages WHERE package_name = %s",
+            """
+            SELECT p.*, c.category_name, c.description as category_description
+            FROM packages p
+            LEFT JOIN category c ON p.category_id = c.id
+            WHERE p.package_name = %s
+            """,
             (package_name,)
         )
         return Package(package_data) if package_data else None
 
     @staticmethod
     def get_all():
-        packages_data = fetch_all("SELECT * FROM packages")
+        packages_data = fetch_all(
+            """
+            SELECT p.*, c.category_name, c.description as category_description
+            FROM packages p
+            LEFT JOIN category c ON p.category_id = c.id
+            """
+        )
         return [Package(p) for p in packages_data]
+    
+    @staticmethod
+    def get_by_photographer_id(photographer_id):
+        package_data = fetch_all(
+            """
+            SELECT p.*, c.category_name, c.description as category_description
+            FROM packages p
+            LEFT JOIN category c ON p.category_id = c.id
+            WHERE p.photographer_id = %s
+            ORDER BY 
+                CASE p.package_name
+                    WHEN 'Basic' THEN 1
+                    WHEN 'Standard' THEN 2
+                    WHEN 'Premium' THEN 3
+                END
+            """,
+            (photographer_id,)
+        )
+        return [Package(p) for p in package_data]
 
     @staticmethod
-    def create(package_name, price, inclusions):
+    def get_by_category(category_id):
+        """Get all packages for a specific category"""
+        package_data = fetch_all(
+            """
+            SELECT p.*, c.category_name, c.description as category_description
+            FROM packages p
+            LEFT JOIN category c ON p.category_id = c.id
+            WHERE p.category_id = %s
+            """,
+            (category_id,)
+        )
+        return [Package(p) for p in package_data]
+
+    @staticmethod
+    def create(package_name, photographer_id, category_id, price, inclusions):
+        """Create a new package with category_id"""
         package_id = execute_query(
-            "INSERT INTO packages (package_name, price, inclusions) VALUES (%s, %s, %s)",
-            (package_name, price, inclusions)
+            """
+            INSERT INTO packages (package_name, photographer_id, category_id, price, inclusions) 
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (package_name, photographer_id, category_id, price, inclusions)
         )
         return Package.get_by_id(package_id)
 
     @staticmethod
     def update(package_id, **kwargs):
-        allowed_fields = ['package_name', 'price', 'inclusions']
+        allowed_fields = ['package_name', 'category_id', 'price', 'inclusions']
         updates = []
         values = []
 
@@ -343,7 +407,6 @@ class Package:
 
     def __repr__(self):
         return f'<Package {self.package_name}>'
-
 
 class Photographer:
     """Photographer profile model."""
@@ -564,7 +627,7 @@ class PortfolioItem:
             INSERT INTO portfolio_items (photographer_id, title, caption, image_path, created_at)
             VALUES (%s, %s, %s, %s, %s)
             """,
-            (photographer_id, title, caption, image_path, datetime.utcnow())
+            (photographer_id, title, caption, image_path, datetime.now())
         )
         return PortfolioItem.get_by_id(portfolio_id)
 

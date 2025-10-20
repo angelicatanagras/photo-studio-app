@@ -1,13 +1,28 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, session
+from flask import Blueprint, render_template, redirect, url_for, flash, request, session, current_app
 from urllib.parse import urlparse
 from functools import wraps
 from database import fetch_one
+from datetime import datetime
+import os
+from werkzeug.utils import secure_filename
 
-from .models import User, Photographer, Customer, Category, Booking, Package
-from .models import User, Photographer, Customer, Category, Booking, Cart, CartItem, Package
-from .forms import LoginForm, RegistrationForm
+
+from .models import User, Photographer, Customer, Category, Booking, Cart, CartItem, Package, PortfolioItem
+from .forms import LoginForm, RegistrationForm, PortfolioUploadForm, PhotographerBioForm, SinglePackageForm
+
+# Upload configuration
+UPLOAD_FOLDER = 'static/uploads/portfolio'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+MAX_FILE_SIZE = 50 * 1024 * 1024  # 5MB
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 def get_cart_items():
     return session.get('cart', {})
+
 
 def add_to_cart(item_id, title, price, qty=1):
     cart = session.get('cart', {})
@@ -18,12 +33,14 @@ def add_to_cart(item_id, title, price, qty=1):
     session['cart'] = cart
     session.modified = True
 
+
 def remove_from_cart(item_id):
     cart = session.get('cart', {})
     if item_id in cart:
         del cart[item_id]
         session['cart'] = cart
         session.modified = True
+
 
 def update_cart(item_id, qty):
     cart = session.get('cart', {})
@@ -35,16 +52,20 @@ def update_cart(item_id, qty):
         session['cart'] = cart
         session.modified = True
 
+
 def clear_cart():
     session.pop('cart', None)
     session.modified = True
+
 
 def login_user(user_id, remember=False):
     session['user_id'] = user_id
     session.permanent = remember
 
+
 def logout_user():
     session.clear()
+
 
 def get_current_user():
     user_id = session.get('user_id')
@@ -52,8 +73,10 @@ def get_current_user():
         return None
     return fetch_one("SELECT * FROM users WHERE id = %s", (user_id,))
 
+
 def is_authenticated():
     return 'user_id' in session
+
 
 def login_required(f):
     @wraps(f)
@@ -63,6 +86,7 @@ def login_required(f):
             return redirect(url_for('auth.login', next=request.url))
         return f(*args, **kwargs)
     return decorated
+
 
 def role_required(*roles):
     def decorator(f):
@@ -87,15 +111,20 @@ def role_required(*roles):
         return decorated
     return decorator
 
+
 def inject_current_user():
     return dict(current_user=get_current_user(), is_authenticated=is_authenticated())
 
+
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 customer_bp = Blueprint('customer', __name__)
-photographer_bp = Blueprint('photographer', __name__, url_prefix='/photographer')
+photographer_bp = Blueprint(
+    'photographer', __name__, url_prefix='/photographer')
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 # -- make cart badge reflect DB for logged-in customers; fallback to session when logged out
+
+
 def inject_cart():
     try:
         # When logged in, read from DB cart
@@ -135,9 +164,11 @@ def login():
         if user and User.check_password(user.password_hash, form.password.data):
             if user.role != 'Customer':
                 if user.role == 'Admin':
-                    flash('This login is for customers only. Please use the admin login.', 'error')
+                    flash(
+                        'This login is for customers only. Please use the admin login.', 'error')
                 else:
-                    flash('This login is for customers only. Please use the photographer login.', 'error')
+                    flash(
+                        'This login is for customers only. Please use the photographer login.', 'error')
                 return render_template('auth/login.html', title='Customer Sign In', form=form)
             login_user(user.id, remember=form.remember_me.data)
             next_page = request.args.get('next')
@@ -146,6 +177,7 @@ def login():
             return redirect(next_page)
         flash('Invalid email or password', 'error')
     return render_template('auth/login.html', title='Customer Sign In', form=form)
+
 
 @auth_bp.route('/photographer/login', methods=['GET', 'POST'])
 def photographer_login():
@@ -164,9 +196,11 @@ def photographer_login():
         if user and User.check_password(user.password_hash, form.password.data):
             if user.role != 'Photographer':
                 if user.role == 'Admin':
-                    flash('This login is for photographers only. Please use the admin login.', 'error')
+                    flash(
+                        'This login is for photographers only. Please use the admin login.', 'error')
                 else:
-                    flash('This login is for photographers only. Please use the customer login.', 'error')
+                    flash(
+                        'This login is for photographers only. Please use the customer login.', 'error')
                 return render_template('auth/photographer_login.html', title='Photographer Sign In', form=form)
             login_user(user.id, remember=form.remember_me.data)
             next_page = request.args.get('next')
@@ -175,6 +209,7 @@ def photographer_login():
             return redirect(next_page)
         flash('Invalid email or password', 'error')
     return render_template('auth/photographer_login.html', title='Photographer Sign In', form=form)
+
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -201,11 +236,13 @@ def register():
             if user:
                 if selected_role == 'Customer':
                     Customer.create(user_id=user.id, postcode='0000')
-                    flash('Registration successful! You can now log in as a customer.', 'success')
+                    flash(
+                        'Registration successful! You can now log in as a customer.', 'success')
                 elif selected_role == 'Photographer':
                     from datetime import datetime
                     default_category = Category.get_by_name('Portrait Photography') or \
-                                       Category.create('Portrait Photography', 'Professional portrait photography')
+                        Category.create('Portrait Photography',
+                                        'Professional portrait photography')
                     Photographer.create(
                         user_id=user.id,
                         category_id=default_category.id,
@@ -213,11 +250,13 @@ def register():
                         social_link='',
                         availability=datetime.utcnow()
                     )
-                    flash('Registration successful! You can now log in as a photographer.', 'success')
+                    flash(
+                        'Registration successful! You can now log in as a photographer.', 'success')
             return redirect(url_for('auth.login'))
         except Exception as e:
             flash(f'Registration failed: {str(e)}', 'error')
     return render_template('auth/register.html', title='Registration', form=form)
+
 
 @auth_bp.route('/photographer/register', methods=['GET', 'POST'])
 def photographer_register():
@@ -243,7 +282,8 @@ def photographer_register():
             )
             if user:
                 default_category = Category.get_by_name('Portrait Photography') or \
-                                   Category.create('Portrait Photography', 'Professional portrait photography')
+                    Category.create('Portrait Photography',
+                                    'Professional portrait photography')
                 Photographer.create(
                     user_id=user.id,
                     category_id=default_category.id,
@@ -251,17 +291,20 @@ def photographer_register():
                     social_link='',
                     availability=datetime.utcnow()
                 )
-            flash('Registration successful! You can now log in as a photographer.', 'success')
+            flash(
+                'Registration successful! You can now log in as a photographer.', 'success')
             return redirect(url_for('auth.photographer_login'))
         except Exception as e:
             flash(f'Registration failed: {str(e)}', 'error')
     return render_template('auth/photographer_register.html', title='Photographer Registration', form=form)
+
 
 @auth_bp.route('/logout')
 def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('customer.index'))
+
 
 @customer_bp.route('/')
 @customer_bp.route('/index')
@@ -282,7 +325,8 @@ def index():
     from project.models import PortfolioItem
     featured_photographers = Photographer.get_featured()
     for photographer in featured_photographers:
-        photographer.portfolio_items = PortfolioItem.get_by_photographer(photographer.id)
+        photographer.portfolio_items = PortfolioItem.get_by_photographer(
+            photographer.id)
 
     service_categories = Category.get_all()
     photographer_locations = []
@@ -302,28 +346,29 @@ def index():
         total=total
     )
 
+
 @customer_bp.route('/basket/add', methods=['POST'])
 def basket_add():
-    package_id = request.form.get('package_id')
+    item_id = request.form.get('id')
+    title = request.form.get('title')
+    price = request.form.get('price')
     qty = int(request.form.get('qty', 1))
-
-    if package_id:
-        package = Package.get_by_id(package_id)
-        if package:
-            add_to_cart(str(package.id), package.package_name, str(package.price), qty)
-
+    add_to_cart(item_id, title, price, qty)
     return redirect(url_for('customer.checkout'))
+
 
 @customer_bp.route('/basket/remove/<item_id>')
 def basket_remove(item_id):
     remove_from_cart(item_id)
     return redirect(url_for('customer.checkout'))
 
+
 @customer_bp.route('/basket/update/<item_id>', methods=['POST'])
 def basket_update(item_id):
     qty = int(request.form.get('qty', 1))
     update_cart(item_id, qty)
     return redirect(url_for('customer.checkout'))
+
 
 @customer_bp.route('/basket/clear')
 def basket_clear():
@@ -355,18 +400,19 @@ def basket_clear():
 #     clear_cart()
 #     return redirect(url_for('customer.checkout'))
 
+
 @customer_bp.route('/bookings')
 @login_required
 def booking_history():
     user = get_current_user()
-    
+
     customer = Customer.get_by_user_id(user.get('id'))
     if not customer:
         flash("Customer profile not found.")
         return redirect(url_for('customer.index'))
-    
+
     bookings = Booking.get_by_customer_with_details(customer.id)
-    
+
     return render_template(
         'customer/booking_history.html',
         title='My Bookings',
@@ -374,12 +420,15 @@ def booking_history():
     )
 
 # View session packages for a photographer
+
+
 @customer_bp.route('/session/<int:photographer_id>', methods=['GET'])
 @login_required
 @role_required('Customer')
 def view_session(photographer_id):
     photographer = Photographer.get_by_id(photographer_id)
-    packages = Package.get_by_photographer(photographer_id) if hasattr(Photographer, 'get_by_photographer') else []
+    packages = Package.get_by_photographer(photographer_id) if hasattr(
+        Photographer, 'get_by_photographer') else []
     return render_template(
         'customer/session_package.html',
         title='Book a Session',
@@ -388,6 +437,8 @@ def view_session(photographer_id):
     )
 
 # cart operations
+
+
 @customer_bp.route('/cart/add', methods=['POST'])
 @login_required
 @role_required('Customer')
@@ -400,11 +451,11 @@ def add_to_cart_db():
     if not (package_id and photographer_id and customer):
         flash('Invalid request.', 'error')
         return redirect(url_for('customer.index'))
-    
+
     package = Package.get_by_id(package_id)
     price = package.price if package else 0.0
     cart = Cart.get_by_customer(customer.id)
-    
+
     if not cart:
         cart = Cart.create(customer_id=customer.id, subtotal=0.0)
 
@@ -413,6 +464,7 @@ def add_to_cart_db():
 
     flash('Item added to your cart.', 'success')
     return redirect(url_for('customer.view_cart'))
+
 
 @customer_bp.route('/cart')
 @login_required
@@ -438,12 +490,14 @@ def cart():
         total=total
     )
 
-#======== TEST ========
+# ======== TEST ========
+
 
 @customer_bp.route('/test_booking')
 def test_booking():
     Booking.create(customer_id=1, photographer_id=1, package_id=1)
     return "Booking created successfully"
+
 
 @customer_bp.route('/test_cart')
 def test_cart():
@@ -461,6 +515,7 @@ def test_cart():
 
     return f"Added package {package_id} to cart {cart.id}"
 
+
 @customer_bp.route('/test_cart_update')
 def test_cart_update():
     cart = Cart.get_by_customer(1)
@@ -469,6 +524,7 @@ def test_cart_update():
     Cart.update(cart.id, subtotal=999.99)
     return f"Cart {cart.id} updated to subtotal 999.99"
 
+
 @customer_bp.route('/test_cart_delete')
 def test_cart_delete():
     cart = Cart.get_by_customer(1)
@@ -476,6 +532,7 @@ def test_cart_delete():
         return "No cart found"
     Cart.delete(cart.id)
     return f"Cart {cart.id} deleted"
+
 
 @customer_bp.route('/test_cartitem_delete')
 def test_cartitem_delete():
@@ -487,7 +544,7 @@ def test_cartitem_delete():
     return f"Deleted item {items[0].id}"
 
 
-#========= TEST END ========
+# ========= TEST END ========
 
 # Submit a booking
 @customer_bp.route('/book', methods=['POST'])
@@ -503,9 +560,11 @@ def create_booking():
         flash('Invalid booking request.', 'error')
         return redirect(url_for('customer.index'))
 
-    Booking.create(customer_id=customer.id, photographer_id=photographer_id, package_id=package_id)
+    Booking.create(customer_id=customer.id,
+                   photographer_id=photographer_id, package_id=package_id)
     flash('Your booking was successful!', 'success')
     return redirect(url_for('customer.success_page'))
+
 
 @customer_bp.route('/checkout')
 @login_required
@@ -542,18 +601,332 @@ def success_page():
 def about():
     return render_template('customer/about.html', title='About')
 
+
 @customer_bp.route('/contact')
 def contact():
     return render_template('customer/contact.html', title='Contact')
 
+# @customer_bp.route('/photographer/<int:photographer_id>/gallery')
+# def photographer_gallery(photographer_id):
+#     """Public gallery view for customers to view photographer's work"""
+#     photographer = Photographer.get_by_id(photographer_id)
 
+#     if not photographer:
+#         flash('Photographer not found.', 'error')
+#         return redirect(url_for('customer.index'))
+
+#     # Get photographer's packages and portfolio items
+#     packages = Package.get_by_photographer_id(photographer.id)
+#     portfolioItems = PortfolioItem.get_by_photographer(photographer.id)
+
+#     return render_template('customer/photographer_gallery.html',
+#                          title=f'{photographer.user.full_name} - Gallery',
+#                          photographer=photographer,
+#                          packages=packages,
+#                          portfolioItems=portfolioItems)
 
 
 @photographer_bp.route('/dashboard')
 @photographer_bp.route('/admin')
 @role_required('Photographer')
 def dashboard():
-    return render_template('photographer/dashboard.html', title='Photographer Dashboard')
+    """Photographer dashboard/admin page"""
+    user = get_current_user()
+    photographer = Photographer.get_by_user_id(user.get('id'))
+
+    portfolioItems = PortfolioItem.get_by_photographer(photographer.id)
+    packages = Package.get_by_photographer_id(photographer.id)
+
+    # Initialize forms
+    upload_form = PortfolioUploadForm()
+    bio_form = PhotographerBioForm()
+    package_form = SinglePackageForm()
+
+    # Pre-populate bio form
+    if photographer.bio:
+        bio_form.bio.data = photographer.bio
+
+    seen_category_ids = set()
+    categories = []
+    for package in packages:
+        if package.category and package.category_id not in seen_category_ids:
+            seen_category_ids.add(package.category_id)
+            categories.append(package.category)
+
+    return render_template('photographer/dashboard.html',
+                           title='Photographer Dashboard',
+                           portfolioItems=portfolioItems,
+                           packages=packages,
+                           photographer=photographer,
+                           upload_form=upload_form,
+                           bio_form=bio_form,
+                           package_form=package_form,
+                           categories=categories)
+
+
+@photographer_bp.route('/create_package', methods=['POST'])
+@role_required('Photographer')
+def create_package():
+    """Create a new package"""
+    user = get_current_user()
+    photographer = Photographer.get_by_user_id(user.get('id'))
+
+    if not photographer:
+        flash('Photographer profile not found.', 'error')
+        return redirect(url_for('photographer.dashboard'))
+
+    form = SinglePackageForm()
+
+    if form.validate_on_submit():
+        try:
+            # Check if category is valid (not 0)
+            if form.category.data == 0:
+                flash('Please select a valid category.', 'error')
+                return redirect(url_for('photographer.dashboard'))
+
+            Package.create(
+                package_name=form.package_name.data,
+                photographer_id=photographer.id,
+                category_id=form.category.data,
+                price=form.price.data,
+                inclusions=form.inclusions.data
+            )
+            flash('Package created successfully!', 'success')
+        except Exception as e:
+            flash(f'Error creating package: {str(e)}', 'error')
+            import traceback
+            print(traceback.format_exc())
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f'{field}: {error}', 'error')
+
+    return redirect(url_for('photographer.dashboard'))
+
+
+@photographer_bp.route('/update_bio', methods=['POST'])
+@role_required('Photographer')
+def update_bio():
+    """Update photographer bio/summary"""
+    user = get_current_user()
+    photographer = Photographer.get_by_user_id(user.get('id'))
+
+    if not photographer:
+        flash('Photographer profile not found.', 'error')
+        return redirect(url_for('photographer.dashboard'))
+
+    form = PhotographerBioForm()
+
+    if form.validate_on_submit():
+        try:
+            Photographer.update(photographer.id, bio=form.bio.data)
+            flash('Bio updated successfully!', 'success')
+        except Exception as e:
+            flash(f'Error updating bio: {str(e)}', 'error')
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f'{field}: {error}', 'error')
+
+    return redirect(url_for('photographer.dashboard'))
+
+
+@photographer_bp.route('/update_package/<int:package_id>', methods=['POST'])
+@role_required('Photographer')
+def update_package(package_id):
+    """Update an existing package"""
+    user = get_current_user()
+    photographer = Photographer.get_by_user_id(user.get('id'))
+
+    if not photographer:
+        flash('Photographer profile not found.', 'error')
+        return redirect(url_for('photographer.dashboard'))
+
+    package = Package.get_by_id(package_id)
+
+    if not package:
+        flash('Package not found.', 'error')
+        return redirect(url_for('photographer.dashboard'))
+
+    # Verify ownership
+    if package.photographer_id != photographer.id:
+        flash('You do not have permission to edit this package.', 'error')
+        return redirect(url_for('photographer.dashboard'))
+
+    try:
+        package_name = request.form.get('package_name')
+        category_id = int(request.form.get('category'))
+        price = float(request.form.get('price'))
+        inclusions = request.form.get('inclusions')
+
+        # Validate inputs
+        if not all([package_name, category_id, price, inclusions]):
+            flash('All fields are required.', 'error')
+            return redirect(url_for('photographer.dashboard'))
+
+        if category_id == 0:
+            flash('Please select a valid category.', 'error')
+            return redirect(url_for('photographer.dashboard'))
+
+        Package.update(
+            package_id,
+            package_name=package_name,
+            category_id=category_id,
+            price=price,
+            inclusions=inclusions
+        )
+        flash('Package updated successfully!', 'success')
+    except Exception as e:
+        flash(f'Error updating package: {str(e)}', 'error')
+        import traceback
+        print(traceback.format_exc())
+
+    return redirect(url_for('photographer.dashboard'))
+
+
+@photographer_bp.route('/delete_package/<int:package_id>', methods=['POST'])
+@role_required('Photographer')
+def delete_package(package_id):
+    """Delete a package"""
+    user = get_current_user()
+    photographer = Photographer.get_by_user_id(user.get('id'))
+
+    if not photographer:
+        flash('Photographer profile not found.', 'error')
+        return redirect(url_for('photographer.dashboard'))
+
+    try:
+        package = Package.get_by_id(package_id)
+
+        if not package:
+            flash('Package not found.', 'error')
+            return redirect(url_for('photographer.dashboard'))
+
+        # Verify ownership
+        if package.photographer_id != photographer.id:
+            flash('You do not have permission to delete this package.', 'error')
+            return redirect(url_for('photographer.dashboard'))
+
+        Package.delete(package_id)
+        flash('Package deleted successfully!', 'success')
+
+    except Exception as e:
+        flash(f'Error deleting package: {str(e)}', 'error')
+
+    return redirect(url_for('photographer.dashboard'))
+
+
+@photographer_bp.route('/upload_portfolio', methods=['POST'])
+@role_required('Photographer')
+def upload_portfolio():
+    """Handle portfolio image upload using WTForms"""
+    user = get_current_user()
+    photographer = Photographer.get_by_user_id(user.get('id'))
+
+    if not photographer:
+        flash('Photographer profile not found.', 'error')
+        return redirect(url_for('photographer.dashboard'))
+
+    form = PortfolioUploadForm()
+
+    if form.validate_on_submit():
+        try:
+            file = form.portfolio_image.data
+            title = form.title.data
+            caption = form.caption.data
+
+            # Check file size
+            file.seek(0, os.SEEK_END)
+            file_size = file.tell()
+            file.seek(0)
+
+            if file_size > MAX_FILE_SIZE:
+                flash('File size exceeds 50MB limit.', 'error')
+                return redirect(url_for('photographer.dashboard'))
+
+            # Secure the filename
+            filename = secure_filename(file.filename)
+
+            # Create unique filename to avoid conflicts
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            name, ext = os.path.splitext(filename)
+            unique_filename = f"{photographer.id}_{timestamp}_{name}{ext}"
+
+            # Get upload path - use constant or app config
+            upload_path = os.path.join(current_app.root_path, UPLOAD_FOLDER)
+
+            # Ensure upload directory exists
+            os.makedirs(upload_path, exist_ok=True)
+
+            # Save file
+            file_path = os.path.join(upload_path, unique_filename)
+            file.save(file_path)
+
+            # Create portfolio item in database
+            PortfolioItem.create(
+                photographer_id=photographer.id,
+                title=title,
+                image_path=unique_filename,
+                caption=caption if caption else None
+            )
+
+            flash('Portfolio item uploaded successfully!', 'success')
+
+        except Exception as e:
+            flash(f'Error uploading file: {str(e)}', 'error')
+            import traceback
+            print(traceback.format_exc())
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f'{field}: {error}', 'error')
+
+    return redirect(url_for('photographer.dashboard'))
+
+
+@photographer_bp.route('/delete_portfolio/<int:portfolio_id>', methods=['POST'])
+@role_required('Photographer')
+def delete_portfolio(portfolio_id):
+    """Delete a portfolio item"""
+    user = get_current_user()
+    photographer = Photographer.get_by_user_id(user.get('id'))
+
+    if not photographer:
+        flash('Photographer profile not found.', 'error')
+        return redirect(url_for('photographer.dashboard'))
+
+    try:
+        portfolio_item = PortfolioItem.get_by_id(portfolio_id)
+
+        if not portfolio_item:
+            flash('Portfolio item not found.', 'error')
+            return redirect(url_for('photographer.dashboard'))
+
+        # Verify ownership
+        if portfolio_item.photographer_id != photographer.id:
+            flash('You do not have permission to delete this item.', 'error')
+            return redirect(url_for('photographer.dashboard'))
+
+        # Get upload path
+        upload_path = os.path.join(current_app.root_path, UPLOAD_FOLDER)
+
+        # Delete file from filesystem
+        file_path = os.path.join(upload_path, portfolio_item.image_path)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        # Delete from database
+        PortfolioItem.delete(portfolio_id)
+
+        flash('Portfolio item deleted successfully!', 'success')
+
+    except Exception as e:
+        flash(f'Error deleting portfolio item: {str(e)}', 'error')
+        import traceback
+        print(traceback.format_exc())
+
+    return redirect(url_for('photographer.dashboard'))
+
 
 @photographer_bp.route('/gallery')
 @photographer_bp.route('/gallery/<int:photographer_id>')
@@ -569,33 +942,60 @@ def gallery(photographer_id=None):
         flash('Photographer not found.', 'error')
         return redirect(url_for('customer.index'))
 
-    from project.models import PortfolioItem
-    portfolio_items = PortfolioItem.get_by_photographer(photographer.id)
+    # Get photographer's packages
+    packages = Package.get_by_photographer_id(photographer.id)
+
+    # Extract unique categories from packages
+    seen_category_ids = set()
+    categories = []
+    for package in packages:
+        if package.category and package.category_id not in seen_category_ids:
+            seen_category_ids.add(package.category_id)
+            categories.append(package.category)
+
+    # Get portfolio items
+    portfolioItems = PortfolioItem.get_by_photographer(photographer.id)
 
     return render_template(
         'photographer/gallery.html',
         title='Gallery',
         photographer=photographer,
-        portfolio_items=portfolio_items
+        categories=categories,
+        portfolioItems=portfolioItems
     )
+
 
 @customer_bp.route('/session-package/<int:photographer_id>')
 def session_package(photographer_id):
-    from project.models import Package
-
     photographer = Photographer.get_by_id(photographer_id)
     if not photographer:
         flash('Photographer not found.', 'error')
         return redirect(url_for('customer.index'))
 
-    packages = Package.get_all()
+    # Get category_id from query parameter
+    category_id = request.args.get('category_id', type=int)
+
+    if category_id:
+        # Filter packages by photographer AND category
+        all_packages = Package.get_by_photographer_id(photographer_id)
+        packages = [
+            pkg for pkg in all_packages if pkg.category_id == category_id]
+
+        # Get category for display
+        category = Category.get_by_id(category_id)
+    else:
+        # If no category specified, show all packages
+        packages = Package.get_by_photographer_id(photographer_id)
+        category = None
 
     return render_template(
         'customer/session_package.html',
         title='Book Session',
         photographer=photographer,
-        packages=packages
+        packages=packages,
+        category=category
     )
+
 
 @admin_bp.route('/', methods=['GET', 'POST'])
 @admin_bp.route('/login', methods=['GET', 'POST'])
@@ -624,6 +1024,7 @@ def login():
         flash('Invalid email or password', 'error')
     return render_template('admin/login.html', title='Admin Sign In', form=form)
 
+
 @admin_bp.route('/dashboard')
 @role_required('Admin')
 def dashboard_admin():
@@ -641,6 +1042,7 @@ def dashboard_admin():
         total_photographers=len(photographers),
         total_admins=len(admins)
     )
+
 
 @admin_bp.route('/users')
 @role_required('Admin')
