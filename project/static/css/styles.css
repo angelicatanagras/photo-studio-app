@@ -234,7 +234,8 @@ a {
 }
 
 .photog-card {
-  width: 250px;
+  width: 100%;
+  max-width: 250px;
   transition: transform 0.3s ease;
 }
 
@@ -273,7 +274,8 @@ a {
 .footer {
   height: auto;
   padding: 50px 0px;
-  background-color: rgb(71 72 73);
+  background-color: #000;
+  color: #bbb;
 }
 
 .footer p {
@@ -711,6 +713,92 @@ a {
   .section_card {
     margin-top: 0 !important;
   }
+  .hero_banner {
+    min-height: 60vh;
+  }
+  .hero_banner h1 {
+    font-size: 1.75rem;
+  }
+  .location-overlay {
+    max-width: 90%;
+    padding: 0.75rem;
+  }
+  .cart-table {
+    font-size: 0.875rem;
+  }
+  .cart-table th,
+  .cart-table td {
+    padding: 0.5rem;
+  }
+
+  /* Footer mobile optimization */
+  .footer {
+    padding: 30px 0px;
+  }
+  .footer_logo_img {
+    width: 80px;
+    height: 80px;
+  }
+  .footer_logo {
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .footer h6 {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .footer .list {
+    font-size: 13px;
+  }
+  .footer .list li {
+    margin-bottom: 8px;
+  }
+  .footer .col-12 {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  .footer .col-12:last-child {
+    margin-bottom: 0;
+  }
+  .social-icons {
+    justify-content: center !important;
+  }
+}
+
+/** Tablet breakpoint (medium screens) **/
+@media (max-width: 768px) {
+  .hero_banner {
+    min-height: 60vh;
+  }
+  .featured-name {
+    font-size: 1.25rem;
+  }
+  .section_card {
+    padding: 25px;
+  }
+  .package_card {
+    padding: 15px;
+  }
+  .footer_logo_img {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+/** Large tablet breakpoint **/
+@media (max-width: 992px) {
+  .navbar-nav .nav-link {
+    padding: 0.5rem 1rem;
+  }
+  .section_card {
+    padding: 20px;
+  }
+  .hero_banner {
+    min-height: 70vh;
+  }
+  .portfolio-image {
+    height: 200px;
+  }
 }
 
 .cart-badge{
@@ -789,10 +877,6 @@ a {
 .contact-dark .social-icons-lg a { color:#fff !important; }
 .contact-dark a:hover { color: var(--teal) !important; }
 
-.footer {
-  background-color: #000;   /* black */
-  color: #bbb;              /* light text so it's readable */
-}
 .footer a { color: #ddd; }
 .footer a:hover { color: #52b6cc; }
 

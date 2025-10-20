@@ -1,90 +1,90 @@
 {% extends "layouts/customer_base.html" %}
 {% block content %}
 <section class="bg-light">
-  <div class="row item_section">
-    <div class="col-lg-7 mt-3">
-      <h2 class="fw-bolder">Checkout</h2>
+  <form method="POST" action="{{ url_for('customer.checkout') }}">
+    <div class="row item_section">
+      <div class="col-lg-7 mt-3">
+        <h2 class="fw-bolder">Checkout</h2>
 
-      <div class="section_card">
-        <h3>Contact information</h3>
-        <form>
+        <div class="section_card">
+          <h3>Contact information</h3>
           <div class="row g-3 mb-3">
             <div class="col-md-6">
-              <label class="form-label">First Name</label>
-              <input type="text" class="form-control" placeholder="Camila"/>
+              <label for="first_name" class="form-label">First Name</label>
+              <input type="text" id="first_name" name="first_name" class="form-control" placeholder="Camila" required/>
             </div>
             <div class="col-md-6">
-              <label class="form-label">Last Name</label>
-              <input type="text" class="form-control" placeholder="Shand"/>
+              <label for="last_name" class="form-label">Last Name</label>
+              <input type="text" id="last_name" name="last_name" class="form-control" placeholder="Shand" required/>
             </div>
           </div>
           <div class="row g-3 mb-3">
             <div class="col-md-6">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" placeholder="camile@shand.com"/>
+              <label for="email" class="form-label">Email</label>
+              <input type="email" id="email" name="email" class="form-control" placeholder="camile@shand.com" required/>
             </div>
             <div class="col-md-6">
-              <label class="form-label">Phone Number</label>
-              <input type="tel" class="form-control" placeholder="0412 345678"/>
+              <label for="phone" class="form-label">Phone Number</label>
+              <input type="tel" id="phone" name="phone" class="form-control" placeholder="0412 345678" required/>
             </div>
           </div>
-        </form>
-      </div>
+        </div>
 
-      <div class="section_card">
-        <h4 class="mb-4"><i class="bi bi-credit-card me-2"></i>Payment Information</h4>
-        <div class="row g-3">
-          <div class="col-12">
-            <label class="form-label">Card Number</label>
-            <input type="text" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19" required/>
+        <div class="section_card">
+          <h4 class="mb-4"><i class="bi bi-credit-card me-2"></i>Payment Information</h4>
+          <div class="row g-3">
+            <div class="col-12">
+              <label for="card_number" class="form-label">Card Number</label>
+              <input type="text" id="card_number" name="card_number" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19" required/>
+            </div>
+            <div class="col-md-6">
+              <label for="expiry_date" class="form-label">Expiry Date</label>
+              <input type="text" id="expiry_date" name="expiry_date" class="form-control" placeholder="MM/YY" maxlength="5" required/>
+            </div>
+            <div class="col-md-6">
+              <label for="cvc" class="form-label">CVC</label>
+              <input type="text" id="cvc" name="cvc" class="form-control" placeholder="123" maxlength="4" required/>
+            </div>
+            <div class="col-12">
+              <label for="cardholder_name" class="form-label">Cardholder Name</label>
+              <input type="text" id="cardholder_name" name="cardholder_name" class="form-control" placeholder="Name on card" required/>
+            </div>
           </div>
-          <div class="col-md-6">
-            <label class="form-label">Expiry Date</label>
-            <input type="text" class="form-control" placeholder="MM/YY" maxlength="5" required/>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">CVC</label>
-            <input type="text" class="form-control" placeholder="123" maxlength="4" required/>
-          </div>
-          <div class="col-12">
-            <label class="form-label">Cardholder Name</label>
-            <input type="text" class="form-control" placeholder="Name on card" required/>
+          <div class="d-flex align-items-center mt-2">
+            <i class="bi bi-shield-check text-success me-2"></i>
+            <small class="text-muted">Your payment information is encrypted and secure.</small>
           </div>
         </div>
-        <div class="d-flex align-items-center mt-2">
-          <i class="bi bi-shield-check text-success me-2"></i>
-          <small class="text-muted">Your payment information is encrypted and secure.</small>
+      </div>
+
+      <div class="col-lg-5 mt-5 mb-md-3 mb-5 booking_summary">
+        <div class="section_card mt-5">
+          <h5>Booking Summary</h5>
+          {% if cart %}
+            {% for id, it in cart.items() %}
+            <div class="d-flex justify-content-between mb-2">
+              <span>{{ it.title }}</span>
+              <span class="fw-bold">${{ '%.2f'|format(it.price) }}</span>
+            </div>
+            {% endfor %}
+            <hr/>
+            <div class="d-flex justify-content-between">
+              <span class="fw-bold">Total</span>
+              <span class="fw-bold fs-5">${{ '%.2f'|format(total) }}</span>
+            </div>
+          {% else %}
+            <div class="text-muted">Your basket is empty.</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="col-lg-7 col-sm-12 col-md-7 pt-3 pb-5">
+        <div class="d-flex justify-content-end">
+          <a href="{{ url_for('customer.cart') }}" class="btn btn-outline-secondary flex-fill me-2">Go back</a>
+          <button type="submit" class="btn btn-orange flex-fill">Place Order</button>
         </div>
       </div>
     </div>
-
-    <div class="col-lg-5 mt-5 mb-md-3 mb-5 booking_summary">
-      <div class="section_card mt-5">
-        <h5>Booking Summary</h5>
-        {% if cart %}
-          {% for id, it in cart.items() %}
-          <div class="d-flex justify-content-between mb-2">
-            <span>{{ it.title }}</span>
-            <span class="fw-bold">${{ '%.2f'|format(it.price) }}</span>
-          </div>
-          {% endfor %}
-          <hr/>
-          <div class="d-flex justify-content-between">
-            <span class="fw-bold">Total</span>
-            <span class="fw-bold fs-5">${{ '%.2f'|format(total) }}</span>
-          </div>
-        {% else %}
-          <div class="text-muted">Your basket is empty.</div>
-        {% endif %}
-      </div>
-    </div>
-
-    <div class="col-lg-7 col-sm-12 col-md-7 pt-3 pb-5">
-      <div class="d-flex justify-content-end">
-        <a href="{{ url_for('customer.cart') }}" class="btn btn-outline-secondary flex-fill me-2">Go back</a>
-        <a href="{{ url_for('customer.success_page') }}" class="btn btn-orange flex-fill">Place Order</a>
-      </div>
-    </div>
-  </div>
+  </form>
 </section>
 {% endblock %}

@@ -20,13 +20,13 @@
     {% if bookings %}
     <!-- Stats Section -->
     <div class="row mb-4">
-      <div class="col-4 mb-3">
+      <div class="col-6 col-md-4 mb-3">
         <div class="stats-card">
           <div class="stats-number">{{ bookings|length }}</div>
           <div class="stats-label">Total Bookings</div>
         </div>
       </div>
-      <div class="col-4 mb-3">
+      <div class="col-6 col-md-4 mb-3">
         <div class="stats-card">
           <div class="stats-number">
             {% set completed = bookings|selectattr("status", "equalto",
@@ -35,7 +35,7 @@
           <div class="stats-label">Completed</div>
         </div>
       </div>
-      <div class="col-4 mb-3">
+      <div class="col-12 col-md-4 mb-3">
         <div class="stats-card">
           <div class="stats-number">
             {% set total = bookings|sum(attribute='total_amount') %} ${{
