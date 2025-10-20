@@ -95,6 +95,29 @@ customer_bp = Blueprint('customer', __name__)
 photographer_bp = Blueprint('photographer', __name__, url_prefix='/photographer')
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
+# -- make cart badge reflect DB for logged-in customers; fallback to session when logged out
+def inject_cart():
+    try:
+        # When logged in, read from DB cart
+        if is_authenticated():
+            user = get_current_user()
+            if user and user.get('role') == 'Customer':
+                customer = Customer.get_by_user_id(user.get('id'))
+                if customer:
+                    cart = Cart.get_by_customer(customer.id)
+                    if cart:
+                        items = CartItem.get_by_cart(cart.id) or []
+                        # if later you store quantity per item, sum it here; for now it's 1 per item
+                        return dict(cart_count=len(items))
+
+        # Not logged in (or no DB cart) → use session cart
+        cart = session.get('cart', {})
+        count = sum(int(it.get('qty', 0)) for it in cart.values())
+        return dict(cart_count=count)
+    except Exception:
+        return dict(cart_count=0)
+
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if is_authenticated():
@@ -394,7 +417,7 @@ def add_to_cart_db():
 @customer_bp.route('/cart')
 @login_required
 @role_required('Customer')
-def view_cart():
+def cart():
     user = get_current_user()
     customer = Customer.get_by_user_id(user.get('id'))
     cart = Cart.get_by_customer(customer.id)
@@ -402,14 +425,14 @@ def view_cart():
 
     cart_dict = {item.id: {
         'title': f'Package #{item.package_id}',
-        'price': item.price,
+        'price': float(item.price),
         'qty': 1
     } for item in items}
 
     total = sum(i['price'] * i['qty'] for i in cart_dict.values())
 
     return render_template(
-        'customer/checkout.html',
+        'customer/cart.html',
         title='Your Basket',
         cart=cart_dict,
         total=total
@@ -485,10 +508,30 @@ def create_booking():
     return redirect(url_for('customer.success_page'))
 
 @customer_bp.route('/checkout')
+@login_required
+@role_required('Customer')
 def checkout():
-    cart = get_cart_items()
-    total = sum(float(i['price']) * int(i['qty']) for i in cart.values()) if cart else 0.0
-    return render_template('customer/checkout.html', title='Checkout', cart=cart, total=total)
+    user = get_current_user()
+    customer = Customer.get_by_user_id(user.get('id'))
+    cart = Cart.get_by_customer(customer.id)
+    items = CartItem.get_by_cart(cart.id) if cart else []
+
+    cart_dict = {
+        item.id: {
+            'title': f'Package #{item.package_id}',
+            'price': float(item.price),
+            'qty': 1
+        } for item in items
+    }
+    total = sum(i['price'] * i['qty'] for i in cart_dict.values())
+
+    return render_template(
+        'customer/checkout.html',      # << Checkout ची फाईल
+        title='Checkout',
+        cart=cart_dict,
+        total=total
+    )
+
 
 @customer_bp.route('/success')
 def success_page():

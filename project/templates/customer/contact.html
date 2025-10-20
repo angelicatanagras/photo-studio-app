@@ -1,0 +1,60 @@
+{% extends "layouts/customer_base.html" %}
+{% block content %}
+
+<section class="py-5 page-surface-white">
+  <div class="container">
+    <header class="mb-4">
+      <h1 class="display-5 fw-bold text-dark mb-2">We’re Here for You</h1>
+      <p class="lead text-muted mb-0">
+        Our team can help you plan and book the right session. Call or email us using the details below.
+      </p>
+    </header>
+
+    <div class="row g-4">
+      <!-- Contact methods -->
+      <div class="col-12 col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body p-4">
+            <h2 class="h5 mb-3">Contact ClickConnect</h2>
+            <ul class="list-unstyled mb-0 contact-list">
+              <li>
+                <i class="bi bi-telephone me-2"></i>
+                <a href="tel:+611234567" class="link-body-emphasis">+61 1234567</a>
+              </li>
+              <li>
+                <i class="bi bi-envelope me-2"></i>
+                <a href="mailto:support@clickconnect.com" class="link-body-emphasis">support@clickconnect.com</a>
+              </li>
+              <li>
+                <i class="bi bi-question-circle me-2"></i>
+                <a href="https://help.clickconnect.com" class="link-body-emphasis" target="_blank" rel="noopener">
+                  Help Center — help.clickconnect.com
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Address & hours -->
+      <div class="col-12 col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body p-4">
+            <h2 class="h6 text-uppercase text-muted mb-3">Address</h2>
+            <address class="mb-4 text-body">
+              <strong>ClickConnect</strong><br />
+              111 ABC Street, Brisbane<br />
+              Australia
+            </address>
+
+            <h2 class="h6 text-uppercase text-muted mb-2">Hours</h2>
+            <p class="mb-0">Mon–Fri, 9:00–17:00 AEST</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+{% endblock %}

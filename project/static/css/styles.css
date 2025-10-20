@@ -946,3 +946,24 @@ a {
   transform: scale(1.1);
   border-color: var(--orange);
 }
+/* --- Cart table: make header, item row, and total row same grey --- */
+.cart-table thead th,
+.cart-table tfoot th,
+.cart-table tbody td {
+  background-color: #fff !important;   /* white */
+  color: #111 !important;
+
+}
+
+/* Consistent borders between rows */
+.cart-table td, 
+.cart-table th {
+  border-color: #dee2e6 !important;
+}
+
+/* Safety: if 'table-striped' sneaks back in, neutralize zebra */
+.cart-table.table-striped > tbody > tr:nth-of-type(odd),
+.cart-table.table-striped > tbody > tr:nth-of-type(even) {
+  --bs-table-accent-bg: #fff !important;
+}
+

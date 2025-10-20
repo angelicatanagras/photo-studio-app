@@ -1,0 +1,54 @@
+{% extends "layouts/customer_base.html" %}
+{% block content %}
+<div class="container py-4 cart-surface">
+  <h2 class="mb-4">Your Basket</h2>
+
+  {% if not cart %}
+    <div class="alert alert-info">Your cart is empty.</div>
+    <a href="{{ url_for('customer.index') }}" class="btn btn-outline-light">Back to Home</a>
+  {% else %}
+    <div class="table-responsive">
+      <table class="table table-striped align-middle cart-table">
+        <!-- Header: light grey -->
+        <thead class="table-secondary">
+          <tr>
+            <th>Item</th>
+            <th class="text-end">Price</th>
+            <th class="text-center">Qty</th>
+            <th class="text-end">Subtotal</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for id, it in cart.items() %}
+            {% set subtotal = it.price * it.qty %}
+            <tr>
+              <td>{{ it.title }}</td>
+              <td class="text-end">${{ '%.2f'|format(it.price|float) }}</td>
+              <td class="text-center">{{ it.qty }}</td>
+              <td class="text-end">${{ '%.2f'|format(subtotal) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+
+        <!-- Total: light grey -->
+        <tfoot class="table-secondary fw-semibold">
+          <tr>
+            <th colspan="3" class="text-end">Total</th>
+            <th class="text-end">${{ '%.2f'|format(total|float) }}</th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="d-flex flex-wrap gap-3 mt-3">
+      <a href="{{ url_for('customer.index') }}" class="btn btn-outline-dark px-4">
+        ← Continue Browsing
+      </a>
+      <a href="{{ url_for('customer.checkout') }}" class="btn btn-warning text-dark fw-semibold px-4">
+        Proceed to Checkout
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
