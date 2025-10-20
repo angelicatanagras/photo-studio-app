@@ -15,8 +15,9 @@ def create_app(config_name=None):
 
     mysql.init_app(app)
 
-    from .views import inject_current_user
+    from .views import inject_current_user,inject_cart
     app.context_processor(inject_current_user)
+    app.context_processor(inject_cart)
 
     from .views import customer_bp, photographer_bp, auth_bp, admin_bp
     app.register_blueprint(customer_bp)
