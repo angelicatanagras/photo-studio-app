@@ -63,6 +63,14 @@
                 </a>
               </li>
               <li class="nav-item">
+                <a
+                  class="nav-link text-white"
+                  href="{{ url_for('admin.photographers') }}"
+                >
+                  Photographers
+                </a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link text-white" href="{{ url_for('admin.bookings') }}"> Bookings </a>
               </li>
             </ul>
@@ -129,6 +137,7 @@
             <ul class="list">
               <li><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
               <li><a href="{{ url_for('admin.users') }}">Users</a></li>
+              <li><a href="{{ url_for('admin.photographers') }}">Photographers</a></li>
               <li><a href="{{ url_for('admin.bookings') }}">Bookings</a></li>
             </ul>
           </div>

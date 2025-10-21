@@ -88,6 +88,15 @@ class PhotographerBioForm(FlaskForm):
     ])
     submit = SubmitField('Update Bio')
 
+class ProfilePictureForm(FlaskForm):
+    """Form for uploading profile picture"""
+    profile_picture = FileField('Profile Picture', validators=[
+        FileRequired(message='Please select an image to upload'),
+        FileAllowed(['png', 'jpg', 'jpeg', 'gif', 'webp'], 
+                   message='Only image files are allowed (PNG, JPG, JPEG, GIF, WEBP)')
+    ])
+    submit = SubmitField('Upload Picture')
+    
     
 class SinglePackageForm(FlaskForm):
     """Form for creating/updating a single package"""

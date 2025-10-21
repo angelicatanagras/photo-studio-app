@@ -64,11 +64,21 @@
     <div class="col-10 col-sm-6 col-md-4 col-lg-3">
       <div class="card border-0 photog-card">
         <div class="image-container">
+          {% if photographer.user and photographer.user.profile_image %}
           <img
-            src="{{ url_for('static', filename='img/photog-1.jpg') }}"
+            src="{{ url_for('static', filename='uploads/profiles/' + photographer.user.profile_image) }}"
             class="card-img-top photog-card-img"
             alt="{{ photographer.user.full_name }}"
+            style="object-fit: cover; height: 250px;"
           />
+          {% else %}
+          <img
+            src="https://ui-avatars.com/api/?name={{ photographer.user.full_name|urlencode }}&size=250&background=f97316&color=fff"
+            class="card-img-top photog-card-img"
+            alt="{{ photographer.user.full_name }}"
+            style="object-fit: cover; height: 250px;"
+          />
+          {% endif %}
           <div class="photog-location-overlay">
             <p class="card-text">
               📍 {{ photographer.location or 'Location not specified' }}

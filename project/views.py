@@ -8,13 +8,14 @@ from werkzeug.utils import secure_filename
 
 
 from .models import User, Photographer, Customer, Category, Booking, Cart, CartItem, Package, PortfolioItem
-from .forms import LoginForm, RegistrationForm, PortfolioUploadForm, PhotographerBioForm, SinglePackageForm
+from .forms import LoginForm, RegistrationForm, PortfolioUploadForm, PhotographerBioForm, ProfilePictureForm,SinglePackageForm
 
 # Upload configuration
 UPLOAD_FOLDER = 'static/uploads/portfolio'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 5MB
 
+PROFILE_UPLOAD_FOLDER = 'static/uploads/profiles'
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -542,9 +543,52 @@ def checkout():
     )
 
 
+@customer_bp.route('/process-payment', methods=['POST'])
+@login_required
+@role_required('Customer')
+def process_payment():
+    """Process payment and clear cart"""
+    user = get_current_user()
+    customer = Customer.get_by_user_id(user.get('id'))
+    
+    if not customer:
+        flash('Customer profile not found.', 'error')
+        return redirect(url_for('customer.index'))
+    
+    # Get current cart
+    cart = Cart.get_by_customer(customer.id, status='Pending')
+    if not cart:
+        flash('No items in cart to process.', 'error')
+        return redirect(url_for('customer.view_cart'))
+    
+    # Get cart items for creating booking record
+    cart_items = CartItem.get_by_cart(cart.id)
+    if not cart_items:
+        flash('Cart is empty.', 'error')
+        return redirect(url_for('customer.view_cart'))
+    
+    try:
+        # Create booking from cart using model method
+        booking_id = Booking.create_from_cart(cart.id, customer.id, cart.subtotal)
+        
+        # Generate order ID for display
+        order_id = f"AUS-{booking_id:05d}"
+        
+        flash('Payment processed successfully!', 'success')
+        return redirect(url_for('customer.success_page', order_id=order_id))
+        
+    except Exception as e:
+        flash(f'Payment processing failed: {str(e)}', 'error')
+        return redirect(url_for('customer.checkout'))
+
+
 @customer_bp.route('/success')
 def success_page():
-    return render_template('customer/success_page.html', title='Booking Success')
+    """Display success page after payment"""
+    order_id = request.args.get('order_id', 'AUS-00000')
+    return render_template('customer/success_page.html', 
+                         title='Booking Success', 
+                         order_id=order_id)
 
 
 @customer_bp.route('/about')
@@ -591,6 +635,7 @@ def dashboard():
     upload_form = PortfolioUploadForm()
     bio_form = PhotographerBioForm()
     package_form = SinglePackageForm()
+    profile_form = ProfilePictureForm() 
 
     # Pre-populate bio form
     if photographer.bio:
@@ -611,6 +656,7 @@ def dashboard():
                            upload_form=upload_form,
                            bio_form=bio_form,
                            package_form=package_form,
+                           profile_form=profile_form,
                            categories=categories)
 
 
@@ -877,20 +923,101 @@ def delete_portfolio(portfolio_id):
 
     return redirect(url_for('photographer.dashboard'))
 
+@photographer_bp.route('/upload_profile_picture', methods=['POST'])
+@role_required('Photographer')
+def upload_profile_picture():
+    """Handle profile picture upload"""
+    user = get_current_user()
+    photographer = Photographer.get_by_user_id(user.get('id'))
+
+    if not photographer:
+        flash('Photographer profile not found.', 'error')
+        return redirect(url_for('photographer.dashboard'))
+
+    form = ProfilePictureForm()
+
+    if form.validate_on_submit():
+        try:
+            file = form.profile_picture.data
+
+            # Check file size (max 5MB)
+            file.seek(0, os.SEEK_END)
+            file_size = file.tell()
+            file.seek(0)
+
+            if file_size > MAX_FILE_SIZE:
+                flash('File size exceeds 50MB limit.', 'error')
+                return redirect(url_for('photographer.dashboard'))
+
+            # Secure the filename
+            filename = secure_filename(file.filename)
+
+            # Create unique filename to avoid conflicts
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            name, ext = os.path.splitext(filename)
+            unique_filename = f"profile_{user.get('id')}_{timestamp}{ext}"
+
+            # Get upload path
+            upload_path = os.path.join(current_app.root_path, PROFILE_UPLOAD_FOLDER)
+
+            # Ensure upload directory exists
+            os.makedirs(upload_path, exist_ok=True)
+
+            # Delete old profile picture if exists
+            if user.get('profile_image'):
+                old_file_path = os.path.join(upload_path, user.get('profile_image'))
+                if os.path.exists(old_file_path):
+                    os.remove(old_file_path)
+
+            # Save new file
+            file_path = os.path.join(upload_path, unique_filename)
+            file.save(file_path)
+
+            # Update user profile in database
+            User.update(user.get('id'), profile_image=unique_filename)
+
+            flash('Profile picture updated successfully!', 'success')
+
+        except Exception as e:
+            flash(f'Error uploading profile picture: {str(e)}', 'error')
+            import traceback
+            print(traceback.format_exc())
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f'{field}: {error}', 'error')
+
+    return redirect(url_for('photographer.dashboard'))
+
+
 
 @photographer_bp.route('/gallery')
 @photographer_bp.route('/gallery/<int:photographer_id>')
 def gallery(photographer_id=None):
+    current_user_obj = get_current_user() if is_authenticated() else None
+    is_owner = False
+
     if photographer_id:
+        # Viewing a specific photographer's gallery (public view)
         photographer = Photographer.get_by_id(photographer_id)
     else:
-        # Default to first photographer if no ID provided
-        photographers = Photographer.get_all()
-        photographer = photographers[0] if photographers else None
+        # No photographer_id provided - must be photographer viewing their own gallery
+        if is_authenticated() and current_user_obj and current_user_obj.get('role') == 'Photographer':
+            photographer = Photographer.get_by_user_id(current_user_obj.get('id'))
+            is_owner = True
+        else:
+            flash('Please log in as a photographer.', 'error')
+            return redirect(url_for('auth.photographer_login'))
 
     if not photographer:
         flash('Photographer not found.', 'error')
         return redirect(url_for('customer.index'))
+
+    # Check if current user is the photographer owner
+    if current_user_obj and current_user_obj.get('role') == 'Photographer':
+        photographer_profile = Photographer.get_by_user_id(current_user_obj.get('id'))
+        if photographer_profile and photographer_profile.id == photographer.id:
+            is_owner = True
 
     # Get photographer's packages
     packages = Package.get_by_photographer_id(photographer.id)
@@ -906,8 +1033,14 @@ def gallery(photographer_id=None):
     # Get portfolio items
     portfolioItems = PortfolioItem.get_by_photographer(photographer.id)
 
+    # Use different template based on whether viewer is the photographer owner or a customer
+    if is_owner:
+        template = 'photographer/gallery.html'
+    else:
+        template = 'customer/photographer_gallery.html'
+
     return render_template(
-        'photographer/gallery.html',
+        template,
         title='Gallery',
         photographer=photographer,
         categories=categories,
@@ -1007,3 +1140,25 @@ def users():
 def bookings():
     all_bookings = Booking.get_all()
     return render_template('admin/bookings.html', title='All Bookings', bookings=all_bookings)
+
+
+@admin_bp.route('/photographers')
+@role_required('Admin')
+def photographers():
+    all_photographers = Photographer.get_all()
+    return render_template('admin/photographers.html', title='Manage Photographers', photographers=all_photographers)
+
+
+@admin_bp.route('/photographers/toggle_featured/<int:photographer_id>', methods=['POST'])
+@role_required('Admin')
+def toggle_featured(photographer_id):
+    try:
+        photographer = Photographer.toggle_featured(photographer_id)
+        if photographer.featured:
+            flash(f'{photographer.user.full_name} is now featured!', 'success')
+        else:
+            flash(f'{photographer.user.full_name} is no longer featured.', 'info')
+    except Exception as e:
+        flash(f'Error toggling featured status: {str(e)}', 'error')
+
+    return redirect(url_for('admin.photographers'))

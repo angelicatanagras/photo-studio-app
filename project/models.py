@@ -561,7 +561,7 @@ class Photographer:
 
     @staticmethod
     def update(photographer_id, **kwargs):
-        allowed_fields = ['category_id', 'bio', 'location', 'social_link', 'availability']
+        allowed_fields = ['category_id', 'bio', 'location', 'social_link', 'availability', 'featured']
         updates = []
         values = []
 
@@ -575,6 +575,15 @@ class Photographer:
             query = f"UPDATE photographers SET {', '.join(updates)} WHERE id = %s"
             execute_query(query, tuple(values))
 
+        return Photographer.get_by_id(photographer_id)
+
+    @staticmethod
+    def toggle_featured(photographer_id):
+        """Toggle featured status for a photographer."""
+        execute_query(
+            "UPDATE photographers SET featured = NOT featured WHERE id = %s",
+            (photographer_id,)
+        )
         return Photographer.get_by_id(photographer_id)
 
     @staticmethod
@@ -956,6 +965,25 @@ class Booking:
     @staticmethod
     def delete(booking_id):
         execute_query("DELETE FROM bookings WHERE id = %s", (booking_id,))
+
+    @staticmethod
+    def create_from_cart(cart_id, customer_id, total_amount):
+        """Create booking from existing cart without clearing cart items"""
+        from database import execute_query
+        
+        # Create booking record
+        booking_id = execute_query(
+            """
+            INSERT INTO bookings (cart_id, customer_id, total_amount, status, payment_date, created_at)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            (cart_id, customer_id, total_amount, 'Completed', datetime.utcnow(), datetime.utcnow())
+        )
+        
+        # Update cart status to Completed (preserve cart and cart_item records)
+        Cart.update(cart_id, status='Completed')
+        
+        return booking_id
 
     def __repr__(self):
         return f'<Booking {self.id}>'

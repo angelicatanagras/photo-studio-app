@@ -7,18 +7,18 @@
 
           <!-- Photographer Image -->
           <div class="flex-shrink-0 text-center">
-            {% if photographer.user.profile_image %}
+           {% if photographer and photographer.user and photographer.user.profile_image %}
             <img
-              src="{{ url_for('static', filename='uploads/' ~ photographer.user.profile_image) }}"
+              class="profile_img rounded-circle"
+              src="{{ url_for('static', filename='uploads/profiles/' + photographer.user.profile_image) }}"
               alt="{{ photographer.user.full_name }}"
-              class="rounded-circle"
               style="width: 150px; height: 150px; object-fit: cover;"
             />
             {% else %}
             <img
-              src="{{ url_for('static', filename='img/photog-1.jpg') }}"
-              alt="photographer"
-              class="rounded-circle"
+              class="profile_img rounded-circle"
+              src="https://ui-avatars.com/api/?name={{ photographer.user.full_name|urlencode }}&size=150&background=f97316&color=fff"
+              alt="Default Profile"
               style="width: 150px; height: 150px; object-fit: cover;"
             />
             {% endif %}
