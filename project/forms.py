@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, HiddenField, TextAreaField, SelectField, DateField, IntegerField, FloatField, RadioField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError, Optional, NumberRange
-from .models import User
+from flask_wtf.file import FileField, FileAllowed, FileRequired
+from .models import User, Category
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
@@ -42,3 +43,57 @@ class BookingForm(FlaskForm):
     pax = IntegerField('Number of Pax', validators=[Optional(), NumberRange(min=1, max=50)])
     notes = TextAreaField('Event Notes', validators=[Optional(), Length(max=500)])
     submit = SubmitField('Proceed to checkout')
+
+class PortfolioUploadForm(FlaskForm):
+    title = StringField('Title', validators=[
+        DataRequired(message='Title is required'),
+        Length(min=2, max=100, message='Title must be between 2 and 100 characters')
+    ])
+    caption = TextAreaField('Caption', validators=[
+        Optional(),
+        Length(max=500, message='Caption cannot exceed 500 characters')
+    ])
+    portfolio_image = FileField('Portfolio Image', validators=[
+        FileRequired(message='Please select an image to upload'),
+        FileAllowed(['png', 'jpg', 'jpeg', 'gif', 'webp'], 
+                   message='Only image files are allowed (PNG, JPG, JPEG, GIF, WEBP)')
+    ])
+    submit = SubmitField('Upload Image')
+
+class PhotographerBioForm(FlaskForm):
+    """Form for updating photographer bio/summary"""
+    bio = TextAreaField('Bio/Summary', validators=[
+        Optional(),
+        Length(max=1000, message='Bio cannot exceed 1000 characters')
+    ])
+    submit = SubmitField('Update Bio')
+
+    
+class SinglePackageForm(FlaskForm):
+    """Form for creating/updating a single package"""
+    package_name = SelectField('Package Type', 
+                                choices=[('', 'Select Package Type'),
+                                        ('Basic', 'Basic'), 
+                                        ('Standard', 'Standard'), 
+                                        ('Premium', 'Premium')],
+                                validators=[DataRequired(message='Package type is required')])
+    category = SelectField('Category', 
+                          choices=[],
+                          coerce=int,
+                          validators=[DataRequired(message='Category is required')])
+    price = FloatField('Price ($)', validators=[
+        DataRequired(message='Price is required'),
+        NumberRange(min=0, max=10000, message='Price must be between $0 and $10,000')
+    ])
+    inclusions = TextAreaField('What\'s Included', validators=[
+        DataRequired(message='Please describe what\'s included in this package'),
+        Length(min=10, max=500, message='Inclusions must be between 10 and 500 characters')
+    ])
+    submit = SubmitField('Create Package')
+    
+    def __init__(self, *args, **kwargs):
+        super(SinglePackageForm, self).__init__(*args, **kwargs)
+        # Populate category choices from database
+        categories = Category.get_all()
+        category_choices = [(0, 'Select Category')] + [(c.id, c.category_name) for c in categories]
+        self.category.choices = category_choices    

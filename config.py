@@ -24,6 +24,13 @@ class Config:
     MYSQL_PASSWORD = os.environ.get('DB_PASSWORD') or ''
     MYSQL_CURSORCLASS = 'DictCursor'
 
+    # Upload Configuration
+    UPLOAD_FOLDER = os.path.join(basedir, 'static', 'uploads', 'portfolio')
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+    MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 5MB max file size
+
+    PROFILE_IMAGE_FOLDER = os.path.join(basedir, 'static', 'uploads', 'profiles')
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -32,10 +39,16 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
 
+    UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER') or os.path.join(basedir, 'static', 'uploads', 'portfolio')
+    PROFILE_IMAGE_FOLDER = os.environ.get('PROFILE_IMAGE_FOLDER') or os.path.join(basedir, 'static', 'uploads', 'profiles')
+
 
 class TestingConfig(Config):
     TESTING = True
     MYSQL_DB = 'photostudio_booking_test'
+
+    UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER') or os.path.join(basedir, 'static', 'uploads', 'portfolio')
+    PROFILE_IMAGE_FOLDER = os.environ.get('PROFILE_IMAGE_FOLDER') or os.path.join(basedir, 'static', 'uploads', 'profiles')
 
 
 config = {

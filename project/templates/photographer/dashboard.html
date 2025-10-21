@@ -1,6 +1,4 @@
-{% extends "layouts/photographer_base.html" %}
-
-{% block content %}
+{% extends "layouts/photographer_base.html" %} {% block content %}
 <section class="portfolio_section mt-4">
   <!-- photog details admin_photographer -->
   <div class="container">
@@ -18,13 +16,18 @@
           </div>
           <div class="vendor-photog-details flex-grow-1 bg-white-95">
             <div>
-              <h3>John Doe</h3>
+              <h3>
+                {{ photographer.user.full_name if photographer and
+                photographer.user else 'Photographer' }}
+              </h3>
             </div>
             <div>
-              📞 0424 121 1212 <br />
-              📍 Adelaide
+              📞 {{ photographer.user.phone if photographer and
+              photographer.user and photographer.user.phone else 'Not set' }}
+              <br />
+              📍 {{ photographer.location if photographer else 'Location not
+              set' }}
             </div>
-            <div>Pricing: Starts at $1500</div>
             <br />
           </div>
         </div>
@@ -32,142 +35,184 @@
     </div>
   </div>
 </section>
+
+<!-- Bio Section -->
 <section class="portfolio_section">
-  <div class="container d-flex justify-content-end">
-    <a href="{{ url_for('photographer.gallery') }}" class="btn btn-orange"
-      >Publish</a
-    >
-  </div>
   <div class="row g-3 p-3">
     <div class="col-12 col-md-12">
-      <div class="form-floating">
-        <textarea
-          class="summary_textarea form-control"
-          placeholder="Summary"
-          id="floatingTextarea"
-        >This is some information or bio about me.</textarea
-        >
-        <label for="floatingTextarea">Summary</label>
-      </div>
+      <form method="POST" action="{{ url_for('photographer.update_bio') }}">
+        {{ bio_form.hidden_tag() }}
+
+        <div class="form-floating">
+          {{ bio_form.bio(class="summary_textarea form-control",
+          placeholder="Tell clients about yourself, your experience, and your
+          photography style...", rows="5", id="floatingTextarea") }}
+          <label for="floatingTextarea">Bio/Summary</label>
+        </div>
+
+        {% if bio_form.bio.errors %}
+        <div class="text-danger small mt-1">
+          {% for error in bio_form.bio.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="mt-2">{{ bio_form.submit(class="btn btn-orange") }}</div>
+      </form>
     </div>
   </div>
 </section>
-<!-- additional services-->
+
+<!-- Package Management Section - UNLIMITED -->
 <section class="portfolio_section">
-  <div class="d-flex flex-column flex-md-row gap-3 p-3">
-    <div class="card w-100 w-sm-50 flex-fill">
+  <div class="container">
+    <div class="card">
       <div class="card-body">
-        <h5 class="card-title">Add your expertise category +</h5>
-        <p class="card-text">Check applicable expertise services</p>
-        <ul class="list-group">
-          <li class="list-group-item">
-            <input
-              class="form-check-input me-1"
-              type="checkbox"
-              value=""
-              id="portrait"
-              checked
-            />
-            <label class="form-check-label" for="portrait">Portrait</label>
-          </li>
-          <li class="list-group-item">
-            <input
-              class="form-check-input me-1"
-              type="checkbox"
-              value=""
-              id="creatives"
-            />
-            <label class="form-check-label" for="creatives">Creatives</label>
-          </li>
-          <li class="list-group-item">
-            <input
-              class="form-check-input me-1"
-              type="checkbox"
-              value=""
-              id="maternity"
-            />
-            <label class="form-check-label" for="maternity"
-              >Maternity & New Born</label
+        <h5 class="card-title mb-4">
+          <i class="bi bi-box"></i> Manage Your Packages
+        </h5>
+
+        <!-- Create New Package Form -->
+        <div class="card mb-4 border-success">
+          <div class="card-header bg-success text-white">
+            <strong><i class="bi bi-plus-circle"></i> Create New Package</strong>
+          </div>
+          <div class="card-body">
+            <form
+              method="POST"
+              action="{{ url_for('photographer.create_package') }}"
             >
-          </li>
-          <li class="list-group-item">
-            <input
-              class="form-check-input me-1"
-              type="checkbox"
-              value=""
-              checked
-              id="pet"
-            />
-            <label class="form-check-label" for="pet">Pet Photography</label>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="card w-100 w-sm-50 flex-fill">
-      <div class="card-body">
-        <h5 class="card-title">Add on services +</h5>
-        <p class="card-text">
-          Check applicable services and include your price.
-        </p>
-        <ul class="list-group">
-          <li
-            class="list-group-item d-flex align-items-center flex-column flex-sm-row justify-content-between"
-          >
-            <div>
-              <input
-                class="form-check-input me-1"
-                type="checkbox"
-                value=""
-                id="package1"
-              />
-              <label class="form-check-label" for="package1">Package 1</label>
+              {{ package_form.hidden_tag() }}
+
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  {{ package_form.package_name.label(class="form-label") }}
+                  {{ package_form.package_name(class="form-control") }}
+                  {% if package_form.package_name.errors %}
+                  <div class="text-danger small mt-1">
+                    {% for error in package_form.package_name.errors %} {{ error }} {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  {{ package_form.category.label(class="form-label") }}
+                  {{ package_form.category(class="form-control") }}
+                  {% if package_form.category.errors %}
+                  <div class="text-danger small mt-1">
+                    {% for error in package_form.category.errors %} {{ error }} {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  {{ package_form.price.label(class="form-label") }}
+                  {{ package_form.price(class="form-control", placeholder="299.99") }}
+                  {% if package_form.price.errors %}
+                  <div class="text-danger small mt-1">
+                    {% for error in package_form.price.errors %} {{ error }} {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="col-md-12 mb-3">
+                  {{ package_form.inclusions.label(class="form-label") }}
+                  {{ package_form.inclusions(class="form-control", rows="3", placeholder="E.g., 2-hour session, 20 edited photos, online gallery") }}
+                  {% if package_form.inclusions.errors %}
+                  <div class="text-danger small mt-1">
+                    {% for error in package_form.inclusions.errors %} {{ error }} {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="d-grid gap-2">
+                {{ package_form.submit(class="btn btn-success") }}
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Existing Packages List -->
+        <div class="mt-4">
+          <h6 class="mb-3"><strong>Your Existing Packages ({{ packages|length }})</strong></h6>
+          
+          {% if packages %}
+            {% for package in packages %}
+            <div class="card mb-3">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>{{ package.package_name }}</strong>
+                <span class="badge bg-primary">${{ package.price }}</span>
+              </div>
+              <div class="card-body">
+                <form method="POST" action="{{ url_for('photographer.update_package', package_id=package.id) }}">
+                  <div class="row">
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">Package Type</label>
+                      <select name="package_name" class="form-control" required>
+                        <option value="Basic" {% if package.package_name == 'Basic' %}selected{% endif %}>Basic</option>
+                        <option value="Standard" {% if package.package_name == 'Standard' %}selected{% endif %}>Standard</option>
+                        <option value="Premium" {% if package.package_name == 'Premium' %}selected{% endif %}>Premium</option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">Category</label>
+                      <select name="category" class="form-control" required>
+                        <option value="0">Select Category</option>
+                        {% for choice_value, choice_label in package_form.category.choices %}
+                          {% if choice_value != 0 %}
+                          <option value="{{ choice_value }}" {% if package.category_id == choice_value %}selected{% endif %}>
+                            {{ choice_label }}
+                          </option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">Price ($)</label>
+                      <input type="number" step="0.01" name="price" class="form-control" value="{{ package.price }}" required>
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                      <label class="form-label">What's Included</label>
+                      <textarea name="inclusions" class="form-control" rows="2" required>{{ package.inclusions }}</textarea>
+                    </div>
+                  </div>
+
+                  <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                      <i class="bi bi-save"></i> Update Package
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDelete({{ package.id }})">
+                      <i class="bi bi-trash"></i> Delete
+                    </button>
+                  </div>
+                </form>
+                
+                <!-- Hidden delete form -->
+                <form id="delete-form-{{ package.id }}" method="POST" action="{{ url_for('photographer.delete_package', package_id=package.id) }}" style="display: none;">
+                </form>
+              </div>
             </div>
-            <input
-              class="form-control w-25"
-              type="number"
-              placeholder="$999"
-              value=""
-            />
-          </li>
-          <li
-            class="list-group-item d-flex align-items-center flex-column flex-sm-row justify-content-between"
-          >
-            <div>
-              <input
-                class="form-check-input me-1"
-                type="checkbox"
-                value=""
-                id="package2"
-              />
-              <label class="form-check-label" for="package2">Package 2</label>
+            {% endfor %}
+          {% else %}
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i> You haven't created any packages yet. Use the form above to create your first package!
             </div>
-            <input
-              class="form-control w-25"
-              type="number"
-              placeholder="$999"
-              value=""
-            />
-          </li>
-          <li
-            class="list-group-item d-flex align-items-center flex-column flex-sm-row justify-content-between"
-          >
-            <div>
-              <input
-                class="form-check-input me-1"
-                type="checkbox"
-                value=""
-                id="package3"
-              />
-              <label class="form-check-label" for="package3">Package 3</label>
-            </div>
-            <input
-              class="form-control w-25"
-              type="number"
-              placeholder="$999"
-              value=""
-            />
-          </li>
-        </ul>
+          {% endif %}
+        </div>
+
+        <div class="alert alert-info mt-3" role="alert">
+          <strong><i class="bi bi-info-circle"></i> Package Tips:</strong>
+          <ul class="mb-0 mt-2">
+            <li>Create as many packages as you need - there's no limit!</li>
+            <li>Each package can have its own category (Wedding, Portrait, Pet, etc.)</li>
+            <li>Choose from Basic, Standard, or Premium tiers</li>
+            <li>Update or delete packages anytime</li>
+            <li>Clearly describe what's included to attract more clients</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -210,119 +255,197 @@
           type="button"
           role="tab"
         >
-          <i class="bi bi-grid-3x3-gap me-2"></i>Upload your works
+          <i class="bi bi-cloud-upload me-2"></i>Upload your works
         </button>
       </li>
     </ul>
+
     <!-- gallery section -->
     <div class="tab-content" id="photo-gallery-content">
+      <!-- Services Tab -->
       <div class="tab-pane fade show active" id="services">
-        <div class="row g-4">
-          <div class="col-md-6 col-lg-4 py-3">
-            <div class="text-center card shadow-sm p-3 mb-5 bg-body rounded">
-              <div class="service-icon mx-auto mb-3">
-                <i class="bi bi-star text-dark fs-4"></i>
+        <div class="py-3">
+          {% if categories %}
+            {% for category in categories %}
+            <!-- Category Section -->
+            <div class="mb-5">
+              <div class="d-flex align-items-center mb-4">
+                <div class="flex-grow-1">
+                  <h4 class="fw-bold mb-1">
+                    <i class="bi bi-tag-fill text-orange me-2"></i>{{ category.category_name }}
+                  </h4>
+                  <p class="text-muted mb-0">{{ category.description }}</p>
+                </div>
               </div>
-              <h5 class="fw-bold mb-3">Portrait Photography</h5>
-              <p class="text-muted mb-3">
-                Professional headshots, backdrops, corporate shots, etc.
-              </p>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="text-teal fw-bold">From $200</span>
-                <small class="text-muted">2 hours</small>
+              
+              <!-- Packages in this category -->
+              <div class="row g-4">
+                {% set category_packages = packages | selectattr('category_id', 'equalto', category.id) | list %}
+                {% for package in category_packages %}
+                <div class="col-md-6 col-lg-4">
+                  <div class="card shadow-sm h-100 border-start border-orange border-3">
+                    <div class="card-body text-center d-flex flex-column">
+                      <div class="service-icon mx-auto mb-3">
+                        <i class="bi bi-{% if package.package_name == 'Basic' %}brightness-high{% elif package.package_name == 'Premium' %}gem{% else %}star{% endif %} text-orange fs-3"></i>
+                      </div>
+                      
+                      <h5 class="fw-bold mb-2">{{ package.package_name }}</h5>
+                      
+                      <div class="mb-3">
+                        <span class="h4 text-orange fw-bold">${{ "%.2f"|format(package.price) }}</span>
+                      </div>
+                      
+                      <div class="text-start mb-3 flex-grow-1">
+                        <p class="text-muted small mb-2"><strong>What's Included:</strong></p>
+                        <p class="text-muted small">{{ package.inclusions }}</p>
+                      </div>
+                      
+                      <div class="mt-auto">
+                        <small class="text-muted">Package ID: #{{ package.id }}</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
               </div>
-              <a
-                href="#"
-                class="btn btn-outline-secondary mt-4"
-                >Remove</a
-              >
             </div>
-          </div>
-          <div class="col-md-6 col-lg-4 py-3">
-            <div class="text-center card shadow-sm p-3 mb-5 bg-body rounded">
-              <div class="service-icon mx-auto mb-3">
-                <i class="bi bi-star text-dark fs-4"></i>
-              </div>
-              <h5 class="fw-bold mb-3">Pet Photography</h5>
-              <p class="text-muted mb-3">
-                Professional and creative photos with your pets
+            <hr class="my-4">
+            {% endfor %}
+          {% else %}
+            <div class="text-center py-5">
+              <i class="bi bi-box-seam fs-1 text-muted mb-3 d-block"></i>
+              <p class="text-muted">
+                No packages available yet. Create your first package in the "Manage Your Packages" section above!
               </p>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="text-teal fw-bold">From $200</span>
-                <small class="text-muted">2 hours</small>
-              </div>
-              <a
-                href="#"
-                class="btn btn-outline-secondary mt-4"
-                >Remove</a
-              >
             </div>
-          </div>
+          {% endif %}
         </div>
       </div>
 
+      <!-- Portfolio Tab -->
       <div class="tab-pane fade" id="portfolio">
         <div class="d-flex flex-column mt-3 mb-5 py-3">
+          {% if portfolioItems %}
           <div class="row g-3">
-            {% for image in ['categories/portrait.jpg',
-            'portraits/portrait-1.jpg', 'portraits/portrait-2.jpg',
-            'portraits/portrait-3.jpg', 'pet/pet-1.jpeg', 'pet/pet-2.jpeg',
-            'pet/pet-3.jpeg', 'pet/pet-4.jpeg', 'pet/pet-5.jpeg',
-            'pet/pet-6.jpeg'] %}
+            {% for item in portfolioItems %}
             <div class="col-md-6 col-lg-4">
               <div class="portfolio-item position-relative">
                 <img
-                  src="{{ url_for('static', filename='img/' + image) }}"
-                  alt="Portfolio"
+                  src="{{ url_for('static', filename='uploads/portfolio/' + item.image_path) }}"
+                  alt="{{ item.title }}"
                   class="portfolio-image w-100"
+                  style="height: 300px; object-fit: cover"
                   loading="lazy"
                 />
+                <div class="portfolio-overlay">
+                  <h6>{{ item.title }}</h6>
+                  {% if item.caption %}
+                  <p class="small">{{ item.caption }}</p>
+                  {% endif %}
+                  <form
+                    method="POST"
+                    action="{{ url_for('photographer.delete_portfolio', portfolio_id=item.id) }}"
+                    onsubmit="return confirm('Are you sure you want to delete this image?');"
+                  >
+                    <button type="submit" class="btn btn-danger btn-sm mt-2">
+                      <i class="bi bi-trash"></i> Delete
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
             {% endfor %}
           </div>
+          {% else %}
+          <div class="text-center py-5">
+            <p class="text-muted">
+              No portfolio items yet. Upload your work to get started!
+            </p>
+          </div>
+          {% endif %}
         </div>
       </div>
 
-      <!-- For uploading -->
+      <!-- Upload Tab with WTForms -->
       <div class="tab-pane fade" id="upload_work">
         <div class="d-flex flex-column mt-3 mb-5 py-3">
-          <label for="file-upload">
-            <i class="bi bi-upload"></i>
-            Upload your work
-          </label>
-          <br />
-          <input
-            type="file"
-            id="file-upload"
-            name="filename"
-            style="display: none"
-          />
-          <div class="row g-3">
-            <div class="col-md-6 col-lg-4">
-              <div class="portfolio-item position-relative">
-                <img
-                  src="{{ url_for('static', filename='img/pet/pet-5.jpeg') }}"
-                  alt="Portfolio"
-                  class="portfolio-image w-100"
-                  loading="lazy"
-                />
-              </div>
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title mb-4">
+                <i class="bi bi-cloud-upload"></i> Upload Portfolio Images
+              </h5>
+
+              <form
+                method="POST"
+                action="{{ url_for('photographer.upload_portfolio') }}"
+                enctype="multipart/form-data"
+              >
+                {{ upload_form.hidden_tag() }}
+
+                <div class="mb-3">
+                  {{ upload_form.title.label(class="form-label") }}
+                  <span class="text-danger">*</span>
+                  {{ upload_form.title(class="form-control", placeholder="Enter image title") }}
+                  {% if upload_form.title.errors %}
+                  <div class="text-danger small mt-1">
+                    {% for error in upload_form.title.errors %} {{ error }} {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="mb-3">
+                  {{ upload_form.caption.label(class="form-label") }}
+                  <span class="text-muted small">(Optional)</span>
+                  {{ upload_form.caption(class="form-control", rows="2", placeholder="Enter a brief description") }}
+                  {% if upload_form.caption.errors %}
+                  <div class="text-danger small mt-1">
+                    {% for error in upload_form.caption.errors %} {{ error }} {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="mb-3">
+                  {{ upload_form.portfolio_image.label(class="form-label") }}
+                  <span class="text-danger">*</span>
+                  <small class="text-muted d-block mb-2">
+                    (Max 50MB, formats: PNG, JPG, JPEG, GIF, WEBP)
+                  </small>
+                  {{ upload_form.portfolio_image(class="form-control", accept="image/png,image/jpeg,image/jpg,image/gif,image/webp") }}
+                  {% if upload_form.portfolio_image.errors %}
+                  <div class="text-danger small mt-1">
+                    {% for error in upload_form.portfolio_image.errors %} {{ error }} {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="d-grid gap-2">
+                  {{ upload_form.submit(class="btn btn-primary") }}
+                </div>
+              </form>
             </div>
-            <div class="col-md-6 col-lg-4">
-              <div class="portfolio-item position-relative">
-                <img
-                  src="{{ url_for('static', filename='img/pet/pet-6.jpeg') }}"
-                  alt="Portfolio"
-                  class="portfolio-image w-100"
-                  loading="lazy"
-                />
-              </div>
-            </div>
+          </div>
+
+          <div class="alert alert-info mt-4" role="alert">
+            <strong><i class="bi bi-info-circle"></i> Tips:</strong>
+            <ul class="mb-0 mt-2">
+              <li>Use high-quality images to showcase your work</li>
+              <li>Keep file sizes under 50MB for faster loading</li>
+              <li>Add descriptive titles and captions to engage clients</li>
+              <li>Organize your portfolio by selecting relevant categories</li>
+            </ul>
           </div>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+function confirmDelete(packageId) {
+  if (confirm('Are you sure you want to delete this package? This action cannot be undone.')) {
+    document.getElementById('delete-form-' + packageId).submit();
+  }
+}
+</script>
+
 {% endblock %}

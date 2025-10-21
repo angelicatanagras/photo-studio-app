@@ -1,24 +1,28 @@
-{% extends "layouts/customer_base.html" %}
-
-{% block content %}
+{% extends "layouts/customer_base.html" %} {% block content %}
 <section class="bg-light py-5">
   <div class="container">
     <!-- Photographer Details Header -->
     <div class="row mb-4">
       <div class="col-12">
         <div class="card section_card">
-          <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-4">
+          <div
+            class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-4"
+          >
             <div class="text-center">
               {% if photographer.user.profile_image %}
-                <img src="{{ url_for('static', filename='uploads/' ~ photographer.user.profile_image) }}"
-                     class="rounded-circle"
-                     alt="{{ photographer.user.full_name }}"
-                     style="width: 150px; height: 150px; object-fit: cover;" />
+              <img
+                src="{{ url_for('static', filename='uploads/' ~ photographer.user.profile_image) }}"
+                class="rounded-circle"
+                alt="{{ photographer.user.full_name }}"
+                style="width: 150px; height: 150px; object-fit: cover"
+              />
               {% else %}
-                <img src="{{ url_for('static', filename='img/photog-1.jpg') }}"
-                     class="rounded-circle"
-                     alt="{{ photographer.user.full_name }}"
-                     style="width: 150px; height: 150px; object-fit: cover;" />
+              <img
+                src="{{ url_for('static', filename='img/photog-1.jpg') }}"
+                class="rounded-circle"
+                alt="{{ photographer.user.full_name }}"
+                style="width: 150px; height: 150px; object-fit: cover"
+              />
               {% endif %}
             </div>
             <div class="flex-grow-1">
@@ -30,10 +34,11 @@
               {% if photographer.category %}
               <div class="d-flex align-items-center gap-2 mb-2">
                 <i class="bi bi-camera text-muted"></i>
-                <span class="text-muted">{{ photographer.category.category_name }}</span>
+                <span class="text-muted"
+                  >{{ photographer.category.category_name }}</span
+                >
               </div>
-              {% endif %}
-              {% if photographer.bio %}
+              {% endif %} {% if photographer.bio %}
               <p class="text-muted mb-0 mt-3">{{ photographer.bio }}</p>
               {% endif %}
             </div>
@@ -42,9 +47,26 @@
       </div>
     </div>
 
+    {% if category %}
+    <div class="row mb-3">
+      <div class="col-12">
+        <div class="alert alert-info d-flex align-items-center" role="alert">
+          <i class="bi bi-camera-fill me-2"></i>
+          <div>
+            <strong>Selected Service:</strong> {{ category.category_name }}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
     <div class="row item_section">
       <div class="col-12 col-lg-8 col-md-12 col-sm-12 mb-lg-0">
-        <form method="POST" action="{{ url_for('customer.basket_add') }}" id="bookingForm">
+        <form
+          method="POST"
+          action="{{ url_for('customer.basket_add') }}"
+          id="bookingForm"
+        >
           <div class="card section_card">
             <h4 class="package_font mb-3">Select a package</h4>
             {% if packages %}
@@ -52,12 +74,35 @@
               {% for package in packages %}
               <div class="col-12 col-sm-6 col-md-4">
                 <label class="package-selector">
-                  <input type="radio" name="package_id" value="{{ package.id }}" {% if loop.first %}checked{% endif %} class="d-none package-radio">
-                  <input type="hidden" name="package_title_{{ package.id }}" value="{{ package.package_name }}">
-                  <input type="hidden" name="package_price_{{ package.id }}" value="{{ package.price }}">
+                  <input
+                    type="radio"
+                    name="package_id"
+                    value="{{ package.id }}"
+                    {%
+                    if
+                    loop.first
+                    %}checked{%
+                    endif
+                    %}
+                    class="d-none package-radio"
+                  />
+                  <input
+                    type="hidden"
+                    name="package_title_{{ package.id }}"
+                    value="{{ package.package_name }}"
+                  />
+                  <input
+                    type="hidden"
+                    name="package_price_{{ package.id }}"
+                    value="{{ package.price }}"
+                  />
                   <div class="package_card">
-                    <h4 class="package_item_font">{{ package.package_name }}</h4>
-                    <p class="package_price">${{ "%.2f"|format(package.price) }}</p>
+                    <h4 class="package_item_font">
+                      {{ package.package_name }}
+                    </h4>
+                    <p class="package_price">
+                      ${{ "%.2f"|format(package.price) }}
+                    </p>
                     {% if package.inclusions %}
                     <p class="small text-muted">{{ package.inclusions }}</p>
                     {% endif %}
@@ -78,7 +123,13 @@
                 <label class="form-label fw-semibold">
                   <i class="bi bi-calendar-event me-2"></i>Choose Date:
                 </label>
-                <input type="date" name="booking_date" class="form-control" placeholder="Pick a date" required />
+                <input
+                  type="date"
+                  name="booking_date"
+                  class="form-control"
+                  placeholder="Pick a date"
+                  required
+                />
               </div>
               <div class="col-md-6">
                 <label class="form-label fw-semibold">
@@ -118,13 +169,27 @@
                 <label class="form-label fw-semibold">
                   <i class="bi bi-pin-map me-2"></i>Event Location:
                 </label>
-                <input type="text" name="event_location" class="form-control" placeholder="Enter postcode" required />
+                <input
+                  type="text"
+                  name="event_location"
+                  class="form-control"
+                  placeholder="Enter postcode"
+                  required
+                />
               </div>
               <div class="col-md-6">
                 <label class="form-label fw-semibold">
                   <i class="bi bi-people me-2"></i>Number of People:
                 </label>
-                <input type="number" name="num_pax" class="form-control" placeholder="1" min="1" max="50" value="1" />
+                <input
+                  type="number"
+                  name="num_pax"
+                  class="form-control"
+                  placeholder="1"
+                  min="1"
+                  max="50"
+                  value="1"
+                />
               </div>
             </div>
 
@@ -132,13 +197,21 @@
               <label class="form-label fw-semibold">
                 <i class="bi bi-card-text me-2"></i>Event Notes:
               </label>
-              <textarea name="event_notes" class="form-control" rows="4" placeholder="Tell us more about your event. Do you have special requests that need certain attention?"></textarea>
+              <textarea
+                name="event_notes"
+                class="form-control"
+                rows="4"
+                placeholder="Tell us more about your event. Do you have special requests that need certain attention?"
+              ></textarea>
             </div>
 
-            <input type="hidden" name="qty" value="1">
+            <input type="hidden" name="qty" value="1" />
 
             <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
-              <a href="{{ url_for('photographer.gallery', photographer_id=photographer.id) }}" class="btn btn-outline-secondary flex-fill">
+              <a
+                href="{{ url_for('photographer.gallery', photographer_id=photographer.id) }}"
+                class="btn btn-outline-secondary flex-fill"
+              >
                 <i class="bi bi-arrow-left me-2"></i>Go back
               </a>
               <button type="submit" class="btn btn-orange flex-fill">

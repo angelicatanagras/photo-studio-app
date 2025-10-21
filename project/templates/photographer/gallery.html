@@ -1,41 +1,56 @@
-{% extends "layouts/photographer_base.html" %}
-
-{% block content %}
-<section class="portfolio_section">
-  <!-- photog details-->
+{% extends "layouts/photographer_base.html" %} {% block content %}
+<section class="portfolio_section py-4">
   <div class="container">
-    <div class="row portfolio_section">
-      <div class="col-12 col-lg-8 col-md-12 col-sm-12 mb-lg-0">
-        <div
-          class="d-flex flex-column flex-sm-row justify-content-center justify-content-sm-center gap-3 align-items-center align-items-sm-center"
-        >
-          <div>
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-8">
+        <div class="d-flex flex-column flex-sm-row align-items-center gap-4 bg-white p-4 rounded-4 shadow">
+
+          <!-- Photographer Image -->
+          <div class="flex-shrink-0 text-center">
             {% if photographer.user.profile_image %}
-              <img class="profile_img rounded-circle" src="{{ url_for('static', filename='uploads/' ~ photographer.user.profile_image) }}" alt="{{ photographer.user.full_name }}" />
+            <img
+              src="{{ url_for('static', filename='uploads/' ~ photographer.user.profile_image) }}"
+              alt="{{ photographer.user.full_name }}"
+              class="rounded-circle"
+              style="width: 150px; height: 150px; object-fit: cover;"
+            />
             {% else %}
-              <img class="profile_img rounded-circle" src="{{ url_for('static', filename='img/photog-1.jpg') }}" alt="photographer" />
+            <img
+              src="{{ url_for('static', filename='img/photog-1.jpg') }}"
+              alt="photographer"
+              class="rounded-circle"
+              style="width: 150px; height: 150px; object-fit: cover;"
+            />
             {% endif %}
           </div>
-          <div class="vendor-photog-details flex-grow-1 bg-white-95">
-            <div>
-              <h3>{{ photographer.user.full_name }}</h3>
-            </div>
-            <div>
-              {% if photographer.user.phone %}📞 {{ photographer.user.phone }}<br />{% endif %}
+
+          <!-- Photographer Details -->
+          <div class="text-center text-sm-start flex-grow-1">
+            <h3 class="mb-2">{{ photographer.user.full_name }}</h3>
+            <p class="mb-1">
+              {% if photographer.user.phone %}
+              📞 {{ photographer.user.phone }} <br />
+              {% endif %}
               📍 {{ photographer.location }}
-            </div>
+            </p>
+
             {% if photographer.bio %}
-            <div>{{ photographer.bio }}</div>
+            <p class="mb-2">{{ photographer.bio }}</p>
             {% endif %}
-            <br />
+
             {% if photographer.social_link %}
-            <p>Social media: {{ photographer.social_link }}</p>
+            <p class="mb-0">
+              🌐 <a href="{{ photographer.social_link }}" target="_blank">{{ photographer.social_link }}</a>
+            </p>
             {% endif %}
           </div>
+
         </div>
       </div>
     </div>
   </div>
+</section>
+
   <!-- tabs for services and portfolio gallery-->
   <div class="container">
     <ul id="photo-gallery" class="nav nav-tabs">
@@ -68,146 +83,72 @@
     <div class="tab-content" id="photo-gallery-content">
       <div class="tab-pane fade show active" id="services">
         <div class="row g-4">
+          {% if categories %} {% for category in categories %}
           <div class="col-md-6 col-lg-4 py-3">
             <div class="text-center card shadow-sm p-3 mb-5 bg-body rounded">
               <div class="service-icon mx-auto mb-3">
                 <i class="bi bi-star text-dark fs-4"></i>
               </div>
-              <h5 class="fw-bold mb-3">Portrait Photography</h5>
-              <p class="text-muted mb-3">
-                Professional headshots, backdrops, corporate shots, etc.
-              </p>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="text-teal fw-bold">From $200</span>
-                <small class="text-muted">2 hours</small>
-              </div>
-              <a href="{{ url_for('customer.session_package', photographer_id=photographer.id) }}" class="btn btn-orange mt-4"
+              <h5 class="fw-bold mb-3">{{ category.category_name }}</h5>
+              <p class="text-muted mb-3">{{ category.description }}</p>
+              <a
+                href="{{ url_for('customer.session_package', photographer_id=photographer.id, category_id=category.id) }}"
+                class="btn btn-orange mt-4"
                 >Book now</a
               >
             </div>
           </div>
-          <div class="col-md-6 col-lg-4 py-3">
-            <div class="text-center card shadow-sm p-3 mb-5 bg-body rounded">
-              <div class="service-icon mx-auto mb-3">
-                <i class="bi bi-star text-dark fs-4"></i>
-              </div>
-              <h5 class="fw-bold mb-3">Pet Photography</h5>
-              <p class="text-muted mb-3">
-                Professional and creative photos with your pets
-              </p>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="text-teal fw-bold">From $200</span>
-                <small class="text-muted">2 hours</small>
-              </div>
-              <a href="{{ url_for('customer.session_package', photographer_id=photographer.id) }}" class="btn btn-orange mt-4"
-                >Book now</a
-              >
-            </div>
+          {% endfor %} {% else %}
+          <div class="col-12 text-center py-5">
+            <p class="text-muted">No services available yet.</p>
           </div>
+          {% endif %}
         </div>
       </div>
 
+      <!-- Portfolio Tab -->
       <div class="tab-pane fade" id="portfolio">
         <div class="d-flex flex-column mt-3 mb-5 py-3">
+          {% if portfolioItems %}
           <div class="row g-3">
+            {% for item in portfolioItems %}
             <div class="col-md-6 col-lg-4">
               <div class="portfolio-item position-relative">
                 <img
-                  src="{{ url_for('static', filename='img/categories/portrait.jpg') }}"
-                  alt="Portraits"
+                  src="{{ url_for('static', filename='uploads/portfolio/' + item.image_path) }}"
+                  alt="{{ item.title }}"
                   class="portfolio-image w-100"
+                  style="height: 300px; object-fit: cover"
                   loading="lazy"
                 />
+                <div class="portfolio-overlay">
+                  <h6>{{ item.title }}</h6>
+                  {% if item.caption %}
+                  <p class="small">{{ item.caption }}</p>
+                  {% endif %}
+                  <form
+                    method="POST"
+                    action="{{ url_for('photographer.delete_portfolio', portfolio_id=item.id) }}"
+                    onsubmit="return confirm('Are you sure you want to delete this image?');"
+                  >
+                    <button type="submit" class="btn btn-danger btn-sm mt-2">
+                      <i class="bi bi-trash"></i> Delete
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
-            <div class="col-md-6 col-lg-4">
-              <div class="portfolio-item position-relative">
-                <img
-                  src="{{ url_for('static', filename='img/portraits/portrait-1.jpg') }}"
-                  alt="Portraits"
-                  class="portfolio-image w-100"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-              <div class="portfolio-item position-relative">
-                <img
-                  src="{{ url_for('static', filename='img/portraits/portrait-2.jpg') }}"
-                  alt="Portraits"
-                  class="portfolio-image w-100"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-              <div class="portfolio-item position-relative">
-                <img
-                  src="{{ url_for('static', filename='img/portraits/portrait-3.jpg') }}"
-                  alt="Portraits"
-                  class="portfolio-image w-100"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-              <div class="portfolio-item position-relative">
-                <img
-                  src="{{ url_for('static', filename='img/pet/pet-1.jpeg') }}"
-                  alt="Portraits"
-                  class="portfolio-image w-100"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-              <div class="portfolio-item position-relative">
-                <img
-                  src="{{ url_for('static', filename='img/pet/pet-2.jpeg') }}"
-                  alt="Portraits"
-                  class="portfolio-image w-100"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-              <div class="portfolio-item position-relative">
-                <img
-                  src="{{ url_for('static', filename='img/pet/pet-3.jpeg') }}"
-                  alt="Portraits"
-                  class="portfolio-image w-100"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-              <div class="portfolio-item position-relative">
-                <img
-                  src="{{ url_for('static', filename='img/pet/pet-4.jpeg') }}"
-                  alt="Portraits"
-                  class="portfolio-image w-100"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-              <div class="portfolio-item position-relative">
-                <img
-                  src="{{ url_for('static', filename='img/pet/pet-5.jpeg') }}"
-                  alt="Portraits"
-                  class="portfolio-image w-100"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-              <div class="portfolio-item position-relative">
-                <img
-                  src="{{ url_for('static', filename='img/pet/pet-6.jpeg') }}"
-                  alt="Portraits"
-                  class="portfolio-image w-100"
-                  loading="lazy"
-                />
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-center py-5">
+            <p class="text-muted">
+              No portfolio items yet. Upload your work to get started!
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
               </div>
             </div>
           </div>
