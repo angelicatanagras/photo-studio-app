@@ -153,16 +153,12 @@
             <h4 class="package_font mb-3">Event Details</h4>
             <div class="mb-3">
               <label class="form-label fw-semibold">
-                <i class="bi bi-camera-fill me-2"></i>Photography Session:
+                <i class="bi bi-camera-fill me-2"></i>Service Type:
               </label>
-              <select name="session_type" class="form-select" required>
-                <option value="">Select type</option>
-                <option value="portrait">Portrait</option>
-                <option value="product">Product shoot</option>
-                <option value="creative">Creatives</option>
-                <option value="maternity">Maternity</option>
-                <option value="pet">Pet</option>
-              </select>
+              <div class="alert alert-info mb-0">
+                <strong>{{ photographer.category.category_name if photographer.category else 'Photography Services' }}</strong>
+                <small class="d-block text-muted">{{ photographer.category.description if photographer.category else 'Professional photography services' }}</small>
+              </div>
             </div>
             <div class="row g-3">
               <div class="col-md-6">
@@ -183,12 +179,13 @@
                 </label>
                 <input
                   type="number"
-                  name="num_pax"
+                  name="pax"
                   class="form-control"
                   placeholder="1"
                   min="1"
                   max="50"
                   value="1"
+                  required
                 />
               </div>
             </div>
@@ -198,10 +195,11 @@
                 <i class="bi bi-card-text me-2"></i>Event Notes:
               </label>
               <textarea
-                name="event_notes"
+                name="notes"
                 class="form-control"
                 rows="4"
                 placeholder="Tell us more about your event. Do you have special requests that need certain attention?"
+                maxlength="500"
               ></textarea>
             </div>
 
