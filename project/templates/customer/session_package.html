@@ -67,6 +67,7 @@
           action="{{ url_for('customer.add_to_cart_db') }}"
           id="bookingForm"
         >
+          <input type="hidden" name="photographer_id" value="{{ photographer.id }}" />
           <div class="card section_card">
             <h4 class="package_font mb-3">Select a package</h4>
             {% if packages %}
