@@ -881,16 +881,30 @@ def delete_portfolio(portfolio_id):
 @photographer_bp.route('/gallery')
 @photographer_bp.route('/gallery/<int:photographer_id>')
 def gallery(photographer_id=None):
+    current_user_obj = get_current_user() if is_authenticated() else None
+    is_owner = False
+
     if photographer_id:
+        # Viewing a specific photographer's gallery (public view)
         photographer = Photographer.get_by_id(photographer_id)
     else:
-        # Default to first photographer if no ID provided
-        photographers = Photographer.get_all()
-        photographer = photographers[0] if photographers else None
+        # No photographer_id provided - must be photographer viewing their own gallery
+        if is_authenticated() and current_user_obj and current_user_obj.get('role') == 'Photographer':
+            photographer = Photographer.get_by_user_id(current_user_obj.get('id'))
+            is_owner = True
+        else:
+            flash('Please log in as a photographer.', 'error')
+            return redirect(url_for('auth.photographer_login'))
 
     if not photographer:
         flash('Photographer not found.', 'error')
         return redirect(url_for('customer.index'))
+
+    # Check if current user is the photographer owner
+    if current_user_obj and current_user_obj.get('role') == 'Photographer':
+        photographer_profile = Photographer.get_by_user_id(current_user_obj.get('id'))
+        if photographer_profile and photographer_profile.id == photographer.id:
+            is_owner = True
 
     # Get photographer's packages
     packages = Package.get_by_photographer_id(photographer.id)
@@ -906,8 +920,14 @@ def gallery(photographer_id=None):
     # Get portfolio items
     portfolioItems = PortfolioItem.get_by_photographer(photographer.id)
 
+    # Use different template based on whether viewer is the photographer owner or a customer
+    if is_owner:
+        template = 'photographer/gallery.html'
+    else:
+        template = 'customer/photographer_gallery.html'
+
     return render_template(
-        'photographer/gallery.html',
+        template,
         title='Gallery',
         photographer=photographer,
         categories=categories,
@@ -1007,3 +1027,25 @@ def users():
 def bookings():
     all_bookings = Booking.get_all()
     return render_template('admin/bookings.html', title='All Bookings', bookings=all_bookings)
+
+
+@admin_bp.route('/photographers')
+@role_required('Admin')
+def photographers():
+    all_photographers = Photographer.get_all()
+    return render_template('admin/photographers.html', title='Manage Photographers', photographers=all_photographers)
+
+
+@admin_bp.route('/photographers/toggle_featured/<int:photographer_id>', methods=['POST'])
+@role_required('Admin')
+def toggle_featured(photographer_id):
+    try:
+        photographer = Photographer.toggle_featured(photographer_id)
+        if photographer.featured:
+            flash(f'{photographer.user.full_name} is now featured!', 'success')
+        else:
+            flash(f'{photographer.user.full_name} is no longer featured.', 'info')
+    except Exception as e:
+        flash(f'Error toggling featured status: {str(e)}', 'error')
+
+    return redirect(url_for('admin.photographers'))
