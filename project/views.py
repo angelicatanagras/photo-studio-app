@@ -366,7 +366,7 @@ def add_to_cart_db():
 
     package = Package.get_by_id(package_id)
     price = package.price if package else 0.0
-    cart = Cart.get_by_customer(customer.id)
+    cart = Cart.get_by_customer(customer.id, status='Pending')
 
     if not cart:
         cart = Cart.create(customer_id=customer.id, subtotal=0.0)
