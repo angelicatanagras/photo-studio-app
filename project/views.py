@@ -8,13 +8,14 @@ from werkzeug.utils import secure_filename
 
 
 from .models import User, Photographer, Customer, Category, Booking, Cart, CartItem, Package, PortfolioItem
-from .forms import LoginForm, RegistrationForm, PortfolioUploadForm, PhotographerBioForm, SinglePackageForm
+from .forms import LoginForm, RegistrationForm, PortfolioUploadForm, PhotographerBioForm, ProfilePictureForm,SinglePackageForm
 
 # Upload configuration
 UPLOAD_FOLDER = 'static/uploads/portfolio'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 5MB
 
+PROFILE_UPLOAD_FOLDER = 'static/uploads/profiles'
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -634,6 +635,7 @@ def dashboard():
     upload_form = PortfolioUploadForm()
     bio_form = PhotographerBioForm()
     package_form = SinglePackageForm()
+    profile_form = ProfilePictureForm() 
 
     # Pre-populate bio form
     if photographer.bio:
@@ -654,6 +656,7 @@ def dashboard():
                            upload_form=upload_form,
                            bio_form=bio_form,
                            package_form=package_form,
+                           profile_form=profile_form,
                            categories=categories)
 
 
@@ -919,6 +922,73 @@ def delete_portfolio(portfolio_id):
         print(traceback.format_exc())
 
     return redirect(url_for('photographer.dashboard'))
+
+@photographer_bp.route('/upload_profile_picture', methods=['POST'])
+@role_required('Photographer')
+def upload_profile_picture():
+    """Handle profile picture upload"""
+    user = get_current_user()
+    photographer = Photographer.get_by_user_id(user.get('id'))
+
+    if not photographer:
+        flash('Photographer profile not found.', 'error')
+        return redirect(url_for('photographer.dashboard'))
+
+    form = ProfilePictureForm()
+
+    if form.validate_on_submit():
+        try:
+            file = form.profile_picture.data
+
+            # Check file size (max 5MB)
+            file.seek(0, os.SEEK_END)
+            file_size = file.tell()
+            file.seek(0)
+
+            if file_size > MAX_FILE_SIZE:
+                flash('File size exceeds 50MB limit.', 'error')
+                return redirect(url_for('photographer.dashboard'))
+
+            # Secure the filename
+            filename = secure_filename(file.filename)
+
+            # Create unique filename to avoid conflicts
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            name, ext = os.path.splitext(filename)
+            unique_filename = f"profile_{user.get('id')}_{timestamp}{ext}"
+
+            # Get upload path
+            upload_path = os.path.join(current_app.root_path, PROFILE_UPLOAD_FOLDER)
+
+            # Ensure upload directory exists
+            os.makedirs(upload_path, exist_ok=True)
+
+            # Delete old profile picture if exists
+            if user.get('profile_image'):
+                old_file_path = os.path.join(upload_path, user.get('profile_image'))
+                if os.path.exists(old_file_path):
+                    os.remove(old_file_path)
+
+            # Save new file
+            file_path = os.path.join(upload_path, unique_filename)
+            file.save(file_path)
+
+            # Update user profile in database
+            User.update(user.get('id'), profile_image=unique_filename)
+
+            flash('Profile picture updated successfully!', 'success')
+
+        except Exception as e:
+            flash(f'Error uploading profile picture: {str(e)}', 'error')
+            import traceback
+            print(traceback.format_exc())
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f'{field}: {error}', 'error')
+
+    return redirect(url_for('photographer.dashboard'))
+
 
 
 @photographer_bp.route('/gallery')
