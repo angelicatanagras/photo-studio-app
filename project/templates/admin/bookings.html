@@ -1,0 +1,59 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<section class="portfolio_section mt-4">
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col-12">
+        <h2 class="text-charcoal">All Bookings</h2>
+        <p class="text-muted">View all customer bookings</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Booking ID</th>
+                    <th>Customer ID</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                    <th>Payment Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for booking in bookings %}
+                  <tr>
+                    <td>{{ booking.id }}</td>
+                    <td>{{ booking.customer_id }}</td>
+                    <td>${{ "%.2f"|format(booking.total_amount) }}</td>
+                    <td>
+                      <span class="badge
+                        {% if booking.status == 'Completed' %}bg-success
+                        {% else %}bg-warning{% endif %}">
+                        {{ booking.status }}
+                      </span>
+                    </td>
+                    <td>{{ booking.created_at.strftime('%Y-%m-%d %H:%M') if booking.created_at else 'N/A' }}</td>
+                    <td>{{ booking.payment_date.strftime('%Y-%m-%d') if booking.payment_date else 'N/A' }}</td>
+                  </tr>
+                  {% else %}
+                  <tr>
+                    <td colspan="6" class="text-center text-muted">No bookings found</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

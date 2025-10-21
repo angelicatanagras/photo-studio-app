@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS photographers (
     location VARCHAR(100) NOT NULL,
     social_link VARCHAR(200) NOT NULL,
     availability DATETIME NOT NULL,
+    featured BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (category_id) REFERENCES category(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -165,14 +166,15 @@ INSERT INTO category (category_name, description) VALUES
 ON DUPLICATE KEY UPDATE category_name=category_name;
 
 -- Create photographer profile for demo photographer
-INSERT INTO photographers (user_id, category_id, bio, location, social_link, availability)
+INSERT INTO photographers (user_id, category_id, bio, location, social_link, availability, featured)
 SELECT
     u.id,
     c.id,
     'Professional photographer specializing in weddings, portraits, and events. Over 10 years of experience capturing precious moments.',
     'Brisbane, Australia',
     'https://instagram.com/demophotographer',
-    NOW()
+    NOW(),
+    TRUE
 FROM users u
 JOIN category c ON c.category_name = 'Wedding Photography'
 WHERE u.email = 'photo@test.com'

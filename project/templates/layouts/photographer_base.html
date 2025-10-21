@@ -76,7 +76,7 @@
                 Welcome, {{ current_user.first_name }}!
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Profile</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('photographer.dashboard') }}">Profile</a></li>
                 <li><hr class="dropdown-divider" /></li>
                 <li>
                   <a class="dropdown-item" href="{{ url_for('auth.logout') }}"

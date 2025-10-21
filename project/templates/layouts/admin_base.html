@@ -63,10 +63,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link text-white" href="#"> Bookings </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link text-white" href="#"> Settings </a>
+                <a class="nav-link text-white" href="{{ url_for('admin.bookings') }}"> Bookings </a>
               </li>
             </ul>
             {% if is_authenticated %}
@@ -81,7 +78,7 @@
                 {{ current_user.first_name }} (Admin)
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Profile</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">Profile</a></li>
                 <li><hr class="dropdown-divider" /></li>
                 <li>
                   <a class="dropdown-item" href="{{ url_for('auth.logout') }}"
@@ -132,6 +129,7 @@
             <ul class="list">
               <li><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
               <li><a href="{{ url_for('admin.users') }}">Users</a></li>
+              <li><a href="{{ url_for('admin.bookings') }}">Bookings</a></li>
             </ul>
           </div>
 
