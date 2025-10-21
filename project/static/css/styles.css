@@ -1013,3 +1013,27 @@ a {
 .portfolio-item:hover .portfolio-image {
   transform: scale(1.05);
 }
+
+.portfolio-overlay {
+  background: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 0.25rem;
+}
+
+.portfolio-item:hover .portfolio-overlay {
+  opacity: 1;
+}
+
+.modal-fullscreen .modal-body {
+  cursor: pointer;
+}
+
+.btn-close-white {
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.btn-close-white:hover {
+  opacity: 1;
+}

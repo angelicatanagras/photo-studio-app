@@ -7,18 +7,18 @@
 
           <!-- Photographer Image -->
           <div class="flex-shrink-0 text-center">
-            {% if photographer.user.profile_image %}
+            {% if photographer and photographer.user and photographer.user.profile_image %}
             <img
-              src="{{ url_for('static', filename='uploads/' ~ photographer.user.profile_image) }}"
+              class="profile_img rounded-circle"
+              src="{{ url_for('static', filename='uploads/profiles/' + photographer.user.profile_image) }}"
               alt="{{ photographer.user.full_name }}"
-              class="rounded-circle"
               style="width: 150px; height: 150px; object-fit: cover;"
             />
             {% else %}
             <img
-              src="{{ url_for('static', filename='img/photog-1.jpg') }}"
-              alt="photographer"
-              class="rounded-circle"
+              class="profile_img rounded-circle"
+              src="https://ui-avatars.com/api/?name={{ photographer.user.full_name|urlencode }}&size=150&background=f97316&color=fff"
+              alt="Default Profile"
               style="width: 150px; height: 150px; object-fit: cover;"
             />
             {% endif %}
@@ -106,26 +106,50 @@
         </div>
       </div>
 
-      <!-- Portfolio Tab -->
+        <!-- Portfolio Tab -->
       <div class="tab-pane fade" id="portfolio">
         <div class="d-flex flex-column mt-3 mb-5 py-3">
           {% if portfolioItems %}
           <div class="row g-3">
             {% for item in portfolioItems %}
             <div class="col-md-6 col-lg-4">
-              <div class="portfolio-item position-relative">
+              <div class="portfolio-item position-relative" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#portfolioModal{{ loop.index }}">
                 <img
                   src="{{ url_for('static', filename='uploads/portfolio/' + item.image_path) }}"
                   alt="{{ item.title }}"
-                  class="portfolio-image w-100"
+                  class="portfolio-image w-100 rounded"
                   style="height: 300px; object-fit: cover"
                   loading="lazy"
                 />
-                <div class="portfolio-overlay">
+                <div class="portfolio-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-white">
                   <h6>{{ item.title }}</h6>
                   {% if item.caption %}
                   <p class="small">{{ item.caption }}</p>
                   {% endif %}
+                  <i class="bi bi-zoom-in fs-3"></i>
+                </div>
+              </div>
+              
+              <!-- Bootstrap Modal for each image -->
+              <div class="modal fade" id="portfolioModal{{ loop.index }}" tabindex="-1" aria-labelledby="portfolioModalLabel{{ loop.index }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+                  <div class="modal-content border-0 bg-transparent">
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 fs-3" data-bs-dismiss="modal" aria-label="Close" style="z-index: 1050;"></button>
+                    <div class="modal-body p-0 d-flex flex-column align-items-center justify-content-center" style="background: rgba(0, 0, 0, 0.95);">
+                      <img
+                        src="{{ url_for('static', filename='uploads/portfolio/' + item.image_path) }}"
+                        alt="{{ item.title }}"
+                        class="img-fluid"
+                        style="max-height: 90vh; max-width: 95vw; object-fit: contain;"
+                      />
+                      <div class="text-center text-white mt-3 px-3">
+                        <h5>{{ item.title }}</h5>
+                        {% if item.caption %}
+                        <p class="mb-0">{{ item.caption }}</p>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -143,4 +167,5 @@
     </div>
   </div>
 </section>
+
 {% endblock %}

@@ -1,32 +1,48 @@
 {% extends "layouts/photographer_base.html" %} {% block content %}
 <section class="portfolio_section mt-4">
-  <!-- photog details admin_photographer -->
+  <!-- photographer details with dynamic profile picture -->
   <div class="container">
     <div class="row portfolio_section">
       <div class="col-12 col-lg-8 col-md-12 col-sm-12 mb-lg-0">
-        <div
-          class="d-flex flex-column flex-sm-row justify-content-center justify-content-sm-center gap-3 align-items-center align-items-sm-center"
-        >
-          <div>
+        <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-sm-center gap-3 align-items-center align-items-sm-center">
+          <div class="position-relative">
+            {% if photographer and photographer.user and photographer.user.profile_image %}
             <img
               class="profile_img rounded-circle"
-              src="{{ url_for('static', filename='img/photog-1.jpg') }}"
-              alt="photographer 1"
+              src="{{ url_for('static', filename='uploads/profiles/' + photographer.user.profile_image) }}"
+              alt="{{ photographer.user.full_name }}"
+              style="width: 150px; height: 150px; object-fit: cover;"
             />
+            {% else %}
+            <img
+              class="profile_img rounded-circle"
+              src="https://ui-avatars.com/api/?name={{ photographer.user.full_name|urlencode }}&size=150&background=f97316&color=fff"
+              alt="Default Profile"
+              style="width: 150px; height: 150px; object-fit: cover;"
+            />
+            {% endif %}
+            <!-- Upload button overlay -->
+            <button 
+              type="button" 
+              class="btn btn-sm btn-orange position-absolute bottom-0 end-0 rounded-circle"
+              data-bs-toggle="modal" 
+              data-bs-target="#profilePictureModal"
+              style="padding: 8px 12px;"
+              title="Change profile picture"
+            >
+              <i class="bi bi-camera"></i>
+            </button>
           </div>
           <div class="vendor-photog-details flex-grow-1 bg-white-95">
             <div>
               <h3>
-                {{ photographer.user.full_name if photographer and
-                photographer.user else 'Photographer' }}
+                {{ photographer.user.full_name if photographer and photographer.user else 'Photographer' }}
               </h3>
             </div>
             <div>
-              📞 {{ photographer.user.phone if photographer and
-              photographer.user and photographer.user.phone else 'Not set' }}
+              📞 {{ photographer.user.phone if photographer and photographer.user and photographer.user.phone else 'Not set' }}
               <br />
-              📍 {{ photographer.location if photographer else 'Location not
-              set' }}
+              📍 {{ photographer.location if photographer else 'Location not set' }}
             </div>
             <br />
           </div>
@@ -35,6 +51,75 @@
     </div>
   </div>
 </section>
+
+<!-- Profile Picture Upload Modal -->
+<div class="modal fade" id="profilePictureModal" tabindex="-1" aria-labelledby="profilePictureModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="profilePictureModalLabel">
+          <i class="bi bi-camera"></i> Update Profile Picture
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{{ url_for('photographer.upload_profile_picture') }}" enctype="multipart/form-data">
+        {{ profile_form.hidden_tag() }}
+        <div class="modal-body">
+          <div class="text-center mb-3">
+            {% if photographer and photographer.user and photographer.user.profile_image %}
+            <img
+              id="current-profile-preview"
+              src="{{ url_for('static', filename='uploads/profiles/' + photographer.user.profile_image) }}"
+              alt="Current profile"
+              class="rounded-circle mb-2"
+              style="width: 120px; height: 120px; object-fit: cover;"
+            />
+            {% else %}
+            <img
+              id="current-profile-preview"
+              src="https://ui-avatars.com/api/?name={{ photographer.user.full_name|urlencode }}&size=120&background=f97316&color=fff"
+              alt="Default profile"
+              class="rounded-circle mb-2"
+              style="width: 120px; height: 120px; object-fit: cover;"
+            />
+            {% endif %}
+            <p class="small text-muted">Current Profile Picture</p>
+          </div>
+
+          <div class="mb-3">
+            {{ profile_form.profile_picture.label(class="form-label") }}
+            <span class="text-danger">*</span>
+            <small class="text-muted d-block mb-2">
+              (Max 50MB, formats: PNG, JPG, JPEG, GIF, WEBP)
+            </small>
+            {{ profile_form.profile_picture(class="form-control", accept="image/png,image/jpeg,image/jpg,image/gif,image/webp", onchange="previewImage(this)") }}
+            {% if profile_form.profile_picture.errors %}
+            <div class="text-danger small mt-1">
+              {% for error in profile_form.profile_picture.errors %} {{ error }} {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="text-center mb-3" id="preview-container" style="display: none;">
+            <p class="small text-muted mb-2">Preview:</p>
+            <img
+              id="image-preview"
+              src=""
+              alt="Preview"
+              class="rounded-circle"
+              style="width: 120px; height: 120px; object-fit: cover;"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          {{ profile_form.submit(class="btn btn-orange") }}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 
 <!-- Bio Section -->
 <section class="portfolio_section">
