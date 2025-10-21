@@ -20,42 +20,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def get_cart_items():
-    return session.get('cart', {})
-
-
-def add_to_cart(item_id, title, price, qty=1):
-    cart = session.get('cart', {})
-    if item_id in cart:
-        cart[item_id]['qty'] += qty
-    else:
-        cart[item_id] = {'title': title, 'price': price, 'qty': qty}
-    session['cart'] = cart
-    session.modified = True
-
-
-def remove_from_cart(item_id):
-    cart = session.get('cart', {})
-    if item_id in cart:
-        del cart[item_id]
-        session['cart'] = cart
-        session.modified = True
-
-
-def update_cart(item_id, qty):
-    cart = session.get('cart', {})
-    if item_id in cart:
-        if qty > 0:
-            cart[item_id]['qty'] = qty
-        else:
-            del cart[item_id]
-        session['cart'] = cart
-        session.modified = True
-
-
-def clear_cart():
-    session.pop('cart', None)
-    session.modified = True
+# Session-based cart functions removed - now using database cart only
 
 
 def login_user(user_id, remember=False):
@@ -126,6 +91,7 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
 def inject_cart():
+    """Inject cart count for template context - database cart only"""
     try:
         # When logged in, read from DB cart
         if is_authenticated():
@@ -136,13 +102,10 @@ def inject_cart():
                     cart = Cart.get_by_customer(customer.id)
                     if cart:
                         items = CartItem.get_by_cart(cart.id) or []
-                        # if later you store quantity per item, sum it here; for now it's 1 per item
                         return dict(cart_count=len(items))
 
-        # Not logged in (or no DB cart) → use session cart
-        cart = session.get('cart', {})
-        count = sum(int(it.get('qty', 0)) for it in cart.values())
-        return dict(cart_count=count)
+        # Not logged in - no cart
+        return dict(cart_count=0)
     except Exception:
         return dict(cart_count=0)
 
@@ -347,58 +310,7 @@ def index():
     )
 
 
-@customer_bp.route('/basket/add', methods=['POST'])
-def basket_add():
-    item_id = request.form.get('id')
-    title = request.form.get('title')
-    price = request.form.get('price')
-    qty = int(request.form.get('qty', 1))
-    add_to_cart(item_id, title, price, qty)
-    return redirect(url_for('customer.checkout'))
-
-
-@customer_bp.route('/basket/remove/<item_id>')
-def basket_remove(item_id):
-    remove_from_cart(item_id)
-    return redirect(url_for('customer.checkout'))
-
-
-@customer_bp.route('/basket/update/<item_id>', methods=['POST'])
-def basket_update(item_id):
-    qty = int(request.form.get('qty', 1))
-    update_cart(item_id, qty)
-    return redirect(url_for('customer.checkout'))
-
-
-@customer_bp.route('/basket/clear')
-def basket_clear():
-    clear_cart()
-    return redirect(url_for('customer.checkout'))
-# # Basket actions
-# @customer_bp.route('/basket/add', methods=['POST'])
-# def basket_add():
-#     item_id = request.form.get('id')
-#     title = request.form.get('title')
-#     price = request.form.get('price')
-#     qty = int(request.form.get('qty', 1))
-#     add_to_cart(item_id, title, price, qty)
-#     return redirect(url_for('customer.checkout'))
-
-# @customer_bp.route('/basket/remove/<item_id>')
-# def basket_remove(item_id):
-#     remove_from_cart(item_id)
-#     return redirect(url_for('customer.checkout'))
-
-# @customer_bp.route('/basket/update/<item_id>', methods=['POST'])
-# def basket_update(item_id):
-#     qty = int(request.form.get('qty', 1))
-#     update_cart(item_id, qty)
-#     return redirect(url_for('customer.checkout'))
-
-# @customer_bp.route('/basket/clear')
-# def basket_clear():
-#     clear_cart()
-#     return redirect(url_for('customer.checkout'))
+# Session-based basket routes removed - now using database cart only
 
 
 @customer_bp.route('/bookings')
@@ -469,26 +381,64 @@ def add_to_cart_db():
 @customer_bp.route('/cart')
 @login_required
 @role_required('Customer')
-def cart():
+def view_cart():
+    """View customer's cart with database items"""
     user = get_current_user()
     customer = Customer.get_by_user_id(user.get('id'))
+    
+    if not customer:
+        flash('Customer profile not found.', 'error')
+        return redirect(url_for('customer.index'))
+    
     cart = Cart.get_by_customer(customer.id)
     items = CartItem.get_by_cart(cart.id) if cart else []
-
-    cart_dict = {item.id: {
-        'title': f'Package #{item.package_id}',
-        'price': float(item.price),
-        'qty': 1
-    } for item in items}
-
-    total = sum(i['price'] * i['qty'] for i in cart_dict.values())
-
+    
+    total = sum(float(item.price) for item in items)
+    
     return render_template(
         'customer/cart.html',
-        title='Your Basket',
-        cart=cart_dict,
-        total=total
+        title='Your Cart',
+        cart_items=items,
+        total=total,
+        cart=cart
     )
+
+@customer_bp.route('/cart/remove', methods=['POST'])
+@login_required
+@role_required('Customer')
+def remove_from_cart():
+    """Remove item from cart"""
+    cart_item_id = request.form.get('cart_item_id')
+    user = get_current_user()
+    customer = Customer.get_by_user_id(user.get('id'))
+    
+    if not cart_item_id or not customer:
+        flash('Invalid request.', 'error')
+        return redirect(url_for('customer.view_cart'))
+    
+    try:
+        # Get cart item to verify ownership
+        cart_item = CartItem.get_by_id(cart_item_id)
+        if not cart_item:
+            flash('Item not found.', 'error')
+            return redirect(url_for('customer.view_cart'))
+        
+        # Get cart to verify it belongs to this customer
+        cart = Cart.get_by_id(cart_item.cart_id)
+        if not cart or cart.customer_id != customer.id:
+            flash('You do not have permission to remove this item.', 'error')
+            return redirect(url_for('customer.view_cart'))
+        
+        # Remove item and update cart total
+        CartItem.delete(cart_item_id)
+        Cart.update(cart.id, subtotal=cart.subtotal - cart_item.price)
+        
+        flash('Item removed from cart.', 'success')
+    except Exception as e:
+        flash(f'Error removing item: {str(e)}', 'error')
+    
+    return redirect(url_for('customer.view_cart'))
+
 
 # ======== TEST ========
 
