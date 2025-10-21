@@ -1,27 +1,7 @@
-================================================================================
+
 PHOTO STUDIO BOOKING APP
-================================================================================
-PROJECT STRUCTURE
-================================================================================
 
-photo_studio_app/
-├── project/ # Main application package
-│ ├── **init**.py # Flask app factory
-│ ├── models.py # Data models (User, Photographer, Booking, etc.)
-│ ├── views.py # Route handlers with blueprints
-│ ├── forms.py # WTForms validation
-│ ├── database.sql # Database schema with demo data
-│ ├── static/ # Static assets (CSS, images, uploads)
-│ └── templates/ # Jinja2 HTML templates
-├── config.py # Flask configuration
-├── database.py # Database helper utilities
-├── run.py # Application entry point
-├── requirements.txt # Python dependencies
-└── .env.example # Environment configuration example
-
-================================================================================
 SETUP INSTRUCTIONS
-================================================================================
 
 1. Clone the Repository
 
@@ -123,9 +103,9 @@ Or using Flask CLI:
 
 The application will be available at http://127.0.0.1:5000
 
-================================================================================
+------
+
 DATABASE MIGRATIONS
-================================================================================
 
 Applying Migrations
 
@@ -133,10 +113,8 @@ Run SQL migration files in order:
 
 mysql -u root -p photostudio_booking < project/database.sql
 
-================================================================================
+-------
 DEVELOPMENT
-================================================================================
-
 Running in Debug Mode
 
 The application runs in debug mode by default when using `python run.py`
@@ -152,4 +130,3 @@ Project Structure Notes
 - database.py: Database helper utilities for executing SQL queries
 - Custom session-based authentication (replaces Flask-Login)
 
-================================================================================
