@@ -626,7 +626,7 @@ def login():
 
 @admin_bp.route('/dashboard')
 @role_required('Admin')
-def dashboard_admin():
+def dashboard():
     user = get_current_user()
     all_users = User.get_all()
     customers = [u for u in all_users if u.role == 'Customer']
@@ -648,3 +648,9 @@ def users():
     all_users = User.get_all()
     users_with_roles = [{'user': u, 'role': u.role} for u in all_users]
     return render_template('admin/users.html', title='Manage Users', users=users_with_roles)
+
+@admin_bp.route('/bookings')
+@role_required('Admin')
+def bookings():
+    all_bookings = Booking.get_all()
+    return render_template('admin/bookings.html', title='All Bookings', bookings=all_bookings)

@@ -113,10 +113,12 @@
                 Welcome, {{ current_user.first_name }}!
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Profile</a></li>
-                {% if current_user.role_name == 'customer' %}
+                <li>
+                  <a class="dropdown-item" href="{% if current_user.role == 'Admin' %}{{ url_for('admin.dashboard') }}{% elif current_user.role == 'Photographer' %}{{ url_for('photographer.dashboard') }}{% else %}#{% endif %}">Profile</a>
+                </li>
+                {% if current_user.role == 'Customer' %}
                 <li><a class="dropdown-item" href="{{ url_for('customer.booking_history') }}">My Bookings</a></li>
-                {% elif current_user.role_name == 'photographer' %}
+                {% elif current_user.role == 'Photographer' %}
                 <li>
                   <a
                     class="dropdown-item"
