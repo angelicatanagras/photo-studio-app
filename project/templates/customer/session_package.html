@@ -64,7 +64,7 @@
       <div class="col-12 col-lg-8 col-md-12 col-sm-12 mb-lg-0">
         <form
           method="POST"
-          action="{{ url_for('customer.basket_add') }}"
+          action="{{ url_for('customer.add_to_cart_db') }}"
           id="bookingForm"
         >
           <div class="card section_card">
@@ -195,6 +195,8 @@
             </div>
 
             <input type="hidden" name="qty" value="1" />
+            <input type="hidden" name="photographer_id" value="{{ photographer.id }}" />
+            <input type="hidden" name="package_id" id="selected_package_id" value="" />
 
             <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
               <a
@@ -204,7 +206,7 @@
                 <i class="bi bi-arrow-left me-2"></i>Go back
               </a>
               <button type="submit" class="btn btn-orange flex-fill">
-                <i class="bi bi-cart-check me-2"></i>Proceed to checkout
+                <i class="bi bi-cart-plus me-2"></i>Add to Cart
               </button>
             </div>
           </div>
@@ -213,4 +215,65 @@
     </div>
   </div>
 </section>
+
+<script>
+// Set minimum date to today
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('event_date').setAttribute('min', today);
+    
+    // Dynamically update time options (hide past times if today is selected)
+    const dateInput = document.getElementById('event_date');
+    const timeSelect = document.querySelector('select[name="event_time"]');
+    
+    function updateTimeOptions() {
+        const selectedDate = dateInput.value;
+        const today = new Date().toISOString().split('T')[0];
+        const currentHour = new Date().getHours();
+        
+        if (selectedDate === today) {
+            // If today is selected, hide past time options
+            Array.from(timeSelect.options).forEach(option => {
+                if (option.value) {
+                    const hour = parseInt(option.value.split(':')[0]);
+                    if (hour <= currentHour) {
+                        option.style.display = 'none';
+                        option.disabled = true;
+                    } else {
+                        option.style.display = 'block';
+                        option.disabled = false;
+                    }
+                }
+            });
+        } else {
+            // If future date is selected, show all time options
+            Array.from(timeSelect.options).forEach(option => {
+                option.style.display = 'block';
+                option.disabled = false;
+            });
+        }
+    }
+    
+    dateInput.addEventListener('change', updateTimeOptions);
+    updateTimeOptions(); // Initial call
+    
+    // Update selected package ID when package selection changes
+    const packageRadios = document.querySelectorAll('input[name="package_id"]');
+    const selectedPackageIdInput = document.getElementById('selected_package_id');
+    
+    packageRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                selectedPackageIdInput.value = this.value;
+            }
+        });
+    });
+    
+    // Set initial package ID (first package is checked by default)
+    const firstPackage = document.querySelector('input[name="package_id"]:checked');
+    if (firstPackage) {
+        selectedPackageIdInput.value = firstPackage.value;
+    }
+});
+</script>
 {% endblock %}
