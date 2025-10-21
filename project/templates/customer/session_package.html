@@ -129,6 +129,7 @@
                   class="form-control"
                   placeholder="Pick a date"
                   id="event_date"
+                  min="{{ today_date }}"
                   required
                 />
               </div>
@@ -229,46 +230,4 @@
   </div>
 </section>
 
-<script>
-// Set minimum date to today
-document.addEventListener('DOMContentLoaded', function() {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('event_date').setAttribute('min', today);
-    
-    // Dynamically update time options (hide past times if today is selected)
-    const dateInput = document.getElementById('event_date');
-    const timeSelect = document.querySelector('select[name="event_time"]');
-    
-    function updateTimeOptions() {
-        const selectedDate = dateInput.value;
-        const today = new Date().toISOString().split('T')[0];
-        const currentHour = new Date().getHours();
-        
-        if (selectedDate === today) {
-            // If today is selected, hide past time options
-            Array.from(timeSelect.options).forEach(option => {
-                if (option.value) {
-                    const hour = parseInt(option.value.split(':')[0]);
-                    if (hour <= currentHour) {
-                        option.style.display = 'none';
-                        option.disabled = true;
-                    } else {
-                        option.style.display = 'block';
-                        option.disabled = false;
-                    }
-                }
-            });
-        } else {
-            // If future date is selected, show all time options
-            Array.from(timeSelect.options).forEach(option => {
-                option.style.display = 'block';
-                option.disabled = false;
-            });
-        }
-    }
-    
-    dateInput.addEventListener('change', updateTimeOptions);
-    updateTimeOptions(); // Initial call
-});
-</script>
 {% endblock %}

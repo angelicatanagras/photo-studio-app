@@ -993,7 +993,8 @@ def session_package(photographer_id):
         title='Book Session',
         photographer=photographer,
         packages=packages,
-        category=category
+        category=category,
+        today_date=datetime.now().date().isoformat()
     )
 
 
