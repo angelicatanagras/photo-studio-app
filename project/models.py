@@ -741,6 +741,13 @@ class CartItem:
             self.package_id = cart_item_dict.get('package_id')
             self.price = cart_item_dict.get('price')
             self.created_at = cart_item_dict.get('created_at')
+            
+            # Additional fields from JOIN queries
+            self.package_name = cart_item_dict.get('package_name')
+            self.inclusions = cart_item_dict.get('inclusions')
+            self.photographer_location = cart_item_dict.get('photographer_location')
+            self.photographer_first_name = cart_item_dict.get('photographer_first_name')
+            self.photographer_last_name = cart_item_dict.get('photographer_last_name')
 
     @staticmethod
     def get_by_id(cart_item_id):
