@@ -82,7 +82,9 @@
     <div class="col-lg-7 col-sm-12 col-md-7 pt-3 pb-5">
       <div class="d-flex justify-content-end">
         <a href="{{ url_for('customer.view_cart') }}" class="btn btn-outline-secondary flex-fill me-2">Go back</a>
-        <a href="{{ url_for('customer.success_page') }}" class="btn btn-orange flex-fill">Place Order</a>
+        <form method="POST" action="{{ url_for('customer.process_payment') }}" style="display: inline; flex: 1;">
+          <button type="submit" class="btn btn-orange flex-fill w-100">Place Order</button>
+        </form>
       </div>
     </div>
   </div>
