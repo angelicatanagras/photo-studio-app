@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, HiddenField, TextAreaField, SelectField, DateField, IntegerField, FloatField, RadioField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError, Optional, NumberRange
 from flask_wtf.file import FileField, FileAllowed, FileRequired
+from datetime import datetime, time
 from .models import User, Category
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
@@ -27,20 +28,39 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Please use a different email address.')
 
 class BookingForm(FlaskForm):
+    def validate_event_date(self, field):
+        """Validate that event date cannot be in the past"""
+        if field.data and field.data < datetime.now().date():
+            raise ValidationError('Event date cannot be in the past.')
+    
+    def validate_event_time(self, field):
+        """Validate that if today is selected, time cannot be in the past"""
+        if self.event_date.data == datetime.now().date() and field.data:
+            try:
+                selected_time = datetime.strptime(field.data, '%H:%M').time()
+                current_time = datetime.now().time()
+                if selected_time <= current_time:
+                    raise ValidationError('Selected time has already passed for today.')
+            except ValueError:
+                raise ValidationError('Invalid time format.')
+
     package_id = HiddenField('Package ID', validators=[DataRequired()])
     photographer_id = HiddenField('Photographer ID', validators=[DataRequired()])
-    event_date = DateField('Event Date', validators=[Optional()])
+    event_date = DateField('Event Date', 
+                          validators=[DataRequired()],
+                          render_kw={"min": datetime.now().date().isoformat()})
     event_time = SelectField('Event Time', choices=[
-        ('9:00', '9:00 AM'),
+        ('09:00', '9:00 AM'),
         ('10:00', '10:00 AM'),
         ('11:00', '11:00 AM'),
         ('12:00', '12:00 PM'),
         ('13:00', '1:00 PM'),
         ('14:00', '2:00 PM'),
         ('15:00', '3:00 PM'),
-        ('16:00', '4:00 PM')
-    ], validators=[Optional()])
-    pax = IntegerField('Number of Pax', validators=[Optional(), NumberRange(min=1, max=50)])
+        ('16:00', '4:00 PM'),
+        ('17:00', '5:00 PM')
+    ], validators=[DataRequired()])
+    pax = IntegerField('Number of Pax', validators=[DataRequired(), NumberRange(min=1, max=50)])
     notes = TextAreaField('Event Notes', validators=[Optional(), Length(max=500)])
     submit = SubmitField('Proceed to checkout')
 

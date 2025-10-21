@@ -125,9 +125,10 @@
                 </label>
                 <input
                   type="date"
-                  name="booking_date"
+                  name="event_date"
                   class="form-control"
                   placeholder="Pick a date"
+                  id="event_date"
                   required
                 />
               </div>
@@ -135,9 +136,9 @@
                 <label class="form-label fw-semibold">
                   <i class="bi bi-clock me-2"></i>Choose Time:
                 </label>
-                <select name="booking_time" class="form-select" required>
+                <select name="event_time" class="form-select" required>
                   <option value="">Select time</option>
-                  <option value="9:00">9:00 AM</option>
+                  <option value="09:00">9:00 AM</option>
                   <option value="10:00">10:00 AM</option>
                   <option value="11:00">11:00 AM</option>
                   <option value="12:00">12:00 PM</option>
@@ -145,6 +146,7 @@
                   <option value="14:00">2:00 PM</option>
                   <option value="15:00">3:00 PM</option>
                   <option value="16:00">4:00 PM</option>
+                  <option value="17:00">5:00 PM</option>
                 </select>
               </div>
             </div>
@@ -183,12 +185,13 @@
                 </label>
                 <input
                   type="number"
-                  name="num_pax"
+                  name="pax"
                   class="form-control"
                   placeholder="1"
                   min="1"
                   max="50"
                   value="1"
+                  required
                 />
               </div>
             </div>
@@ -198,10 +201,11 @@
                 <i class="bi bi-card-text me-2"></i>Event Notes:
               </label>
               <textarea
-                name="event_notes"
+                name="notes"
                 class="form-control"
                 rows="4"
                 placeholder="Tell us more about your event. Do you have special requests that need certain attention?"
+                maxlength="500"
               ></textarea>
             </div>
 
@@ -224,4 +228,47 @@
     </div>
   </div>
 </section>
+
+<script>
+// Set minimum date to today
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('event_date').setAttribute('min', today);
+    
+    // Dynamically update time options (hide past times if today is selected)
+    const dateInput = document.getElementById('event_date');
+    const timeSelect = document.querySelector('select[name="event_time"]');
+    
+    function updateTimeOptions() {
+        const selectedDate = dateInput.value;
+        const today = new Date().toISOString().split('T')[0];
+        const currentHour = new Date().getHours();
+        
+        if (selectedDate === today) {
+            // If today is selected, hide past time options
+            Array.from(timeSelect.options).forEach(option => {
+                if (option.value) {
+                    const hour = parseInt(option.value.split(':')[0]);
+                    if (hour <= currentHour) {
+                        option.style.display = 'none';
+                        option.disabled = true;
+                    } else {
+                        option.style.display = 'block';
+                        option.disabled = false;
+                    }
+                }
+            });
+        } else {
+            // If future date is selected, show all time options
+            Array.from(timeSelect.options).forEach(option => {
+                option.style.display = 'block';
+                option.disabled = false;
+            });
+        }
+    }
+    
+    dateInput.addEventListener('change', updateTimeOptions);
+    updateTimeOptions(); // Initial call
+});
+</script>
 {% endblock %}
