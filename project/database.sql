@@ -117,8 +117,8 @@ INSERT INTO users (email, password_hash, first_name, last_name, role, profile_im
 SELECT
     'customer@test.com',
     'scrypt:32768:8:1$GRBu4CIvnxydSres$08f327db51930911c8b3dbd3a660fa37bb2e1eb5fa6379398769a1134859df281aa36932636eacaaf833a2b93f488a0071d5683b75bd9d3529f9008d0879f87f',
-    'Demo',
-    'Customer',
+    'Katie',
+    'Holmes',
     'Customer',
     NULL,
     '0400 000 001',
@@ -147,8 +147,8 @@ INSERT INTO users (email, password_hash, first_name, last_name, role, profile_im
 SELECT
     'photo@test.com',
     'scrypt:32768:8:1$kcbZEKcIvveiBhDu$d423d2fd1be147a474a3f6eea71626328121576994123986afe1bb4e48059b2df6d902e2c932d2d507aa437ee025394329d0568ac3c55fbe62fc943e29fe24be',
-    'Demo',
-    'Photographer',
+    'Steve',
+    'Philips',
     'Photographer',
     NULL,
     '0400 000 002'
