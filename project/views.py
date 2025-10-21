@@ -542,9 +542,52 @@ def checkout():
     )
 
 
+@customer_bp.route('/process-payment', methods=['POST'])
+@login_required
+@role_required('Customer')
+def process_payment():
+    """Process payment and clear cart"""
+    user = get_current_user()
+    customer = Customer.get_by_user_id(user.get('id'))
+    
+    if not customer:
+        flash('Customer profile not found.', 'error')
+        return redirect(url_for('customer.index'))
+    
+    # Get current cart
+    cart = Cart.get_by_customer(customer.id, status='Pending')
+    if not cart:
+        flash('No items in cart to process.', 'error')
+        return redirect(url_for('customer.view_cart'))
+    
+    # Get cart items for creating booking record
+    cart_items = CartItem.get_by_cart(cart.id)
+    if not cart_items:
+        flash('Cart is empty.', 'error')
+        return redirect(url_for('customer.view_cart'))
+    
+    try:
+        # Create booking from cart using model method
+        booking_id = Booking.create_from_cart(cart.id, customer.id, cart.subtotal)
+        
+        # Generate order ID for display
+        order_id = f"AUS-{booking_id:05d}"
+        
+        flash('Payment processed successfully!', 'success')
+        return redirect(url_for('customer.success_page', order_id=order_id))
+        
+    except Exception as e:
+        flash(f'Payment processing failed: {str(e)}', 'error')
+        return redirect(url_for('customer.checkout'))
+
+
 @customer_bp.route('/success')
 def success_page():
-    return render_template('customer/success_page.html', title='Booking Success')
+    """Display success page after payment"""
+    order_id = request.args.get('order_id', 'AUS-00000')
+    return render_template('customer/success_page.html', 
+                         title='Booking Success', 
+                         order_id=order_id)
 
 
 @customer_bp.route('/about')
