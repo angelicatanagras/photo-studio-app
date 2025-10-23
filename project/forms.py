@@ -100,13 +100,13 @@ class ProfilePictureForm(FlaskForm):
     
 class SinglePackageForm(FlaskForm):
     """Form for creating/updating a single package"""
-    package_name = SelectField('Package Type', 
+    package_name = SelectField('Package Type',
                                 choices=[('', 'Select Package Type'),
-                                        ('Basic', 'Basic'), 
-                                        ('Standard', 'Standard'), 
+                                        ('Basic', 'Basic'),
+                                        ('Standard', 'Standard'),
                                         ('Premium', 'Premium')],
                                 validators=[DataRequired(message='Package type is required')])
-    category = SelectField('Category', 
+    category = SelectField('Category',
                           choices=[],
                           coerce=int,
                           validators=[DataRequired(message='Category is required')])
@@ -119,10 +119,22 @@ class SinglePackageForm(FlaskForm):
         Length(min=10, max=500, message='Inclusions must be between 10 and 500 characters')
     ])
     submit = SubmitField('Create Package')
-    
+
     def __init__(self, *args, **kwargs):
         super(SinglePackageForm, self).__init__(*args, **kwargs)
         # Populate category choices from database
         categories = Category.get_all()
         category_choices = [(0, 'Select Category')] + [(c.id, c.category_name) for c in categories]
-        self.category.choices = category_choices    
+        self.category.choices = category_choices
+
+class CategoryForm(FlaskForm):
+    """Form for creating a new category"""
+    category_name = StringField('Category Name', validators=[
+        DataRequired(message='Category name is required'),
+        Length(min=2, max=25, message='Category name must be between 2 and 25 characters')
+    ])
+    description = StringField('Description', validators=[
+        Optional(),
+        Length(max=100, message='Description cannot exceed 100 characters')
+    ])
+    submit = SubmitField('Add Category')    

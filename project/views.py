@@ -273,11 +273,29 @@ def logout():
 @customer_bp.route('/')
 @customer_bp.route('/index')
 def index():
-    # Pagination
+    category_id = request.args.get('category', type=int)
+    location_filter = request.args.get('location', type=str)
+    search_query = request.args.get('search', type=str, default='').strip()
+
     page = request.args.get('page', 1, type=int)
     per_page = 8
 
-    all_photographers = Photographer.get_all()
+    if category_id:
+        all_photographers = Photographer.get_by_category(category_id)
+    else:
+        all_photographers = Photographer.get_all()
+
+    if location_filter:
+        all_photographers = [p for p in all_photographers if p.location and location_filter.lower() in p.location.lower()]
+
+    if search_query:
+        all_photographers = [
+            p for p in all_photographers
+            if (p.user and search_query.lower() in p.user.full_name.lower())
+            or (p.location and search_query.lower() in p.location.lower())
+            or (p.bio and search_query.lower() in p.bio.lower())
+        ]
+
     total = len(all_photographers)
     total_pages = (total + per_page - 1) // per_page
 
@@ -285,7 +303,6 @@ def index():
     end = start + per_page
     photographers = all_photographers[start:end]
 
-    # Get featured photographers with portfolio
     from project.models import PortfolioItem
     featured_photographers = Photographer.get_featured()
     for photographer in featured_photographers:
@@ -294,7 +311,7 @@ def index():
 
     service_categories = Category.get_all()
     photographer_locations = []
-    for p in all_photographers:
+    for p in Photographer.get_all():
         if p.location and p.location not in photographer_locations:
             photographer_locations.append(p.location)
 
@@ -307,7 +324,10 @@ def index():
         photographer_locations=photographer_locations,
         page=page,
         total_pages=total_pages,
-        total=total
+        total=total,
+        selected_category=category_id,
+        selected_location=location_filter,
+        search_query=search_query
     )
 
 
@@ -1142,11 +1162,46 @@ def bookings():
     return render_template('admin/bookings.html', title='All Bookings', bookings=all_bookings)
 
 
-@admin_bp.route('/photographers')
+@admin_bp.route('/photographers', methods=['GET', 'POST'])
 @role_required('Admin')
 def photographers():
+    from .forms import CategoryForm
+    form = CategoryForm()
+
+    # Handle category creation
+    if form.validate_on_submit():
+        try:
+            existing = Category.get_by_name(form.category_name.data)
+            if existing:
+                flash('A category with this name already exists.', 'error')
+            else:
+                Category.create(form.category_name.data, form.description.data)
+                flash(f'Category "{form.category_name.data}" has been added successfully!', 'success')
+                return redirect(url_for('admin.photographers'))
+        except Exception as e:
+            flash(f'Error creating category: {str(e)}', 'error')
+
+    # Get all photographers
     all_photographers = Photographer.get_all()
-    return render_template('admin/photographers.html', title='Manage Photographers', photographers=all_photographers)
+
+    # Get categories with photographers
+    all_categories = Category.get_all()
+    categories_with_photographers = []
+    for category in all_categories:
+        photographers = Photographer.get_by_category(category.id)
+        categories_with_photographers.append({
+            'category': category,
+            'photographers': photographers,
+            'count': len(photographers)
+        })
+
+    return render_template(
+        'admin/photographers.html',
+        title='Manage Photographers',
+        photographers=all_photographers,
+        categories=categories_with_photographers,
+        form=form
+    )
 
 
 @admin_bp.route('/photographers/toggle_featured/<int:photographer_id>', methods=['POST'])
