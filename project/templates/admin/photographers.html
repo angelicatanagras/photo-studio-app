@@ -5,69 +5,200 @@
   <div class="container">
     <div class="row mb-4">
       <div class="col-12">
-        <h2 class="text-charcoal">Manage Photographers</h2>
-        <p class="text-muted">View all photographers and manage featured status (max 3 featured)</p>
+        <h2 class="text-charcoal">Manage Photographers & Categories</h2>
+        <p class="text-muted">View all photographers and manage categories</p>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-12">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Location</th>
-                    <th>Category</th>
-                    <th>Featured</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for photographer in photographers %}
-                  <tr>
-                    <td>{{ photographer.id }}</td>
-                    <td>{{ photographer.user.full_name }}</td>
-                    <td>{{ photographer.user.email }}</td>
-                    <td>{{ photographer.user.phone or 'N/A' }}</td>
-                    <td>{{ photographer.location }}</td>
-                    <td>{{ photographer.category.category_name if photographer.category else 'N/A' }}</td>
-                    <td>
-                      {% if photographer.featured %}
-                      <span class="badge bg-success">
-                        <i class="bi bi-star-fill"></i> Featured
-                      </span>
-                      {% else %}
-                      <span class="badge bg-secondary">Not Featured</span>
-                      {% endif %}
-                    </td>
-                    <td>
-                      <form method="POST" action="{{ url_for('admin.toggle_featured', photographer_id=photographer.id) }}" style="display: inline;">
-                        {% if photographer.featured %}
-                        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Remove from featured">
-                          <i class="bi bi-star"></i> Unfeature
-                        </button>
-                        {% else %}
-                        <button type="submit" class="btn btn-sm btn-warning" title="Add to featured">
-                          <i class="bi bi-star-fill"></i> Feature
-                        </button>
-                        {% endif %}
-                      </form>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs mb-4" id="photographerTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-photographers" type="button" role="tab">
+          <i class="bi bi-people-fill"></i> All Photographers
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="category-tab" data-bs-toggle="tab" data-bs-target="#by-category" type="button" role="tab">
+          <i class="bi bi-tags-fill"></i> By Category
+        </button>
+      </li>
+    </ul>
+
+    <!-- Tabs Content -->
+    <div class="tab-content" id="photographerTabsContent">
+
+      <!-- Tab 1: All Photographers -->
+      <div class="tab-pane fade show active" id="all-photographers" role="tabpanel">
+        <div class="row">
+          <div class="col-12">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title mb-3">All Photographers ({{ photographers|length }})</h5>
+                <p class="text-muted small">Manage featured status (max 3 featured)</p>
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Location</th>
+                        <th>Category</th>
+                        <th>Featured</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for photographer in photographers %}
+                      <tr>
+                        <td>{{ photographer.id }}</td>
+                        <td>{{ photographer.user.full_name }}</td>
+                        <td>{{ photographer.user.email }}</td>
+                        <td>{{ photographer.user.phone or 'N/A' }}</td>
+                        <td>{{ photographer.location }}</td>
+                        <td>{{ photographer.category.category_name if photographer.category else 'N/A' }}</td>
+                        <td>
+                          {% if photographer.featured %}
+                          <span class="badge bg-success">
+                            <i class="bi bi-star-fill"></i> Featured
+                          </span>
+                          {% else %}
+                          <span class="badge bg-secondary">Not Featured</span>
+                          {% endif %}
+                        </td>
+                        <td>
+                          <form method="POST" action="{{ url_for('admin.toggle_featured', photographer_id=photographer.id) }}" style="display: inline;">
+                            {% if photographer.featured %}
+                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Remove from featured">
+                              <i class="bi bi-star"></i> Unfeature
+                            </button>
+                            {% else %}
+                            <button type="submit" class="btn btn-sm btn-warning" title="Add to featured">
+                              <i class="bi bi-star-fill"></i> Feature
+                            </button>
+                            {% endif %}
+                          </form>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Tab 2: By Category -->
+      <div class="tab-pane fade" id="by-category" role="tabpanel">
+
+        <!-- Add New Category Form -->
+        <div class="row mb-4">
+          <div class="col-lg-6">
+            <div class="card shadow-sm">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Add New Category</h5>
+              </div>
+              <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.photographers') }}">
+                  {{ form.hidden_tag() }}
+
+                  <div class="mb-3">
+                    {{ form.category_name.label(class="form-label") }}
+                    {{ form.category_name(class="form-control" + (" is-invalid" if form.category_name.errors else "")) }}
+                    {% if form.category_name.errors %}
+                      <div class="invalid-feedback">
+                        {% for error in form.category_name.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  <div class="mb-3">
+                    {{ form.description.label(class="form-label") }}
+                    {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else "")) }}
+                    {% if form.description.errors %}
+                      <div class="invalid-feedback">
+                        {% for error in form.description.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  {{ form.submit(class="btn btn-primary") }}
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categories with Photographers -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <h4 class="text-charcoal">All Categories ({{ categories|length }})</h4>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            {% if categories %}
+            <div class="card shadow-sm">
+              <div class="card-body">
+                {% for item in categories %}
+                <div class="mb-4 {% if not loop.last %}border-bottom pb-4{% endif %}">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                      <h5 class="mb-1">
+                        {{ item.category.category_name }}
+                      </h5>
+                      {% if item.category.description %}
+                      <small class="text-muted">{{ item.category.description }}</small>
+                      {% endif %}
+                    </div>
+                    <span class="badge bg-info">{{ item.count }} Photographer{{ 's' if item.count != 1 else '' }}</span>
+                  </div>
+
+                  {% if item.photographers %}
+                  <div class="ms-4">
+                    <ul class="list-unstyled mb-0">
+                      {% for photographer in item.photographers %}
+                      <li class="py-2">
+                        <strong>{{ photographer.user.full_name }}</strong>
+                        {% if photographer.featured %}
+                        <span class="badge bg-warning text-dark ms-1" title="Featured Photographer">
+                          <i class="bi bi-star-fill"></i>
+                        </span>
+                        {% endif %}
+                        <br>
+                        <small class="text-muted">{{ photographer.location }}</small>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                  {% else %}
+                  <p class="text-muted ms-4 mb-0">
+                    <i class="bi bi-inbox"></i> No photographers in this category yet
+                  </p>
+                  {% endif %}
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i> No categories found. Add your first category using the form above.
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
     </div>
+
   </div>
 </section>
 {% endblock %}
