@@ -1162,11 +1162,46 @@ def bookings():
     return render_template('admin/bookings.html', title='All Bookings', bookings=all_bookings)
 
 
-@admin_bp.route('/photographers')
+@admin_bp.route('/photographers', methods=['GET', 'POST'])
 @role_required('Admin')
 def photographers():
+    from .forms import CategoryForm
+    form = CategoryForm()
+
+    # Handle category creation
+    if form.validate_on_submit():
+        try:
+            existing = Category.get_by_name(form.category_name.data)
+            if existing:
+                flash('A category with this name already exists.', 'error')
+            else:
+                Category.create(form.category_name.data, form.description.data)
+                flash(f'Category "{form.category_name.data}" has been added successfully!', 'success')
+                return redirect(url_for('admin.photographers'))
+        except Exception as e:
+            flash(f'Error creating category: {str(e)}', 'error')
+
+    # Get all photographers
     all_photographers = Photographer.get_all()
-    return render_template('admin/photographers.html', title='Manage Photographers', photographers=all_photographers)
+
+    # Get categories with photographers
+    all_categories = Category.get_all()
+    categories_with_photographers = []
+    for category in all_categories:
+        photographers = Photographer.get_by_category(category.id)
+        categories_with_photographers.append({
+            'category': category,
+            'photographers': photographers,
+            'count': len(photographers)
+        })
+
+    return render_template(
+        'admin/photographers.html',
+        title='Manage Photographers',
+        photographers=all_photographers,
+        categories=categories_with_photographers,
+        form=form
+    )
 
 
 @admin_bp.route('/photographers/toggle_featured/<int:photographer_id>', methods=['POST'])
