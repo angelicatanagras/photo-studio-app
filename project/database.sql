@@ -97,11 +97,11 @@ CREATE TABLE IF NOT EXISTS bookings (
     FOREIGN KEY (customer_id) REFERENCES customers(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Default credentials: admin@test.com / Admin123
+-- Default credentials for admin 1: admin@test.com / Admin123
 INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone, created_at)
 SELECT
     'admin@test.com',
-    'scrypt:32768:8:1$vdVMI7dDENnBLjjC$135eaa86bef9cff49f048a3f83af83f173dde2ac5f8ba46ebd77d07cf51da93e26b1e991aa8eb82af13664d32ddfd4a1f0416a353675564bf5cc412d269f3791',
+    'pbkdf2:sha256:1000000$iQFxqpTjE4LOThXO$11e9350f5bc12fa5069822c022bcfe4ad8d107d1b66c5d26eb6de0bbb646299a',
     'Super',
     'Admin',
     'Admin',
@@ -112,13 +112,28 @@ WHERE NOT EXISTS (
     SELECT 1 FROM users WHERE email = 'admin@test.com'
 );
 
--- Default credentials: customer@test.com / customer123
+-- Default credentials for admin 2: admin2@test.com / Admin567
+INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone, created_at)
+SELECT
+    'admin2@test.com',
+    'pbkdf2:sha256:1000000$0BA1FEUDzOjFFo59$16bbb282da5d22db373e426da4686584c23bea0e6fd69650c4cad04a29f0fdbe',
+    'Super',
+    'Admin',
+    'Admin',
+    NULL,
+    '0400000009',
+    NOW()
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'admin2@test.com'
+);
+
+-- Default credentials for customer_1: customer@test.com / customer123
 INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone, created_at)
 SELECT
     'customer@test.com',
-    'scrypt:32768:8:1$GRBu4CIvnxydSres$08f327db51930911c8b3dbd3a660fa37bb2e1eb5fa6379398769a1134859df281aa36932636eacaaf833a2b93f488a0071d5683b75bd9d3529f9008d0879f87f',
-    'Demo',
-    'Customer',
+    'pbkdf2:sha256:1000000$Fl12fLtid5y51OXw$c56a78171284dc7c11cf976a684dd276c1a201c606c1555c0e02ef47e2ef22e1',
+    'Katie',
+    'Holmes',
     'Customer',
     NULL,
     '0400 000 001',
@@ -127,7 +142,7 @@ WHERE NOT EXISTS (
     SELECT 1 FROM users WHERE email = 'customer@test.com'
 );
 
--- Create customer profile for demo customer
+-- Create customer profile for demo customer_1
 INSERT INTO customers (user_id, address, city, postcode, billing_address)
 SELECT
     u.id,
@@ -141,43 +156,106 @@ AND NOT EXISTS (
     SELECT 1 FROM customers WHERE user_id = u.id
 );
 
+-- Default credentials for customer_2: customer2@test.com / Roger123
+INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone, created_at)
+SELECT
+    'customer2@test.com',
+    'pbkdf2:sha256:1000000$AEHrqGbttpqtbN0Y$dc6c7a42c88d8042b71af42c4dd44a0ab76de026bc186ec2f3929ad4e727a900',
+    'Roger',
+    'Chavez',
+    'Customer',
+    NULL,
+    '0400 000 006',
+    NOW()
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'customer2@test.com'
+);
+
+-- Create customer profile for demo customer_2
+INSERT INTO customers (user_id, address, city, postcode, billing_address)
+SELECT
+    u.id,
+    '234 Brisbane, Australia',
+    'Brisbane',
+    '4001',
+    '234 Brisbane, Australia'
+FROM users u
+WHERE u.email = 'customer2@test.com'
+AND NOT EXISTS (
+    SELECT 1 FROM customers WHERE user_id = u.id
+);
+
 -- Insert demo photographer user
--- Default credentials: photo@test.com / photo123
+-- Default credentials for photographer_1: photo@test.com / photo123
 INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone)
 SELECT
     'photo@test.com',
-    'scrypt:32768:8:1$kcbZEKcIvveiBhDu$d423d2fd1be147a474a3f6eea71626328121576994123986afe1bb4e48059b2df6d902e2c932d2d507aa437ee025394329d0568ac3c55fbe62fc943e29fe24be',
-    'Demo',
+    'pbkdf2:sha256:1000000$YoUDg7LC9YTd0xEq$9ba94263116947ce2e9c27d0a298b403be1d389aa492892df960365d08eca5d1',
+    'Steve',
+    'Philips',
     'Photographer',
-    'Photographer',
-    NULL,
+    'profile_5_20251023_122340.jpg',
     '0400 000 002'
 WHERE NOT EXISTS (
     SELECT 1 FROM users WHERE email = 'photo@test.com'
 );
 
+-- Default credentials for photographer_2: photo2@test.com / Bryan123
+INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone)
+SELECT
+    'photo2@test.com',
+    'pbkdf2:sha256:1000000$HgrBr181DITCLmPP$a88ceb911e669d2cd91924a78828248b737f5bc6487f42fe99372ac8ade9cd60',
+    'Bryan',
+    'Bays',
+    'Photographer',
+    'profile_6_20251022_093104.jpg',
+    '0400 000 011'
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'photo2@test.com'
+);
+
 -- Insert sample service categories
 INSERT INTO category (category_name, description) VALUES
-    ('Wedding Photography', 'Complete wedding photography services'),
-    ('Portrait Photography', 'Individual and family portrait sessions'),
+    ('Wedding', 'Complete wedding photography services'),
+    ('Portrait', 'Individual and family portrait sessions'),
+    ('Events','Turning your event into unforgettable memories'),
     ('Pet Photography', 'Pet photography services'),
-    ('Party Photography', 'Commercial party and events photography'),
-    ('Maternity Photography', 'Maternity shooting services')
+    ('Party', 'Commercial party and events photography'),
+    ('Maternity', 'Maternity shooting services'),
+    ('Newborn','Capturing precious moments'),
+    ('Business Branding','Branding creatives'),
+    ('Sports and Action', 'Capturing moments in athletic events'),
+    ('Cosplay','Bringing your character to life')
 ON DUPLICATE KEY UPDATE category_name=category_name;
 
--- Create photographer profile for demo photographer
+-- Create photographer profile for demo photographer_1
 INSERT INTO photographers (user_id, category_id, bio, location, social_link, availability, featured)
 SELECT
     u.id,
-    c.id,
-    'Professional photographer specializing in weddings, portraits, and events. Over 10 years of experience capturing precious moments.',
+    1,
+    'Professional photographer specialising in weddings, portraits, events, business branding, and cosplay photography. Over 10 years of experience capturing precious moments.',
     'Brisbane, Australia',
     'https://instagram.com/demophotographer',
     NOW(),
     TRUE
 FROM users u
-JOIN category c ON c.category_name = 'Wedding Photography'
 WHERE u.email = 'photo@test.com'
+AND NOT EXISTS (
+    SELECT 1 FROM photographers WHERE user_id = u.id
+);
+
+-- Create photographer profile for demo photographer_2
+INSERT INTO photographers (user_id, category_id, bio, location, social_link, availability, featured)
+SELECT
+    u.id,
+    2,
+    'Professional photographer specialising in maternity, newborn, party, pet, and events photography. 7 years of turning moments into breathtaking memories.',
+    'Brisbane, Australia',
+    'https://instagram.com/demophotographer2',
+    NOW(),
+    TRUE
+FROM users u
+WHERE u.email = 'photo2@test.com'
 AND NOT EXISTS (
     SELECT 1 FROM photographers WHERE user_id = u.id
 );
@@ -186,6 +264,55 @@ AND NOT EXISTS (
 INSERT INTO packages (package_name, photographer_id, category_id, price, inclusions) VALUES
     ('Basic', 1, 1, 250.00, '1-hour photo session, 10 edited digital images'),
     ('Standard', 1, 1, 350.00, '2-hour photo session, 25 edited digital images'),
-    ('Premium', 1, 1, 600.00, '3-hour session, 40 edited images, and prints')
+    ('Premium', 1, 1, 600.00, '3-hour session, 40 edited images, and prints'),
+    ('Basic', 1, 2, 250.00, '1-hour photo session, 10 edited digital images'),
+    ('Standard', 1, 2, 350.00, '2-hour photo session, 25 edited digital images'),
+    ('Premium', 1, 2, 600.00, '3-hour session, 40 edited images, and prints'),
+    ('Basic', 1, 3, 250.00, '1-hour photo session, 10 edited digital images'),
+    ('Standard', 1, 3, 350.00, '2-hour photo session, 25 edited digital images'),
+    ('Premium', 1, 3, 600.00, '3-hour session, 40 edited images, and prints'),
+    ('Basic', 1, 8, 250.00, '1-hour photo session, 10 edited digital images'),
+    ('Standard', 1, 8, 350.00, '2-hour photo session, 25 edited digital images'),
+    ('Premium', 1, 8, 600.00, '3-hour session, 40 edited images, and prints'),
+    ('Basic', 1, 10, 250.00, '1-hour photo session, 10 edited digital images'),
+    ('Standard', 1, 10, 350.00, '2-hour photo session, 25 edited digital images'),
+    ('Premium', 1, 10, 600.00, '3-hour session, 40 edited images, and prints'),
+    ('Basic', 2, 3, 200.00, '1-hour photo session, 10 BW and 10 colored edited digital images'),
+    ('Standard', 2, 3, 350.00, '2-hour photo session, 10 BW and 30 colored edited digital images'),
+    ('Premium', 2, 3, 550.00, '3-hour session, 50 edited images, and prints'),
+    ('Basic', 2, 4, 200.00, '1-hour photo session, 10 BW and 10 colored edited digital images'),
+    ('Standard', 2, 4, 350.00, '2-hour photo session, 10 BW and 30 colored edited digital images'),
+    ('Premium', 2, 4, 550.00, '3-hour session, 50 edited images, and prints'),
+    ('Basic', 2, 5, 200.00, '1-hour photo session, 10 BW and 10 colored edited digital images'),
+    ('Standard', 2, 5, 350.00, '2-hour photo session, 10 BW and 30 colored edited digital images'),
+    ('Premium', 2, 5, 550.00, '3-hour session, 50 edited images, and prints'),
+    ('Basic', 2, 6, 200.00, '1-hour photo session, 10 BW and 10 colored edited digital images'),
+    ('Standard', 2, 6, 350.00, '2-hour photo session, 10 BW and 30 colored edited digital images'),
+    ('Premium', 2, 6, 550.00, '3-hour session, 50 edited images, and prints'),
+    ('Basic', 2, 7, 200.00, '1-hour photo session, 10 BW and 10 colored edited digital images'),
+    ('Standard', 2, 7, 350.00, '2-hour photo session, 10 BW and 30 colored edited digital images'),
+    ('Premium', 2, 7, 550.00, '3-hour session, 50 edited images, and prints')
 ON DUPLICATE KEY UPDATE package_name=package_name;
 
+INSERT INTO portfolio_items (photographer_id, title, caption, image_path) VALUES
+    (1,"Outdoor wedding","Beach wedding shot","1_20251021_195046_wedding2.jpg"),
+    (1,"Flowers and rings","Close up photos for flowers and rings","1_20251021_195134_wedding5.jpg"),
+    (1,"Couple photo","Outdoor couple shot","1_20251021_195331_wedding1.jpg"),
+    (1,"Portrait sample 1","Portrait Sample 1","portrait1.jpg"),
+    (1,"Portrait sample 2","Portrait Sample 2","portrait2.jpg"),
+    (1,"Portrait sample 3","Portrait Sample 3","portrait3.jpg"),
+    (1,"Event sample 1","Event sample 1","event1.jpg"),
+    (1,"Event sample 2","Event sample 2","event2.jpg"),
+    (1,"Event sample 3","Event sample 3","event3.jpg"),
+    (1,"Cosplay sample 1","Cosplay sample 1","cosplay1.jpg"),
+    (1,"Cosplay sample 2","Cosplay sample 2","cosplay2.jpg"),
+    (2,"BW Maternity","Black & White maternity shot","2_20251021_214659_maternity1.jpg"),
+    (2,"Baby feet","Mum with baby","2_20251021_221533_maternity2.jpg"),
+    (2,"Autumn shoot",NULL,"2_20251021_221550_maternity3.jpg"),
+    (2,"Party sample 1","Party sample 1","party1.jpg"),
+    (2,"Party sample 2","Party sample 2","party2.jpg"),
+    (2,"Party sample 3","Party sample 3","party3.jpg"),
+    (2,"Pet sample 1","Pet sample 1","pet1.jpg"),
+    (2,"Pet sample 2","Pet sample 2","pet2.jpg"),
+    (2,"Pet sample 3","Pet sample 3","pet3.jpg")
+ON DUPLICATE KEY UPDATE photographer_id=photographer_id;
