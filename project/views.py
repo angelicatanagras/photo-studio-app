@@ -1308,6 +1308,53 @@ def users():
     users_with_roles = [{'user': u, 'role': u.role} for u in all_users]
     return render_template('admin/users.html', title='Manage Users', users=users_with_roles)
 
+
+@admin_bp.route('/users/delete/<int:user_id>', methods=['POST'])
+@role_required('Admin')
+def delete_user(user_id):
+    try:
+        user = User.get_by_id(user_id)
+        if not user:
+            flash('User not found.', 'error')
+        else:
+            user_name = user.full_name
+            User.delete(user_id)
+            flash(f'User "{user_name}" has been deleted successfully.', 'success')
+    except Exception as e:
+        flash(f'Error deleting user: {str(e)}', 'error')
+
+    return redirect(url_for('admin.users'))
+
+
+@admin_bp.route('/users/edit/<int:user_id>', methods=['GET', 'POST'])
+@role_required('Admin')
+def edit_user(user_id):
+    user = User.get_by_id(user_id)
+    if not user:
+        flash('User not found.', 'error')
+        return redirect(url_for('admin.users'))
+
+    if request.method == 'POST':
+        try:
+            # Get form data
+            email = request.form.get('email')
+            first_name = request.form.get('first_name')
+            last_name = request.form.get('last_name')
+            role = request.form.get('role')
+            phone = request.form.get('phone')
+
+            # Update user
+            User.update(user_id, email=email, first_name=first_name,
+                       last_name=last_name, role=role, phone=phone)
+
+            flash(f'User "{first_name} {last_name}" has been updated successfully.', 'success')
+            return redirect(url_for('admin.users'))
+        except Exception as e:
+            flash(f'Error updating user: {str(e)}', 'error')
+
+    return render_template('admin/edit_user.html', title='Edit User', user=user)
+
+
 @admin_bp.route('/bookings')
 @role_required('Admin')
 def bookings():

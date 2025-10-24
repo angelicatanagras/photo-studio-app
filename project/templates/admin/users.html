@@ -42,8 +42,10 @@
                     </td>
                     <td>{{ item.user.created_at.strftime('%Y-%m-%d') if item.user.created_at else 'N/A' }}</td>
                     <td>
-                      <button class="btn btn-sm btn-outline-secondary">Edit</button>
-                      <button class="btn btn-sm btn-outline-danger">Delete</button>
+                      <a href="{{ url_for('admin.edit_user', user_id=item.user.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                      <form method="POST" action="{{ url_for('admin.delete_user', user_id=item.user.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                      </form>
                     </td>
                   </tr>
                   {% endfor %}
