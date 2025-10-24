@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 
 
 from .models import User, Photographer, Customer, Category, Booking, Cart, CartItem, Package, PortfolioItem
-from .forms import LoginForm, RegistrationForm, PortfolioUploadForm, PhotographerBioForm, ProfilePictureForm,SinglePackageForm
+from .forms import LoginForm, RegistrationForm, PortfolioUploadForm, PhotographerBioForm, ProfilePictureForm,SinglePackageForm, CheckoutForm
 
 # Upload configuration
 UPLOAD_FOLDER = 'static/uploads/portfolio'
@@ -542,7 +542,7 @@ def create_booking():
     return redirect(url_for('customer.success_page'))
 
 
-@customer_bp.route('/checkout')
+@customer_bp.route('/checkout', methods=['GET', 'POST'])
 @login_required
 @role_required('Customer')
 def checkout():
@@ -550,12 +550,43 @@ def checkout():
     customer = Customer.get_by_user_id(user.get('id'))
     cart = Cart.get_by_customer(customer.id, status='Pending')
     items = CartItem.get_by_cart(cart.id) if cart else []
-
+    
+    if not items:
+        flash('Your cart is empty.', 'warning')
+        return redirect(url_for('customer.view_cart'))
+    
     total = sum(float(item.price) for item in items)
-
+    
+    # Create form and pre-populate with user data
+    form = CheckoutForm()
+    
+    # Pre-populate form with user data on GET request
+    if request.method == 'GET':
+        form.first_name.data = user.get('first_name')
+        form.last_name.data = user.get('last_name')
+        form.email.data = user.get('email')
+        form.phone.data = user.get('phone')
+    
+    # Handle form submission
+    if form.validate_on_submit():
+        try:
+            # Create booking from cart
+            booking_id = Booking.create_from_cart(cart.id, customer.id, total)
+            
+            # Generate order ID for display
+            order_id = f"AUS-{booking_id:05d}"
+            
+            flash('Payment processed successfully!', 'success')
+            return redirect(url_for('customer.success_page', order_id=order_id))
+            
+        except Exception as e:
+            flash(f'Payment processing failed: {str(e)}', 'error')
+            return redirect(url_for('customer.checkout'))
+    
     return render_template(
         'customer/checkout.html',
         title='Checkout',
+        form=form,
         cart_items=items,
         total=total
     )

@@ -138,3 +138,43 @@ class CategoryForm(FlaskForm):
         Length(max=100, message='Description cannot exceed 100 characters')
     ])
     submit = SubmitField('Add Category')    
+
+class CheckoutForm(FlaskForm):
+    """Form for checkout with contact and payment information"""
+    
+    # Contact Information
+    first_name = StringField('First Name', validators=[
+        DataRequired(message='First name is required'),
+        Length(min=2, max=50, message='First name must be between 2 and 50 characters')
+    ])
+    last_name = StringField('Last Name', validators=[
+        DataRequired(message='Last name is required'),
+        Length(min=2, max=50, message='Last name must be between 2 and 50 characters')
+    ])
+    email = StringField('Email', validators=[
+        DataRequired(message='Email is required'),
+        Email(message='Please enter a valid email address')
+    ])
+    phone = StringField('Phone Number', validators=[
+        DataRequired(message='Phone number is required')
+    ])
+    
+    # Payment Information
+    card_number = StringField('Card Number', validators=[
+        DataRequired(message='Card number is required'),
+        Length(min=13, max=19, message='Card number must be between 13 and 19 digits')
+    ])
+    expiry_date = StringField('Expiry Date', validators=[
+        DataRequired(message='Expiry date is required')
+    ])
+    cvc = StringField('CVC', validators=[
+        DataRequired(message='CVC is required'),
+        Length(min=3, max=4, message='CVC must be 3 or 4 digits'),
+        
+    ])
+    cardholder_name = StringField('Cardholder Name', validators=[
+        DataRequired(message='Cardholder name is required'),
+        Length(min=2, max=100, message='Cardholder name must be between 2 and 100 characters')
+    ])
+    
+    submit = SubmitField('Place Order')

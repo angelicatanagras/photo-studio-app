@@ -78,10 +78,6 @@ CREATE TABLE IF NOT EXISTS cart_item (
     photographer_id INT NOT NULL,
     package_id INT NOT NULL,
     price FLOAT NOT NULL,
-    event_date DATE,
-    event_time TIME,
-    pax INT,
-    notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     event_date DATE NOT NULL,
     event_time TIME NOT NULL,
@@ -91,6 +87,8 @@ CREATE TABLE IF NOT EXISTS cart_item (
     FOREIGN KEY (photographer_id) REFERENCES photographers(id),
     FOREIGN KEY (package_id) REFERENCES packages(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 
 CREATE TABLE IF NOT EXISTS bookings (
     id INT AUTO_INCREMENT PRIMARY KEY,

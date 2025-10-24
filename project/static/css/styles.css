@@ -1037,3 +1037,32 @@ a {
 .btn-close-white:hover {
   opacity: 1;
 }
+
+.photographer-avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+  border: 2px solid #e0e0e0;
+}
+
+.photographer-badge {
+  display: flex;
+  align-items: center;
+}
+
+.photographer-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
