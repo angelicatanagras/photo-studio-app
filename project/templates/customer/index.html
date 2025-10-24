@@ -6,7 +6,7 @@
     <h1 class="display-4 mb-5">Book Professional Photographers Near You</h1>
     <div class="location-overlay mt-5">
       <h4 class="text-dark mb-4">Let's find your photographers nearby</h4>
-      <form action="/" method="GET">
+      <form action="{{ url_for('customer.index') }}#photographers" method="GET">
         <div class="location-input mb-3">
           <input
             type="text"
@@ -30,7 +30,7 @@
   <div class="container">
     <div class="row align-items-center justify-content-between gap-3">
       <div class="col-auto">
-        <form method="GET" action="{{ url_for('customer.index') }}" class="d-flex flex-wrap gap-3 align-items-center">
+        <form method="GET" action="{{ url_for('customer.index') }}#photographers" class="d-flex flex-wrap gap-3 align-items-center">
           <input
             type="text"
             name="search"
@@ -63,7 +63,7 @@
           </button>
 
           {% if search_query or selected_category or selected_location %}
-          <a href="{{ url_for('customer.index') }}" class="btn btn-outline-danger btn-sm">
+          <a href="{{ url_for('customer.index') }}#photographers" class="btn btn-outline-danger btn-sm">
             <span class="bi bi-x-circle"></span> Clear
           </a>
           {% endif %}
@@ -104,12 +104,18 @@
         </div>
         <div class="photog-card-body">
           <h5 class="card-title">{{ photographer.user.full_name }}</h5>
-          <div class="card-tags">
-            <i class="bi bi-tag"></i>
-            {% if photographer.services %} {% for service in
-            photographer.services[:2] %} {{ service.category.category_name }}{%
-            if not loop.last %}, {% endif %} {% endfor %} {% else %} Services
-            available {% endif %}
+          <div class="card-tags mb-3">
+            {% if photographer.categories %}
+              {% for category in photographer.categories[:3] %}
+              <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">
+                <i class="bi bi-camera"></i> {{ category.category_name }}
+              </span>
+              {% endfor %}
+            {% else %}
+              <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">
+                <i class="bi bi-camera"></i> General Photography
+              </span>
+            {% endif %}
           </div>
           <a class="icon-link icon-link-hover btn-gradient" href="{{ url_for('photographer.gallery', photographer_id=photographer.id) }}">
             View Full Portfolio
@@ -201,9 +207,18 @@
             <div class="col-md-9">
               <div class="featured-content">
                 <h3 class="featured-name">{{ photographer.user.full_name }}</h3>
-                <div class="featured-specialty">
-                  <i class="bi bi-camera"></i>
-                  {{ photographer.category.category_name if photographer.category else 'Photography' }}
+                <div class="mb-3 d-flex flex-wrap gap-2">
+                  {% if photographer.categories %}
+                    {% for category in photographer.categories[:3] %}
+                    <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                      <i class="bi bi-camera"></i> {{ category.category_name }}
+                    </span>
+                    {% endfor %}
+                  {% else %}
+                    <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                      <i class="bi bi-camera"></i> Photography
+                    </span>
+                  {% endif %}
                 </div>
                 <p class="featured-bio">
                   {{ photographer.bio or 'Professional photographer specializing in creating stunning visual stories.' }}

@@ -89,17 +89,18 @@
               </li>
             </ul>
             <div class="d-flex flex-column flex-lg-row my-3 my-lg-0 mx-lg-3">
-              <div class="d-flex">
+              <form class="d-flex" method="GET" action="{{ url_for('customer.index') }}#photographers" role="search">
                 <input
                   class="form-control form_input_search me-2"
                   type="search"
+                  name="search"
                   placeholder="Photographers, categories, location..."
                   aria-label="Search"
                 />
                 <button class="btn text-white p-2" type="submit">
                   <i class="bi bi-search"></i>
                 </button>
-              </div>
+              </form>
             </div>
             {% if is_authenticated %}
             <div class="dropdown">
@@ -152,24 +153,25 @@
       </div>
     </nav>
 
-    <main>
-      <div class="container mt-4">
-        {% with messages = get_flashed_messages(with_categories=true) %} {% if
-        messages %} {% for category, message in messages %}
-        <div
-          class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
-          role="alert"
-        >
-          {{ message }}
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="alert"
-          ></button>
-        </div>
-        {% endfor %} {% endif %} {% endwith %}
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div
+      class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show m-0"
+      role="alert"
+      style="position: fixed; top: 70px; left: 0; right: 0; z-index: 1050; border-radius: 0;"
+    >
+      <div class="container">
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+        ></button>
       </div>
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
 
+    <main>
       {% block content %}{% endblock %}
     </main>
 
