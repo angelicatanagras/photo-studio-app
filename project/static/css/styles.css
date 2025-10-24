@@ -1,9 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 
-html {
-  margin: 0 auto;
-  overflow: auto;
+html,
+body {
+  height: 100%;
+  margin: 0;
 }
 
 :root {
@@ -15,8 +16,16 @@ html {
 
 body {
   font-family: "Roboto", sans-serif;
-  padding-top: 70px; /* Add padding for fixed navbar */
+  padding-top: 70px; 
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
+
+main {
+  flex: 1; 
+}
+
 
 h1 {
   font-family: "Playfair Display", serif;
@@ -268,10 +277,12 @@ a {
   margin: 0 auto;
 }
 
+
 .footer {
   height: auto;
-  padding: 50px 0px;
-  background-color: rgb(71 72 73);
+  padding: 50px 0;
+  background-color: rgb(71, 72, 73); 
+  color: var(--white);
 }
 
 .footer p {
