@@ -841,6 +841,9 @@ class Booking:
             self.cart_items = []
             self.photographer_name = booking_dict.get('photographer_name')
             self.photographer_images = booking_dict.get('photographer_images')
+            self.customer_name = booking_dict.get('customer_name')
+            self.customer_email = booking_dict.get('customer_email')
+            self.customer_phone = booking_dict.get('customer_phone')
             self.package_name = booking_dict.get('package_name')
             self.package_inclusions = booking_dict.get('package_inclusions')
             self.event_dates = booking_dict.get('event_dates')
@@ -890,6 +893,44 @@ class Booking:
             ORDER BY b.created_at DESC
             """,
             (customer_id,)
+        )
+        return [Booking(b) for b in bookings_data]
+    
+    @staticmethod
+    def get_by_photographer_with_details(photographer_id):
+        """Gets all bookings for a photographer with related cart items and customer details."""
+        bookings_data = fetch_all(
+            """
+            SELECT DISTINCT
+                b.id,
+                b.cart_id,
+                b.customer_id,
+                b.created_at,
+                b.updated_at,
+                b.payment_date,
+                b.total_amount,
+                b.status,
+                GROUP_CONCAT(DISTINCT CONCAT(cu.first_name, ' ', cu.last_name) SEPARATOR ', ') as customer_name,
+                GROUP_CONCAT(DISTINCT cu.email SEPARATOR ', ') as customer_email,
+                GROUP_CONCAT(DISTINCT cu.phone SEPARATOR ', ') as customer_phone,
+                GROUP_CONCAT(DISTINCT pkg.package_name SEPARATOR ', ') as package_name,
+                GROUP_CONCAT(DISTINCT pkg.inclusions SEPARATOR '; ') as package_inclusions,
+                GROUP_CONCAT(DISTINCT ci.event_date ORDER BY ci.event_date SEPARATOR ', ') as event_dates,
+                GROUP_CONCAT(DISTINCT ci.event_time ORDER BY ci.event_time SEPARATOR ', ') as event_times,
+                GROUP_CONCAT(DISTINCT ci.pax SEPARATOR ', ') as pax_counts,
+                GROUP_CONCAT(DISTINCT ci.notes SEPARATOR '|||') as event_notes
+            FROM bookings b
+            LEFT JOIN cart c ON c.id = b.cart_id
+            LEFT JOIN cart_item ci ON ci.cart_id = c.id
+            LEFT JOIN customers cust ON cust.id = b.customer_id
+            LEFT JOIN users cu ON cu.id = cust.user_id
+            LEFT JOIN packages pkg ON pkg.id = ci.package_id
+            WHERE ci.photographer_id = %s
+            GROUP BY b.id, b.cart_id, b.customer_id, b.created_at, b.updated_at, 
+                    b.payment_date, b.total_amount, b.status
+            ORDER BY b.id DESC
+            """,
+            (photographer_id,)
         )
         return [Booking(b) for b in bookings_data]
     
