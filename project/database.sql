@@ -221,6 +221,118 @@ WHERE NOT EXISTS (
     SELECT 1 FROM users WHERE email = 'photo2@test.com'
 );
 
+-- Default credentials for photographer_3: events@test.com / Events123
+INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone)
+SELECT
+    'events@test.com',
+    'scrypt:32768:8:1$xEOzURTQhrn3ogk4$8dba241ad13ee8f011ed39db83381f8fda06341c923fce2076ac92e562b7b757316b8d08dc572aa2909df941c27e68ad4d380f471d059a255f844d9e55fa00b8',
+    'Emma',
+    'Thompson',
+    'Photographer',
+    'profile_events.jpg',
+    '0400 000 003'
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'events@test.com'
+);
+
+-- Default credentials for photographer_4: pet@test.com / Pet123
+INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone)
+SELECT
+    'pet@test.com',
+    'scrypt:32768:8:1$oPlgWfHWnTEI6Fyz$8f70768d16a8d619d79c9360e74923f64fbad69f05a22878fd87926757afe59f8e2562268597d945f21b5ee71360f66c365fb1fcc171b8269aeec42af503abaf',
+    'Alex',
+    'Johnson',
+    'Photographer',
+    'profile_pet.jpg',
+    '0400 000 004'
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'pet@test.com'
+);
+
+-- Default credentials for photographer_5: party@test.com / Party123
+INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone)
+SELECT
+    'party@test.com',
+    'scrypt:32768:8:1$XxrzllPIBdN67tD1$04723b050e8a353e47e2125d06411f2503f2d8d7d43053a04beac358bddccd5ad2a0befb8b1d661716c3d71901d7f8390ccb84755930454499742019afc05569',
+    'Sarah',
+    'Wilson',
+    'Photographer',
+    'profile_party.jpg',
+    '0400 000 005'
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'party@test.com'
+);
+
+-- Default credentials for photographer_6: maternity@test.com / Maternity123
+INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone)
+SELECT
+    'maternity@test.com',
+    'scrypt:32768:8:1$9s4xcTbFmcTRvH5O$92291ca8ca86908b6c856aff60cd03b200ac38866d2a9bfb7b0381b666e85d97fceddb64b117e10294a12f1444feda413d56e5c3d87cc4b5eeca8a77048fee65',
+    'Lisa',
+    'Anderson',
+    'Photographer',
+    'profile_maternity.jpg',
+    '0400 000 007'
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'maternity@test.com'
+);
+
+-- Default credentials for photographer_7: newborn@test.com / Newborn123
+INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone)
+SELECT
+    'newborn@test.com',
+    'scrypt:32768:8:1$vlfNevIrL7imuZUg$71c6f8c201b40a81f9b1ffa57fb289e5fc495d0534054ef94a9bdfe5874683712a81cecf52e0f36cde56c5ec659fca6097721cd829f10e5ac69437c0b81a722f',
+    'Michael',
+    'Brown',
+    'Photographer',
+    'profile_newborn.jpg',
+    '0400 000 008'
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'newborn@test.com'
+);
+
+-- Default credentials for photographer_8: branding@test.com / Branding123
+INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone)
+SELECT
+    'branding@test.com',
+    'scrypt:32768:8:1$e2XNT1uUn02gMkrs$c7d7a80f38c549b6bb6a007255cb417f1320ea2ade7ac881bb2a83b5a4c8ec665a7246048c9798f695dbf9f604278c53e4c24e1b06f6e611216546cf88abf84c',
+    'David',
+    'Miller',
+    'Photographer',
+    'profile_branding.jpg',
+    '0400 000 009'
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'branding@test.com'
+);
+
+-- Default credentials for photographer_9: sports@test.com / Sports123
+INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone)
+SELECT
+    'sports@test.com',
+    'scrypt:32768:8:1$GsgQWgsYgORQSf7j$c050f611115be7fc000629efa27a75c02b4f15fc5e3b8f8c67bc77af3a35759fb96bd7605faa63cb85e7d291cf5d968de058270f0e838c1367201fe10a726bda',
+    'James',
+    'Taylor',
+    'Photographer',
+    'profile_sports.jpg',
+    '0400 000 010'
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'sports@test.com'
+);
+
+-- Default credentials for photographer_10: cosplay@test.com / Cosplay123
+INSERT INTO users (email, password_hash, first_name, last_name, role, profile_image, phone)
+SELECT
+    'cosplay@test.com',
+    'scrypt:32768:8:1$W2QmcLcD6e5O8e1Y$41bb33f46840dba1cc6b8c689b28fbc0f3fd20627ceda46cadfb90c72a70e6239485ca461b21ab61d4becbc6093aa52647cf354c41cac076868a024365339de6',
+    'Rachel',
+    'Davis',
+    'Photographer',
+    'profile_cosplay.jpg',
+    '0400 000 012'
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'cosplay@test.com'
+);
+
 -- Insert sample service categories
 INSERT INTO category (category_name, description) VALUES
     ('Wedding', 'Complete wedding photography services'),
@@ -267,6 +379,134 @@ AND NOT EXISTS (
     SELECT 1 FROM photographers WHERE user_id = u.id
 );
 
+-- Create photographer profile for Events specialist
+INSERT INTO photographers (user_id, category_id, bio, location, social_link, availability, featured)
+SELECT
+    u.id,
+    3,
+    'Event photography specialist with 8 years experience capturing corporate events, conferences, and celebrations. Expert in low-light and dynamic environments.',
+    'Sydney, Australia',
+    'https://instagram.com/eventsphotographer',
+    NOW(),
+    TRUE
+FROM users u
+WHERE u.email = 'events@test.com'
+AND NOT EXISTS (
+    SELECT 1 FROM photographers WHERE user_id = u.id
+);
+
+-- Create photographer profile for Pet specialist
+INSERT INTO photographers (user_id, category_id, bio, location, social_link, availability, featured)
+SELECT
+    u.id,
+    4,
+    'Pet photography specialist with 6 years experience capturing the unique personalities of dogs, cats, and exotic pets. Patient and animal-loving professional.',
+    'Melbourne, Australia',
+    'https://instagram.com/petphotographer',
+    NOW(),
+    TRUE
+FROM users u
+WHERE u.email = 'pet@test.com'
+AND NOT EXISTS (
+    SELECT 1 FROM photographers WHERE user_id = u.id
+);
+
+-- Create photographer profile for Party specialist
+INSERT INTO photographers (user_id, category_id, bio, location, social_link, availability, featured)
+SELECT
+    u.id,
+    5,
+    'Party and celebration photographer with 5 years experience capturing birthdays, anniversaries, and special occasions. Expert in candid and posed shots.',
+    'Perth, Australia',
+    'https://instagram.com/partyphotographer',
+    NOW(),
+    TRUE
+FROM users u
+WHERE u.email = 'party@test.com'
+AND NOT EXISTS (
+    SELECT 1 FROM photographers WHERE user_id = u.id
+);
+
+-- Create photographer profile for Maternity specialist
+INSERT INTO photographers (user_id, category_id, bio, location, social_link, availability, featured)
+SELECT
+    u.id,
+    6,
+    'Maternity photography specialist with 9 years experience capturing the beauty of pregnancy. Specializes in elegant and artistic maternity portraits.',
+    'Adelaide, Australia',
+    'https://instagram.com/maternityphotographer',
+    NOW(),
+    TRUE
+FROM users u
+WHERE u.email = 'maternity@test.com'
+AND NOT EXISTS (
+    SELECT 1 FROM photographers WHERE user_id = u.id
+);
+
+-- Create photographer profile for Newborn specialist
+INSERT INTO photographers (user_id, category_id, bio, location, social_link, availability, featured)
+SELECT
+    u.id,
+    7,
+    'Newborn photography specialist with 7 years experience safely photographing babies. Certified in newborn safety and specialized equipment.',
+    'Canberra, Australia',
+    'https://instagram.com/newbornphotographer',
+    NOW(),
+    TRUE
+FROM users u
+WHERE u.email = 'newborn@test.com'
+AND NOT EXISTS (
+    SELECT 1 FROM photographers WHERE user_id = u.id
+);
+
+-- Create photographer profile for Branding specialist
+INSERT INTO photographers (user_id, category_id, bio, location, social_link, availability, featured)
+SELECT
+    u.id,
+    8,
+    'Commercial branding photographer with 10 years experience in corporate headshots, product photography, and business branding. Studio and location shoots.',
+    'Brisbane, Australia',
+    'https://instagram.com/brandingphotographer',
+    NOW(),
+    TRUE
+FROM users u
+WHERE u.email = 'branding@test.com'
+AND NOT EXISTS (
+    SELECT 1 FROM photographers WHERE user_id = u.id
+);
+
+-- Create photographer profile for Sports specialist
+INSERT INTO photographers (user_id, category_id, bio, location, social_link, availability, featured)
+SELECT
+    u.id,
+    9,
+    'Sports and action photographer with 8 years experience capturing athletic events, competitions, and training sessions. Expert in fast-paced photography.',
+    'Gold Coast, Australia',
+    'https://instagram.com/sportsphotographer',
+    NOW(),
+    TRUE
+FROM users u
+WHERE u.email = 'sports@test.com'
+AND NOT EXISTS (
+    SELECT 1 FROM photographers WHERE user_id = u.id
+);
+
+-- Create photographer profile for Cosplay specialist
+INSERT INTO photographers (user_id, category_id, bio, location, social_link, availability, featured)
+SELECT
+    u.id,
+    10,
+    'Cosplay and character photography specialist with 6 years experience. Expert in costume photography, character portraits, and convention shoots.',
+    'Sydney, Australia',
+    'https://instagram.com/cosplayphotographer',
+    NOW(),
+    TRUE
+FROM users u
+WHERE u.email = 'cosplay@test.com'
+AND NOT EXISTS (
+    SELECT 1 FROM photographers WHERE user_id = u.id
+);
+
 -- Insert sample packages
 INSERT INTO packages (package_name, photographer_id, category_id, price, inclusions) VALUES
     ('Basic', 1, 1, 250.00, '1-hour photo session, 10 edited digital images'),
@@ -298,7 +538,31 @@ INSERT INTO packages (package_name, photographer_id, category_id, price, inclusi
     ('Premium', 2, 6, 550.00, '3-hour session, 50 edited images, and prints'),
     ('Basic', 2, 7, 200.00, '1-hour photo session, 10 BW and 10 colored edited digital images'),
     ('Standard', 2, 7, 350.00, '2-hour photo session, 10 BW and 30 colored edited digital images'),
-    ('Premium', 2, 7, 550.00, '3-hour session, 50 edited images, and prints')
+    ('Premium', 2, 7, 550.00, '3-hour session, 50 edited images, and prints'),
+    ('Basic', 3, 3, 300.00, '2-hour event coverage, 20 edited digital images'),
+    ('Standard', 3, 3, 500.00, '4-hour event coverage, 50 edited digital images'),
+    ('Premium', 3, 3, 800.00, '6-hour event coverage, 100 edited images, and prints'),
+    ('Basic', 4, 4, 180.00, '1-hour pet session, 15 edited digital images'),
+    ('Standard', 4, 4, 280.00, '1.5-hour pet session, 25 edited digital images'),
+    ('Premium', 4, 4, 400.00, '2-hour pet session, 40 edited images, and prints'),
+    ('Basic', 5, 5, 200.00, '2-hour party coverage, 20 edited digital images'),
+    ('Standard', 5, 5, 350.00, '3-hour party coverage, 40 edited digital images'),
+    ('Premium', 5, 5, 500.00, '4-hour party coverage, 60 edited images, and prints'),
+    ('Basic', 6, 6, 250.00, '1-hour maternity session, 15 edited digital images'),
+    ('Standard', 6, 6, 400.00, '1.5-hour maternity session, 30 edited digital images'),
+    ('Premium', 6, 6, 600.00, '2-hour maternity session, 50 edited images, and prints'),
+    ('Basic', 7, 7, 300.00, '1-hour newborn session, 15 edited digital images'),
+    ('Standard', 7, 7, 450.00, '2-hour newborn session, 30 edited digital images'),
+    ('Premium', 7, 7, 650.00, '3-hour newborn session, 50 edited images, and prints'),
+    ('Basic', 8, 8, 400.00, '1-hour branding session, 10 edited digital images'),
+    ('Standard', 8, 8, 600.00, '2-hour branding session, 20 edited digital images'),
+    ('Premium', 8, 8, 900.00, '3-hour branding session, 35 edited images, and prints'),
+    ('Basic', 9, 9, 250.00, '1-hour sports session, 20 edited digital images'),
+    ('Standard', 9, 9, 400.00, '2-hour sports session, 40 edited digital images'),
+    ('Premium', 9, 9, 600.00, '3-hour sports session, 60 edited images, and prints'),
+    ('Basic', 10, 10, 200.00, '1-hour cosplay session, 15 edited digital images'),
+    ('Standard', 10, 10, 350.00, '1.5-hour cosplay session, 30 edited digital images'),
+    ('Premium', 10, 10, 500.00, '2-hour cosplay session, 50 edited images, and prints')
 ON DUPLICATE KEY UPDATE package_name=package_name;
 
 INSERT INTO portfolio_items (photographer_id, title, caption, image_path) VALUES
@@ -321,7 +585,47 @@ INSERT INTO portfolio_items (photographer_id, title, caption, image_path) VALUES
     (2,"Party sample 3","Party sample 3","party3.jpg"),
     (2,"Pet sample 1","Pet sample 1","pet1.jpg"),
     (2,"Pet sample 2","Pet sample 2","pet2.jpg"),
-    (2,"Pet sample 3","Pet sample 3","pet3.jpg")
+    (2,"Pet sample 3","Pet sample 3","pet3.jpg"),
+    (3,"Corporate Conference","Professional corporate event photography","events_corporate1.jpg"),
+    (3,"Wedding Reception","Elegant wedding reception coverage","events_wedding1.jpg"),
+    (3,"Product Launch","Dynamic product launch event","events_product1.jpg"),
+    (3,"Charity Gala","Sophisticated charity event","events_charity1.jpg"),
+    (3,"Conference Speaker","Professional speaker photography","events_speaker1.jpg"),
+    (4,"Golden Retriever","Happy dog portrait in natural light","pet_dog1.jpg"),
+    (4,"Cat Portrait","Elegant cat photography","pet_cat1.jpg"),
+    (4,"Dog Action","Dynamic dog action shot","pet_action1.jpg"),
+    (4,"Pet Family","Pet with family portrait","pet_family1.jpg"),
+    (4,"Exotic Pet","Unique exotic pet photography","pet_exotic1.jpg"),
+    (5,"Birthday Celebration","Fun birthday party moments","party_birthday1.jpg"),
+    (5,"Anniversary Party","Romantic anniversary celebration","party_anniversary1.jpg"),
+    (5,"Kids Party","Joyful children's party","party_kids1.jpg"),
+    (5,"Cocktail Party","Elegant cocktail event","party_cocktail1.jpg"),
+    (5,"Surprise Party","Exciting surprise celebration","party_surprise1.jpg"),
+    (6,"Elegant Maternity","Beautiful maternity portrait","maternity_elegant1.jpg"),
+    (6,"Outdoor Maternity","Natural outdoor maternity shoot","maternity_outdoor1.jpg"),
+    (6,"Studio Maternity","Professional studio maternity","maternity_studio1.jpg"),
+    (6,"Couple Maternity","Expecting parents together","maternity_couple1.jpg"),
+    (6,"Artistic Maternity","Creative maternity photography","maternity_artistic1.jpg"),
+    (7,"Sleeping Newborn","Peaceful newborn portrait","newborn_sleeping1.jpg"),
+    (7,"Family Newborn","Newborn with family","newborn_family1.jpg"),
+    (7,"Newborn Props","Creative newborn prop shots","newborn_props1.jpg"),
+    (7,"Tiny Details","Newborn detail photography","newborn_details1.jpg"),
+    (7,"Newborn Lifestyle","Natural newborn lifestyle","newborn_lifestyle1.jpg"),
+    (8,"Corporate Headshot","Professional business portrait","branding_headshot1.jpg"),
+    (8,"Product Photography","Clean product shots","branding_product1.jpg"),
+    (8,"Team Photo","Corporate team photography","branding_team1.jpg"),
+    (8,"Office Environment","Professional workspace","branding_office1.jpg"),
+    (8,"Executive Portrait","Senior executive photography","branding_executive1.jpg"),
+    (9,"Football Action","Dynamic sports action shot","sports_football1.jpg"),
+    (9,"Swimming Competition","Underwater sports photography","sports_swimming1.jpg"),
+    (9,"Basketball Game","Fast-paced basketball action","sports_basketball1.jpg"),
+    (9,"Track and Field","Athletic competition moments","sports_track1.jpg"),
+    (9,"Team Victory","Celebration moments","sports_victory1.jpg"),
+    (10,"Fantasy Character","Epic fantasy cosplay","cosplay_fantasy1.jpg"),
+    (10,"Anime Character","Anime character recreation","cosplay_anime1.jpg"),
+    (10,"Superhero Costume","Superhero cosplay photography","cosplay_superhero1.jpg"),
+    (10,"Medieval Character","Medieval fantasy cosplay","cosplay_medieval1.jpg"),
+    (10,"Sci-Fi Character","Science fiction cosplay","cosplay_scifi1.jpg")
 ON DUPLICATE KEY UPDATE photographer_id=photographer_id;
 
 -- Insert sample cart
