@@ -840,8 +840,13 @@ class Booking:
             self.status = booking_dict.get('status')
             self.cart_items = []
             self.photographer_name = booking_dict.get('photographer_name')
+            self.photographer_images = booking_dict.get('photographer_images')
             self.package_name = booking_dict.get('package_name')
             self.package_inclusions = booking_dict.get('package_inclusions')
+            self.event_dates = booking_dict.get('event_dates')
+            self.event_times = booking_dict.get('event_times')
+            self.pax_counts = booking_dict.get('pax_counts')
+            self.event_notes = booking_dict.get('event_notes')
 
     @staticmethod
     def get_by_id(booking_id):
@@ -866,8 +871,13 @@ class Booking:
                 b.total_amount,
                 b.status,
                 GROUP_CONCAT(DISTINCT CONCAT(u.first_name, ' ', u.last_name) SEPARATOR ', ') as photographer_name,
+                GROUP_CONCAT(DISTINCT u.profile_image SEPARATOR ', ') as photographer_images,
                 GROUP_CONCAT(DISTINCT pkg.package_name SEPARATOR ', ') as package_name,
-                GROUP_CONCAT(DISTINCT pkg.inclusions SEPARATOR '; ') as package_inclusions
+                GROUP_CONCAT(DISTINCT pkg.inclusions SEPARATOR '; ') as package_inclusions,
+                GROUP_CONCAT(DISTINCT ci.event_date ORDER BY ci.event_date SEPARATOR ', ') as event_dates,
+                GROUP_CONCAT(DISTINCT ci.event_time ORDER BY ci.event_time SEPARATOR ', ') as event_times,
+                GROUP_CONCAT(DISTINCT ci.pax SEPARATOR ', ') as pax_counts,
+                GROUP_CONCAT(DISTINCT ci.notes SEPARATOR '|||') as event_notes
             FROM bookings b
             LEFT JOIN cart c ON c.id = b.cart_id
             LEFT JOIN cart_item ci ON ci.cart_id = c.id
@@ -876,7 +886,7 @@ class Booking:
             LEFT JOIN packages pkg ON pkg.id = ci.package_id
             WHERE b.customer_id = %s
             GROUP BY b.id, b.cart_id, b.customer_id, b.created_at, b.updated_at, 
-                     b.payment_date, b.total_amount, b.status
+                    b.payment_date, b.total_amount, b.status
             ORDER BY b.created_at DESC
             """,
             (customer_id,)

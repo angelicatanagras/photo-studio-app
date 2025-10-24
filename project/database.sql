@@ -78,15 +78,17 @@ CREATE TABLE IF NOT EXISTS cart_item (
     photographer_id INT NOT NULL,
     package_id INT NOT NULL,
     price FLOAT NOT NULL,
-    event_date DATE,
-    event_time TIME,
-    pax INT,
-    notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    event_date DATE NOT NULL,
+    event_time TIME NOT NULL,
+    pax INT NOT NULL,
+    notes TEXT NOT NULL,
     FOREIGN KEY (cart_id) REFERENCES cart(id),
-    FOREIGN KEY (package_id) REFERENCES packages(id),
-    FOREIGN KEY (photographer_id) REFERENCES photographers(id)
+    FOREIGN KEY (photographer_id) REFERENCES photographers(id),
+    FOREIGN KEY (package_id) REFERENCES packages(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 
 CREATE TABLE IF NOT EXISTS bookings (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -227,8 +229,8 @@ INSERT INTO category (category_name, description) VALUES
     ('Party', 'Commercial party and events photography'),
     ('Maternity', 'Maternity shooting services'),
     ('Newborn','Capturing precious moments'),
-    ('Business Branding','Branding creatives'),
-    ('Sports and Action', 'Capturing moments in athletic events'),
+    ('Branding','Branding creatives'),
+    ('Sports', 'Capturing moments in athletic events'),
     ('Cosplay','Bringing your character to life')
 ON DUPLICATE KEY UPDATE category_name=category_name;
 
@@ -254,7 +256,7 @@ SELECT
     u.id,
     2,
     'Professional photographer specialising in maternity, newborn, party, pet, and events photography. 7 years of turning moments into breathtaking memories.',
-    'Brisbane, Australia',
+    'Gold Coast, Australia',
     'https://instagram.com/demophotographer2',
     NOW(),
     TRUE
@@ -320,3 +322,27 @@ INSERT INTO portfolio_items (photographer_id, title, caption, image_path) VALUES
     (2,"Pet sample 2","Pet sample 2","pet2.jpg"),
     (2,"Pet sample 3","Pet sample 3","pet3.jpg")
 ON DUPLICATE KEY UPDATE photographer_id=photographer_id;
+
+-- Insert sample cart
+INSERT INTO cart (customer_id, subtotal, status) VALUES
+    (1, 200, 'Completed'),
+    (1, 900, 'Completed'),
+    (2, 800, 'Completed')
+ON DUPLICATE KEY UPDATE id=id;
+
+-- Insert sample cart_item
+INSERT INTO cart_item (cart_id, photographer_id, package_id, price, event_date, event_time, pax, notes) VALUES
+    (1, 1, 19, 200, '2025-11-21','15:00', 2, 'Sample photoshoot notes'),
+    (2, 1, 5, 350, '2025-11-10', '09:00', 20, 'Sample photoshoot notes'),
+    (2, 2, 21, 550, '2025-12-21','10:00', 10, 'Sample photoshoot notes'),
+    (3, 1, 13, 250, '2025-12-01','11:00', 5, 'Sample photoshoot notes'),
+    (3, 2, 22, 200, '2025-12-19','12:00', 4, 'Sample photoshoot notes'),
+    (3, 2, 29, 350, '2025-12-30','13:00', 3, 'Sample photoshoot notes')
+ON DUPLICATE KEY UPDATE id=id;
+
+-- Insert sample bookings
+INSERT INTO bookings (cart_id, customer_id, payment_date, total_amount, status) VALUES
+    (1, 1, CURRENT_TIMESTAMP, 200, 'Completed'),
+    (2, 1, CURRENT_TIMESTAMP, 900, 'Completed'),
+    (3, 2, CURRENT_TIMESTAMP, 800, 'Completed')
+ON DUPLICATE KEY UPDATE id=id;

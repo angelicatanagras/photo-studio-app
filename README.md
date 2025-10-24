@@ -1,4 +1,3 @@
-
 PHOTO STUDIO BOOKING APP
 
 SETUP INSTRUCTIONS
@@ -103,7 +102,7 @@ Or using Flask CLI:
 
 The application will be available at http://127.0.0.1:5000
 
-------
+---
 
 DATABASE MIGRATIONS
 
@@ -113,7 +112,8 @@ Run SQL migration files in order:
 
 mysql -u root -p photostudio_booking < project/database.sql
 
--------
+---
+
 DEVELOPMENT
 Running in Debug Mode
 
@@ -129,4 +129,3 @@ Project Structure Notes
 - static/: CSS, JavaScript, and image files
 - database.py: Database helper utilities for executing SQL queries
 - Custom session-based authentication (replaces Flask-Login)
-

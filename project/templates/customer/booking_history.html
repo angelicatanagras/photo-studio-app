@@ -6,7 +6,7 @@
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-8">
-          <h1 class="display-5 fw-bold mb-2">My Bookings</h1>
+          <h1 class="display-5 fw-bold mb-2 mt-4">My Bookings</h1>
           <p class="lead mb-0">
             Track and manage all your photography bookings
           </p>
@@ -82,9 +82,23 @@
             <div class="detail-value">
               {% if booking.photographer_name %}
               <div class="photographer-badge">
+                {% set profile_images = booking.photographer_images.split(', ')
+                if booking.photographer_images else [] %} {% if profile_images
+                and profile_images[0] and profile_images[0] != 'None' %}
+                <img
+                  src="{{ url_for('static', filename='uploads/profiles/' + profile_images[0]) }}"
+                  alt="{{ booking.photographer_name }}"
+                  class="photographer-avatar-img"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                />
+                <div class="photographer-avatar" style="display: none">
+                  {{ booking.photographer_name.split()[0][0] }}
+                </div>
+                {% else %}
                 <div class="photographer-avatar">
                   {{ booking.photographer_name.split()[0][0] }}
                 </div>
+                {% endif %}
                 <div>
                   <strong>{{ booking.photographer_name }}</strong>
                 </div>
@@ -120,6 +134,64 @@
               {% endif %}
             </div>
           </div>
+
+          <!-- Event Details -->
+          {% if booking.event_dates %}
+          <div class="col-lg-12">
+            <div class="detail-label">
+              <i class="bi bi-calendar-check"></i> Event Details
+            </div>
+            <div class="detail-value">
+              {% set dates = booking.event_dates.split(', ') %} {% set times =
+              booking.event_times.split(', ') if booking.event_times else [] %}
+              {% set pax_list = booking.pax_counts.split(', ') if
+              booking.pax_counts else [] %} {% set notes_list =
+              booking.event_notes.split('|||') if booking.event_notes else [] %}
+              {% for date in dates %}
+              <div class="event-detail-card mb-3 p-3 border rounded">
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <small class="text-muted d-block">
+                      <i class="bi bi-calendar3"></i> Date
+                    </small>
+                    <strong>
+                      {% if date %} {{ date }} {% else %} Not specified {% endif
+                      %}
+                    </strong>
+                  </div>
+                  <div class="col-md-3">
+                    <small class="text-muted d-block">
+                      <i class="bi bi-clock"></i> Time
+                    </small>
+                    <strong>
+                      {% if times[loop.index0] %} {{ times[loop.index0] }} {%
+                      else %} Not specified {% endif %}
+                    </strong>
+                  </div>
+                  <div class="col-md-2">
+                    <small class="text-muted d-block">
+                      <i class="bi bi-people"></i> Pax
+                    </small>
+                    <strong>
+                      {% if pax_list[loop.index0] %} {{ pax_list[loop.index0] }}
+                      {% else %} N/A {% endif %}
+                    </strong>
+                  </div>
+                  {% if notes_list[loop.index0] and
+                  notes_list[loop.index0].strip() %}
+                  <div class="col-md-12">
+                    <small class="text-muted d-block">
+                      <i class="bi bi-sticky"></i> Notes
+                    </small>
+                    <p class="mb-0">{{ notes_list[loop.index0] }}</p>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
 
           <!-- Payment Status -->
           <div class="col-12">

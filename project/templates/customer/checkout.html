@@ -1,151 +1,230 @@
-{% extends "layouts/customer_base.html" %}
-{% block content %}
+{% extends "layouts/customer_base.html" %} {% block content %}
 <section class="bg-light">
-  <div class="row item_section">
-    <div class="col-lg-7 mt-3">
-      <h2 class="fw-bolder">Checkout</h2>
+  <form method="POST" action="{{ url_for('customer.checkout') }}">
+    {{ form.hidden_tag() }}
+    <div class="row item_section">
+      <div class="col-lg-7 mt-3">
+        <h2 class="fw-bolder">Checkout</h2>
 
-      <div class="section_card">
-        <h3>Contact information</h3>
-        <form>
+        <!-- Contact Information Section -->
+        <div class="section_card">
+          <h3>Contact Information</h3>
           <div class="row g-3 mb-3">
             <div class="col-md-6">
-              <label class="form-label">First Name</label>
-              <input type="text" class="form-control" placeholder="Camila"/>
+              {{ form.first_name.label(class="form-label") }} {{
+              form.first_name(class="form-control" + (" is-invalid" if
+              form.first_name.errors else ""), placeholder="John") }} {% if
+              form.first_name.errors %}
+              <div class="invalid-feedback">
+                {{ form.first_name.errors[0] }}
+              </div>
+              {% endif %}
             </div>
             <div class="col-md-6">
-              <label class="form-label">Last Name</label>
-              <input type="text" class="form-control" placeholder="Shand"/>
+              {{ form.last_name.label(class="form-label") }} {{
+              form.last_name(class="form-control" + (" is-invalid" if
+              form.last_name.errors else ""), placeholder="Smith") }} {% if
+              form.last_name.errors %}
+              <div class="invalid-feedback">{{ form.last_name.errors[0] }}</div>
+              {% endif %}
             </div>
           </div>
           <div class="row g-3 mb-3">
             <div class="col-md-6">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" placeholder="camile@shand.com"/>
+              {{ form.email.label(class="form-label") }} {{
+              form.email(class="form-control" + (" is-invalid" if
+              form.email.errors else ""), type="email",
+              placeholder="john.smith@example.com") }} {% if form.email.errors
+              %}
+              <div class="invalid-feedback">{{ form.email.errors[0] }}</div>
+              {% endif %}
             </div>
             <div class="col-md-6">
-              <label class="form-label">Phone Number</label>
-              <input type="tel" class="form-control" placeholder="0412 345678"/>
+              {{ form.phone.label(class="form-label") }} {{
+              form.phone(class="form-control" + (" is-invalid" if
+              form.phone.errors else ""), placeholder="0412 345 678") }} {% if
+              form.phone.errors %}
+              <div class="invalid-feedback">{{ form.phone.errors[0] }}</div>
+              {% endif %}
             </div>
           </div>
-        </form>
-      </div>
+        </div>
 
-      <div class="section_card">
-        <h4 class="mb-4"><i class="bi bi-credit-card me-2"></i>Payment Information</h4>
-        <div class="row g-3">
-          <div class="col-12">
-            <label class="form-label">Card Number</label>
-            <input type="text" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19" required/>
+        <!-- Payment Information Section -->
+        <div class="section_card">
+          <h4 class="mb-4">
+            <i class="bi bi-credit-card me-2"></i>Payment Information
+          </h4>
+          <div class="row g-3">
+            <div class="col-12">
+              <!-- prettier-ignore -->
+              {{ form.card_number.label(class="form-label") }} {{
+              form.card_number(class="form-control" + (" is-invalid" if
+              form.card_number.errors else ""), placeholder="1234 5678 9012 3456", 
+              maxlength="19") }} {% if form.card_number.errors %}
+              <div class="invalid-feedback">
+                {{ form.card_number.errors[0] }}
+              </div>
+              {% endif %}
+            </div>
+            <div class="col-md-6">
+              {{ form.expiry_date.label(class="form-label") }} {{
+              form.expiry_date(class="form-control" + (" is-invalid" if
+              form.expiry_date.errors else ""), placeholder="MM/YY",
+              maxlength="5") }} {% if form.expiry_date.errors %}
+              <div class="invalid-feedback">
+                {{ form.expiry_date.errors[0] }}
+              </div>
+              {% endif %}
+            </div>
+            <div class="col-md-6">
+              {{ form.cvc.label(class="form-label") }} {{
+              form.cvc(class="form-control" + (" is-invalid" if form.cvc.errors
+              else ""), placeholder="123", maxlength="4") }} {% if
+              form.cvc.errors %}
+              <div class="invalid-feedback">{{ form.cvc.errors[0] }}</div>
+              {% endif %}
+            </div>
+            <div class="col-12">
+              {{ form.cardholder_name.label(class="form-label") }} {{
+              form.cardholder_name(class="form-control" + (" is-invalid" if
+              form.cardholder_name.errors else ""), placeholder="John Smith") }}
+              {% if form.cardholder_name.errors %}
+              <div class="invalid-feedback">
+                {{ form.cardholder_name.errors[0] }}
+              </div>
+              {% endif %}
+            </div>
           </div>
-          <div class="col-md-6">
-            <label class="form-label">Expiry Date</label>
-            <input type="text" class="form-control" placeholder="MM/YY" maxlength="5" required/>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">CVC</label>
-            <input type="text" class="form-control" placeholder="123" maxlength="4" required/>
-          </div>
-          <div class="col-12">
-            <label class="form-label">Cardholder Name</label>
-            <input type="text" class="form-control" placeholder="Name on card" required/>
+          <div class="d-flex align-items-center mt-3">
+            <i class="bi bi-shield-check text-success me-2"></i>
+            <small class="text-muted"
+              >Your payment information is encrypted and secure.</small
+            >
           </div>
         </div>
-        <div class="d-flex align-items-center mt-2">
-          <i class="bi bi-shield-check text-success me-2"></i>
-          <small class="text-muted">Your payment information is encrypted and secure.</small>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 mt-4 mb-4">
+          <a
+            href="{{ url_for('customer.view_cart') }}"
+            class="btn btn-outline-secondary flex-fill"
+          >
+            <i class="bi bi-arrow-left me-1"></i> Go Back
+          </a>
+          {{ form.submit(class="btn btn-orange flex-fill") }}
         </div>
       </div>
-    </div>
 
-    <div class="col-lg-5 mt-5 mb-md-3 mb-5 booking_summary">
-      <div class="section_card mt-5">
-        <h5>Booking Summary</h5>
-        {% if cart_items %}
-          {% for item in cart_items %}
+      <!-- Booking Summary -->
+      <div class="col-lg-5 mt-5 mb-md-3 mb-5 booking_summary">
+        <div class="section_card mt-5">
+          <h5 class="mb-4">Booking Summary</h5>
+          {% if cart_items %} {% for item in cart_items %}
           <div class="mb-4">
             <div class="d-flex justify-content-between mb-2">
               <span class="fw-bold">{{ item.package_name }}</span>
-              <span class="fw-bold">${{ '%.2f'|format(item.price) }}</span>
+              <span class="fw-bold text-primary"
+                >${{ '%.2f'|format(item.price) }}</span
+              >
             </div>
-            
+
             <div class="booking-details">
               <div class="row mb-2">
                 <div class="col-6">
-                  <small class="text-muted">Photographer:</small><br>
-                  <small>{{ item.photographer_first_name }} {{ item.photographer_last_name }}</small>
+                  <small class="text-muted"
+                    ><i class="bi bi-camera me-1"></i>Photographer:</small
+                  ><br />
+                  <small class="fw-medium"
+                    >{{ item.photographer_first_name }} {{
+                    item.photographer_last_name }}</small
+                  >
                 </div>
                 <div class="col-6">
-                  <small class="text-muted">Location:</small><br>
-                  <small>{{ item.photographer_location or 'TBD' }}</small>
+                  <small class="text-muted"
+                    ><i class="bi bi-geo-alt me-1"></i>Location:</small
+                  ><br />
+                  <small class="fw-medium"
+                    >{{ item.photographer_location or 'TBD' }}</small
+                  >
                 </div>
               </div>
-              
+
               {% if item.event_date %}
               <div class="row mb-2">
                 <div class="col-6">
-                  <small class="text-muted">Date:</small><br>
-                  <small>{{ item.event_date.strftime('%B %d, %Y') }}</small>
+                  <small class="text-muted"
+                    ><i class="bi bi-calendar-event me-1"></i>Date:</small
+                  ><br />
+                  <small class="fw-medium"
+                    >{{ item.event_date.strftime('%b %d, %Y') }}</small
+                  >
                 </div>
                 <div class="col-6">
-                  <small class="text-muted">Time:</small><br>
-                  <small>
-                    {% if item.event_time %}
-                      {% set hours = item.event_time.seconds // 3600 %}
-                      {% set minutes = (item.event_time.seconds % 3600) // 60 %}
-                      {{ "%02d:%02d"|format(hours, minutes) }}
-                    {% else %}
-                      TBD
-                    {% endif %}
+                  <small class="text-muted"
+                    ><i class="bi bi-clock me-1"></i>Time:</small
+                  ><br />
+                  <small class="fw-medium">
+                    {% if item.event_time %} {% set hours =
+                    item.event_time.seconds // 3600 %} {% set minutes =
+                    (item.event_time.seconds % 3600) // 60 %} {{
+                    "%02d:%02d"|format(hours, minutes) }} {% else %} TBD {%
+                    endif %}
                   </small>
                 </div>
               </div>
-              {% endif %}
-              
-              {% if item.pax %}
+              {% endif %} {% if item.pax %}
               <div class="row mb-2">
                 <div class="col-6">
-                  <small class="text-muted">Number of People:</small><br>
-                  <small>{{ item.pax }}</small>
+                  <small class="text-muted"
+                    ><i class="bi bi-people me-1"></i>Guests:</small
+                  ><br />
+                  <small class="fw-medium"
+                    >{{ item.pax }} {{ 'person' if item.pax == 1 else 'people'
+                    }}</small
+                  >
                 </div>
                 <div class="col-6">
-                  <small class="text-muted">Package Includes:</small><br>
-                  <small>{{ item.inclusions or 'Standard package' }}</small>
+                  <small class="text-muted"
+                    ><i class="bi bi-box-seam me-1"></i>Includes:</small
+                  ><br />
+                  <small class="fw-medium"
+                    >{{ item.inclusions or 'Standard package' }}</small
+                  >
                 </div>
               </div>
-              {% endif %}
-              
-              {% if item.notes %}
+              {% endif %} {% if item.notes %}
               <div class="mb-2">
-                <small class="text-muted">Notes:</small><br>
-                <small>{{ item.notes }}</small>
+                <small class="text-muted"
+                  ><i class="bi bi-sticky me-1"></i>Notes:</small
+                ><br />
+                <small class="fw-medium">{{ item.notes }}</small>
               </div>
               {% endif %}
             </div>
-            
-            {% if not loop.last %}<hr class="my-3">{% endif %}
+
+            {% if not loop.last %}
+            <hr class="my-3" />
+            {% endif %}
           </div>
           {% endfor %}
-          
-          <hr/>
-          <div class="d-flex justify-content-between">
-            <span class="fw-bold">Total</span>
-            <span class="fw-bold fs-5">${{ '%.2f'|format(total) }}</span>
-          </div>
-        {% else %}
-          <div class="text-muted">Your cart is empty.</div>
-        {% endif %}
-      </div>
-    </div>
 
-    <div class="col-lg-7 col-sm-12 col-md-7 pt-3 pb-5">
-      <div class="d-flex justify-content-end">
-        <a href="{{ url_for('customer.view_cart') }}" class="btn btn-outline-secondary flex-fill me-2">Go back</a>
-        <form method="POST" action="{{ url_for('customer.process_payment') }}" style="display: inline; flex: 1;">
-          <button type="submit" class="btn btn-orange flex-fill w-100">Place Order</button>
-        </form>
+          <hr class="my-3" />
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-bold fs-5">Total Amount</span>
+            <span class="fw-bold fs-4 text-success"
+              >${{ '%.2f'|format(total) }}</span
+            >
+          </div>
+          {% else %}
+          <div class="alert alert-info text-center">
+            <i class="bi bi-cart-x fs-3 d-block mb-2"></i>
+            <p class="mb-0">Your cart is empty.</p>
+          </div>
+          {% endif %}
+        </div>
       </div>
     </div>
-  </div>
+  </form>
 </section>
 {% endblock %}
