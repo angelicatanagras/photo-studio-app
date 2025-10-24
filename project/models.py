@@ -509,7 +509,7 @@ class Photographer:
     def get_by_category(category_id):
         photographers_data = fetch_all(
             """
-            SELECT p.*,
+            SELECT DISTINCT p.*,
                    u.first_name as user_first_name,
                    u.last_name as user_last_name,
                    u.email as user_email,
@@ -520,9 +520,10 @@ class Photographer:
             FROM photographers p
             JOIN users u ON p.user_id = u.id
             LEFT JOIN category c ON p.category_id = c.id
-            WHERE p.category_id = %s
+            LEFT JOIN packages pkg ON p.id = pkg.photographer_id
+            WHERE p.category_id = %s OR pkg.category_id = %s
             """,
-            (category_id,)
+            (category_id, category_id)
         )
         return [Photographer(p) for p in photographers_data]
 

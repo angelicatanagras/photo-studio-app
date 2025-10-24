@@ -1,8 +1,9 @@
 {% extends "layouts/customer_base.html" %} {% block content %}
-<section class="bg-light">
-  <form method="POST" action="{{ url_for('customer.checkout') }}">
-    {{ form.hidden_tag() }}
-    <div class="row item_section">
+<section class="bg-light py-4">
+  <div class="container">
+    <form method="POST" action="{{ url_for('customer.checkout') }}">
+      {{ form.hidden_tag() }}
+      <div class="row">
       <div class="col-lg-7 mt-4">
         <h2 class="fw-bolder">Checkout</h2>
 
@@ -223,7 +224,8 @@
           {% endif %}
         </div>
       </div>
-    </div>
-  </form>
+      </div>
+    </form>
+  </div>
 </section>
 {% endblock %}
