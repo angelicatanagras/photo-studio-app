@@ -303,11 +303,30 @@ def index():
     end = start + per_page
     photographers = all_photographers[start:end]
 
+    # Load packages and categories for each photographer
+    for photographer in photographers:
+        photographer.packages = Package.get_by_photographer_id(photographer.id)
+        # Get unique categories from packages
+        seen_categories = set()
+        photographer.categories = []
+        for package in photographer.packages:
+            if package.category and package.category_id not in seen_categories:
+                seen_categories.add(package.category_id)
+                photographer.categories.append(package.category)
+
     from project.models import PortfolioItem
     featured_photographers = Photographer.get_featured()
     for photographer in featured_photographers:
         photographer.portfolio_items = PortfolioItem.get_by_photographer(
             photographer.id)
+        # Load categories for featured photographers too
+        photographer.packages = Package.get_by_photographer_id(photographer.id)
+        seen_categories = set()
+        photographer.categories = []
+        for package in photographer.packages:
+            if package.category and package.category_id not in seen_categories:
+                seen_categories.add(package.category_id)
+                photographer.categories.append(package.category)
 
     service_categories = Category.get_all()
     photographer_locations = []

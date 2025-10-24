@@ -74,10 +74,11 @@
             </li>
 
             <li class="nav-item">
-              <form class="d-flex ms-lg-2 my-2 my-lg-0" role="search">
+              <form class="d-flex ms-lg-2 my-2 my-lg-0" method="GET" action="{{ url_for('customer.index') }}#photographers" role="search">
                 <input
                   class="form-control form_input_search me-2"
                   type="search"
+                  name="search"
                   placeholder="Photographers, categories, location..."
                   aria-label="Search"
                 />
@@ -99,9 +100,6 @@
                 Welcome, {{ current_user.first_name }}!
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                  <a class="dropdown-item" href="{% if current_user.role == 'Admin' %}{{ url_for('admin.dashboard') }}{% elif current_user.role == 'Photographer' %}{{ url_for('photographer.dashboard') }}{% else %}#{% endif %}">Profile</a>
-                </li>
                 <li>
                   <a class="dropdown-item" href="{{ url_for('customer.booking_history') }}">
                     My Bookings
@@ -132,23 +130,24 @@
       </div>
     </nav>
 
-    <main>
-      <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          {% for category, message in messages %}
-          <div
-            class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
-            role="alert"
-          >
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-          {% endfor %}
-        {% endif %}
-        {% endwith %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+      <div
+        class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show m-0"
+        role="alert"
+        style="position: fixed; top: 70px; left: 0; right: 0; z-index: 1050; border-radius: 0;"
+      >
+        <div class="container">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
       </div>
+      {% endfor %}
+    {% endif %}
+    {% endwith %}
 
+    <main>
       {% block content %}{% endblock %}
     </main>
 
