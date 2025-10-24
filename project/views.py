@@ -1038,7 +1038,24 @@ def upload_profile_picture():
 
     return redirect(url_for('photographer.dashboard'))
 
-
+@photographer_bp.route('/bookings')
+@login_required
+@role_required('Photographer')
+def booking_history():
+    user = get_current_user()
+    photographer = Photographer.get_by_user_id(user.get('id'))
+    
+    if not photographer:
+        flash("Photographer profile not found.", 'error')
+        return redirect(url_for('photographer.dashboard'))
+    
+    bookings = Booking.get_by_photographer_with_details(photographer.id)
+    
+    return render_template(
+        'photographer/booking_history.html',
+        title='My Bookings',
+        bookings=bookings
+    )
 
 @photographer_bp.route('/gallery')
 @photographer_bp.route('/gallery/<int:photographer_id>')

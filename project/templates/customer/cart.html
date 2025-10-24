@@ -1,57 +1,69 @@
-{% extends "layouts/customer_base.html" %}
-{% block content %}
+{% extends "layouts/customer_base.html" %} {% block content %}
 <div class="container py-4 cart-surface">
   <h2 class="mb-4">Your Cart</h2>
 
   {% if not cart_items %}
-    <div class="alert alert-info">Your cart is empty.</div>
-    <a href="{{ url_for('customer.index') }}" class="btn btn-outline-light">Back to Home</a>
+  <div class="alert alert-info">Your cart is empty.</div>
+  <a href="{{ url_for('customer.index') }}" class="btn btn-outline-light"
+    >Back to Home</a
+  >
   {% else %}
-    <div class="table-responsive">
-      <table class="table table-striped align-middle cart-table">
-        <thead class="table-secondary">
-          <tr>
-            <th>Photographer</th>
-            <th>Package</th>
-            <th class="text-end">Price</th>
-            <th class="text-center">Action</th>
-          </tr>
-        </thead>
+  <div class="table-responsive">
+    <table class="table table-striped align-middle cart-table">
+      <thead class="table-secondary">
+        <tr>
+          <th>Photographer</th>
+          <th>Package</th>
+          <th class="text-end">Price</th>
+          <th class="text-center">Action</th>
+        </tr>
+      </thead>
 
-        <tbody>
-          {% for item in cart_items %}
-            <tr>
-              <td>{{ item.photographer_first_name }} {{ item.photographer_last_name }}</td>
-              <td>{{ item.package_name }}</td>
-              <td class="text-end">${{ '%.2f'|format(item.price|float) }}</td>
-              <td class="text-center">
-                <form method="POST" action="{{ url_for('customer.remove_from_cart') }}" style="display: inline;">
-                  <input type="hidden" name="cart_item_id" value="{{ item.id }}">
-                  <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-                </form>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
+      <tbody>
+        {% for item in cart_items %}
+        <tr>
+          <td>
+            {{ item.photographer_first_name }} {{ item.photographer_last_name }}
+          </td>
+          <td>{{ item.package_name }}</td>
+          <td class="text-end">${{ '%.2f'|format(item.price|float) }}</td>
+          <td class="text-center">
+            <form
+              method="POST"
+              action="{{ url_for('customer.remove_from_cart') }}"
+              style="display: inline"
+            >
+              <input type="hidden" name="cart_item_id" value="{{ item.id }}" />
+              <button type="submit" class="btn btn-sm btn-outline-danger">
+                Remove
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
 
-        <tfoot class="table-secondary fw-semibold">
-          <tr>
-            <th colspan="2" class="text-end">Total</th>
-            <th class="text-end">${{ '%.2f'|format(total|float) }}</th>
-            <th></th>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
+      <tfoot class="table-secondary fw-semibold">
+        <tr>
+          <th colspan="2" class="text-end">Total</th>
+          <th class="text-end">${{ '%.2f'|format(total|float) }}</th>
+          <th></th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 
-    <div class="d-flex flex-wrap gap-3 mt-3">
-      <a href="{{ url_for('customer.index') }}" class="btn btn-outline-dark px-4">
-        ← Continue Browsing
-      </a>
-      <a href="{{ url_for('customer.checkout') }}" class="btn btn-warning text-dark fw-semibold px-4">
-        Proceed to Checkout
-      </a>
-    </div>
+  <div class="d-flex flex-wrap gap-3 mt-3">
+    <a href="{{ url_for('customer.index') }}" class="btn btn-outline-dark px-4">
+      ← Continue Browsing
+    </a>
+    <a
+      href="{{ url_for('customer.checkout') }}"
+      class="btn btn-orange text-dark fw-semibold px-4"
+    >
+      Proceed to Checkout
+    </a>
+  </div>
   {% endif %}
 </div>
 {% endblock %}

@@ -63,6 +63,13 @@
                   >My Gallery</a
                 >
               </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link text-white"
+                  href="{{ url_for('photographer.booking_history') }}"
+                  >My Bookings</a
+                >
+              </li>
             </ul>
             {% if is_authenticated %}
             <div class="dropdown">
@@ -76,7 +83,13 @@
                 Welcome, {{ current_user.first_name }}!
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{{ url_for('photographer.dashboard') }}">Profile</a></li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{{ url_for('photographer.dashboard') }}"
+                    >Profile</a
+                  >
+                </li>
                 <li><hr class="dropdown-divider" /></li>
                 <li>
                   <a class="dropdown-item" href="{{ url_for('auth.logout') }}"
