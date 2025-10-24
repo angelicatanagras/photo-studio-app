@@ -137,30 +137,29 @@
               <i class="bi bi-calendar-check"></i> Event Details
             </div>
             <div class="detail-value">
-              {% set dates = booking.event_dates.split(', ') %} {% set times =
-              booking.event_times.split(', ') if booking.event_times else [] %}
-              {% set pax_list = booking.pax_counts.split(', ') if
-              booking.pax_counts else [] %} {% set notes_list =
-              booking.event_notes.split('|||') if booking.event_notes else [] %}
+              {% set dates = booking.event_dates.split(', ') %} 
+              {% set times = booking.event_times.split(', ') if booking.event_times else [] %}
+              {% set pax_list = booking.pax_counts.split(', ') if booking.pax_counts else [] %} 
+              {% set notes_list = booking.event_notes.split('|||') if booking.event_notes else [] %}
+              {% set locations_list = booking.event_locations.split(', ') if booking.event_locations else [] %}
+              
               {% for date in dates %}
               <div class="event-detail-card mb-3 p-3 border rounded">
                 <div class="row g-3">
-                  <div class="col-md-4">
+                  <div class="col-md-3">
                     <small class="text-muted d-block">
                       <i class="bi bi-calendar3"></i> Date
                     </small>
                     <strong>
-                      {% if date %} {{ date }} {% else %} Not specified {% endif
-                      %}
+                      {% if date %} {{ date }} {% else %} Not specified {% endif %}
                     </strong>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-2">
                     <small class="text-muted d-block">
                       <i class="bi bi-clock"></i> Time
                     </small>
                     <strong>
-                      {% if times[loop.index0] %} {{ times[loop.index0] }} {%
-                      else %} Not specified {% endif %}
+                      {% if times[loop.index0] %} {{ times[loop.index0] }} {% else %} Not specified {% endif %}
                     </strong>
                   </div>
                   <div class="col-md-2">
@@ -168,12 +167,18 @@
                       <i class="bi bi-people"></i> Pax
                     </small>
                     <strong>
-                      {% if pax_list[loop.index0] %} {{ pax_list[loop.index0] }}
-                      {% else %} N/A {% endif %}
+                      {% if pax_list[loop.index0] %} {{ pax_list[loop.index0] }} {% else %} N/A {% endif %}
                     </strong>
                   </div>
-                  {% if notes_list[loop.index0] and
-                  notes_list[loop.index0].strip() %}
+                  <div class="col-md-5">
+                    <small class="text-muted d-block">
+                      <i class="bi bi-pin-map"></i> Event Location
+                    </small>
+                    <strong>
+                      {% if locations_list[loop.index0] %} {{ locations_list[loop.index0] }} {% else %} Not specified {% endif %}
+                    </strong>
+                  </div>
+                  {% if notes_list[loop.index0] and notes_list[loop.index0].strip() %}
                   <div class="col-md-12">
                     <small class="text-muted d-block">
                       <i class="bi bi-sticky"></i> Notes
@@ -234,7 +239,7 @@
         Keep your portfolio updated and packages attractive to get more
         bookings!
       </p>
-      <a
+      
         href="{{ url_for('photographer.dashboard') }}"
         class="btn btn-gradient btn-lg"
       >

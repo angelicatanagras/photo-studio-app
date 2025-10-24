@@ -382,6 +382,8 @@ def add_to_cart_db():
     event_time = request.form.get('event_time')
     pax = request.form.get('pax')
     notes = request.form.get('notes')
+    event_location = request.form.get('event_location')  # ADD THIS LINE
+    edit_item_id = request.form.get('edit_item_id')
     
     user = get_current_user()
     customer = Customer.get_by_user_id(user.get('id'))
@@ -392,12 +394,42 @@ def add_to_cart_db():
 
     package = Package.get_by_id(package_id)
     price = package.price if package else 0.0
+    
+    # Check if we're editing an existing item
+    if edit_item_id:
+        try:
+            cart_item = CartItem.get_by_id(edit_item_id)
+            if cart_item:
+                cart = Cart.get_by_id(cart_item.cart_id)
+                
+                # Verify ownership
+                if cart and cart.customer_id == customer.id:
+                    old_price = cart_item.price
+                    
+                    # Delete old item
+                    CartItem.delete(edit_item_id)
+                    
+                    # Create new item with updated details
+                    CartItem.create(cart.id, photographer_id, package_id, price, 
+                                  event_date, event_time, pax, notes, event_location)  # ADD event_location
+                    
+                    # Update cart total
+                    new_subtotal = cart.subtotal - old_price + price
+                    Cart.update(cart.id, subtotal=new_subtotal)
+                    
+                    flash('Item updated successfully.', 'success')
+                    return redirect(url_for('customer.view_cart'))
+        except Exception as e:
+            flash(f'Error updating item: {str(e)}', 'error')
+            return redirect(url_for('customer.view_cart'))
+    
+    # Normal add to cart flow
     cart = Cart.get_by_customer(customer.id, status='Pending')
 
     if not cart:
         cart = Cart.create(customer_id=customer.id, subtotal=0.0)
 
-    CartItem.create(cart.id, photographer_id, package_id, price, event_date, event_time, pax, notes)
+    CartItem.create(cart.id, photographer_id, package_id, price, event_date, event_time, pax, notes, event_location)  # ADD event_location
     Cart.update(cart.id, subtotal=cart.subtotal + price)
 
     flash('Item added to your cart.', 'success')
@@ -421,10 +453,22 @@ def view_cart():
     
     total = sum(float(item.price) for item in items)
     
+    # Group items by photographer for better display
+    items_by_photographer = {}
+    for item in items:
+        if item.photographer_id not in items_by_photographer:
+            photographer = Photographer.get_by_id(item.photographer_id)
+            items_by_photographer[item.photographer_id] = {
+                'photographer': photographer,
+                'cart_items': []  # Changed from 'items' to 'cart_items'
+            }
+        items_by_photographer[item.photographer_id]['cart_items'].append(item)  # Changed here too
+    
     return render_template(
         'customer/cart.html',
         title='Your Cart',
         cart_items=items,
+        items_by_photographer=items_by_photographer,
         total=total,
         cart=cart
     )
@@ -540,6 +584,42 @@ def create_booking():
                    photographer_id=photographer_id, package_id=package_id)
     flash('Your booking was successful!', 'success')
     return redirect(url_for('customer.success_page'))
+
+
+@customer_bp.route('/cart/edit/<int:cart_item_id>', methods=['GET'])
+@login_required
+@role_required('Customer')
+def edit_cart_item(cart_item_id):
+    """Edit a cart item - redirect to session package page with pre-filled data"""
+    user = get_current_user()
+    customer = Customer.get_by_user_id(user.get('id'))
+    
+    if not customer:
+        flash('Customer profile not found.', 'error')
+        return redirect(url_for('customer.index'))
+    
+    # Get cart item
+    cart_item = CartItem.get_by_id(cart_item_id)
+    if not cart_item:
+        flash('Item not found.', 'error')
+        return redirect(url_for('customer.view_cart'))
+    
+    # Verify ownership
+    cart = Cart.get_by_id(cart_item.cart_id)
+    if not cart or cart.customer_id != customer.id:
+        flash('You do not have permission to edit this item.', 'error')
+        return redirect(url_for('customer.view_cart'))
+    
+    # Get package to determine category
+    package = Package.get_by_id(cart_item.package_id)
+    
+    # Store edit mode in session
+    session['edit_cart_item_id'] = cart_item_id
+    
+    # Redirect to session package page with query parameters
+    return redirect(url_for('customer.session_package', 
+                           photographer_id=cart_item.photographer_id,
+                           category_id=package.category_id if package else None))
 
 
 @customer_bp.route('/checkout', methods=['GET', 'POST'])
@@ -1137,13 +1217,21 @@ def session_package(photographer_id):
         packages = Package.get_by_photographer_id(photographer_id)
         category = None
 
+    # Check if we're in edit mode
+    edit_cart_item_id = session.pop('edit_cart_item_id', None)
+    edit_item = None
+    
+    if edit_cart_item_id:
+        edit_item = CartItem.get_by_id(edit_cart_item_id)
+
     return render_template(
         'customer/session_package.html',
         title='Book Session',
         photographer=photographer,
         packages=packages,
         category=category,
-        today_date=datetime.now().date().isoformat()
+        today_date=datetime.now().date().isoformat(),
+        edit_item=edit_item
     )
 
 

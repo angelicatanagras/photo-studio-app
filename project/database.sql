@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS cart_item (
     event_time TIME NOT NULL,
     pax INT NOT NULL,
     notes TEXT NOT NULL,
+    event_location VARCHAR(200) NOT NULL,
     FOREIGN KEY (cart_id) REFERENCES cart(id),
     FOREIGN KEY (photographer_id) REFERENCES photographers(id),
     FOREIGN KEY (package_id) REFERENCES packages(id)
@@ -331,13 +332,13 @@ INSERT INTO cart (customer_id, subtotal, status) VALUES
 ON DUPLICATE KEY UPDATE id=id;
 
 -- Insert sample cart_item
-INSERT INTO cart_item (cart_id, photographer_id, package_id, price, event_date, event_time, pax, notes) VALUES
-    (1, 1, 19, 200, '2025-11-21','15:00', 2, 'Sample photoshoot notes'),
-    (2, 1, 5, 350, '2025-11-10', '09:00', 20, 'Sample photoshoot notes'),
-    (2, 2, 21, 550, '2025-12-21','10:00', 10, 'Sample photoshoot notes'),
-    (3, 1, 13, 250, '2025-12-01','11:00', 5, 'Sample photoshoot notes'),
-    (3, 2, 22, 200, '2025-12-19','12:00', 4, 'Sample photoshoot notes'),
-    (3, 2, 29, 350, '2025-12-30','13:00', 3, 'Sample photoshoot notes')
+INSERT INTO cart_item (cart_id, photographer_id, package_id, price, event_date, event_time, pax, notes, event_location) VALUES
+    (1, 1, 19, 200, '2025-11-21','15:00', 2, 'Sample photoshoot notes', 'Brisbane'),
+    (2, 1, 5, 350, '2025-11-10', '09:00', 20, 'Sample photoshoot notes', 'Gold Coast'),
+    (2, 2, 21, 550, '2025-12-21','10:00', 10, 'Sample photoshoot notes', 'Sunshine Coast'),
+    (3, 1, 13, 250, '2025-12-01','11:00', 5, 'Sample photoshoot notes', 'Brisbane'),
+    (3, 2, 22, 200, '2025-12-19','12:00', 4, 'Sample photoshoot notes', 'Gold Coast'),
+    (3, 2, 29, 350, '2025-12-30','13:00', 3, 'Sample photoshoot notes', 'Sunshine Coast')
 ON DUPLICATE KEY UPDATE id=id;
 
 -- Insert sample bookings

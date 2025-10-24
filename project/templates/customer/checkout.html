@@ -142,14 +142,13 @@
                 </div>
                 <div class="col-6">
                   <small class="text-muted"
-                    ><i class="bi bi-geo-alt me-1"></i>Location:</small
+                    ><i class="bi bi-pin-map me-1"></i>Event Location:</small
                   ><br />
                   <small class="fw-medium"
-                    >{{ item.photographer_location or 'TBD' }}</small
+                    >{{ item.event_location or 'TBD' }}</small
                   >
                 </div>
               </div>
-
               {% if item.event_date %}
               <div class="row mb-2">
                 <div class="col-6">

@@ -753,6 +753,7 @@ class CartItem:
             self.event_time = cart_item_dict.get('event_time')
             self.pax = cart_item_dict.get('pax')
             self.notes = cart_item_dict.get('notes')
+            self.event_location = cart_item_dict.get('event_location') 
             self.created_at = cart_item_dict.get('created_at')
             
             # Additional fields from JOIN queries
@@ -765,7 +766,19 @@ class CartItem:
     @staticmethod
     def get_by_id(cart_item_id):
         cart_item_data = fetch_one(
-            "SELECT * FROM cart_item WHERE id = %s",
+            """
+            SELECT ci.*,
+                p.package_name,
+                p.inclusions,
+                ph.location as photographer_location,
+                u.first_name as photographer_first_name,
+                u.last_name as photographer_last_name
+            FROM cart_item ci
+            JOIN packages p ON ci.package_id = p.id
+            JOIN photographers ph ON ci.photographer_id = ph.id
+            JOIN users u ON ph.user_id = u.id
+            WHERE ci.id = %s
+            """,
             (cart_item_id,)
         )
         return CartItem(cart_item_data) if cart_item_data else None
@@ -792,10 +805,10 @@ class CartItem:
         return [CartItem(ci) for ci in cart_items_data]
 
     @staticmethod
-    def create(cart_id, photographer_id, package_id, price, event_date=None, event_time=None, pax=None, notes=None):
+    def create(cart_id, photographer_id, package_id, price, event_date=None, event_time=None, pax=None, notes=None, event_location=None):
         cart_item_id = execute_query(
-            "INSERT INTO cart_item (cart_id, photographer_id, package_id, price, event_date, event_time, pax, notes, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-            (cart_id, photographer_id, package_id, price, event_date, event_time, pax, notes, datetime.utcnow())
+            "INSERT INTO cart_item (cart_id, photographer_id, package_id, price, event_date, event_time, pax, notes, event_location, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            (cart_id, photographer_id, package_id, price, event_date, event_time, pax, notes, event_location, datetime.utcnow())
         )
         return CartItem.get_by_id(cart_item_id)
 
@@ -850,6 +863,7 @@ class Booking:
             self.event_times = booking_dict.get('event_times')
             self.pax_counts = booking_dict.get('pax_counts')
             self.event_notes = booking_dict.get('event_notes')
+            self.event_locations = booking_dict.get('event_locations')
 
     @staticmethod
     def get_by_id(booking_id):
@@ -880,7 +894,8 @@ class Booking:
                 GROUP_CONCAT(DISTINCT ci.event_date ORDER BY ci.event_date SEPARATOR ', ') as event_dates,
                 GROUP_CONCAT(DISTINCT ci.event_time ORDER BY ci.event_time SEPARATOR ', ') as event_times,
                 GROUP_CONCAT(DISTINCT ci.pax SEPARATOR ', ') as pax_counts,
-                GROUP_CONCAT(DISTINCT ci.notes SEPARATOR '|||') as event_notes
+                GROUP_CONCAT(DISTINCT ci.notes SEPARATOR '|||') as event_notes,
+                GROUP_CONCAT(DISTINCT ci.event_location SEPARATOR ', ') as event_locations
             FROM bookings b
             LEFT JOIN cart c ON c.id = b.cart_id
             LEFT JOIN cart_item ci ON ci.cart_id = c.id
@@ -918,7 +933,8 @@ class Booking:
                 GROUP_CONCAT(DISTINCT ci.event_date ORDER BY ci.event_date SEPARATOR ', ') as event_dates,
                 GROUP_CONCAT(DISTINCT ci.event_time ORDER BY ci.event_time SEPARATOR ', ') as event_times,
                 GROUP_CONCAT(DISTINCT ci.pax SEPARATOR ', ') as pax_counts,
-                GROUP_CONCAT(DISTINCT ci.notes SEPARATOR '|||') as event_notes
+                GROUP_CONCAT(DISTINCT ci.notes SEPARATOR '|||') as event_notes,
+                GROUP_CONCAT(DISTINCT ci.event_location SEPARATOR ', ') as event_locations
             FROM bookings b
             LEFT JOIN cart c ON c.id = b.cart_id
             LEFT JOIN cart_item ci ON ci.cart_id = c.id

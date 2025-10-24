@@ -1,69 +1,162 @@
 {% extends "layouts/customer_base.html" %} {% block content %}
-<div class="container py-4 cart-surface">
-  <h2 class="mb-4">Your Cart</h2>
+<section class="bg-light py-5">
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col-12">
+        <h2 class="mb-3">Your Cart</h2>
+      </div>
+    </div>
 
-  {% if not cart_items %}
-  <div class="alert alert-info">Your cart is empty.</div>
-  <a href="{{ url_for('customer.index') }}" class="btn btn-outline-light"
-    >Back to Home</a
-  >
-  {% else %}
-  <div class="table-responsive">
-    <table class="table table-striped align-middle cart-table">
-      <thead class="table-secondary">
-        <tr>
-          <th>Photographer</th>
-          <th>Package</th>
-          <th class="text-end">Price</th>
-          <th class="text-center">Action</th>
-        </tr>
-      </thead>
+    {% if not cart_items %}
+    <div class="row">
+      <div class="col-12">
+        <div class="alert alert-info">
+          <i class="bi bi-cart-x me-2"></i>
+          Your cart is empty.
+          <a href="{{ url_for('customer.index') }}">Browse photographers</a> to
+          get started.
+        </div>
+      </div>
+    </div>
+    {% else %}
 
-      <tbody>
-        {% for item in cart_items %}
-        <tr>
-          <td>
-            {{ item.photographer_first_name }} {{ item.photographer_last_name }}
-          </td>
-          <td>{{ item.package_name }}</td>
-          <td class="text-end">${{ '%.2f'|format(item.price|float) }}</td>
-          <td class="text-center">
-            <form
-              method="POST"
-              action="{{ url_for('customer.remove_from_cart') }}"
-              style="display: inline"
-            >
-              <input type="hidden" name="cart_item_id" value="{{ item.id }}" />
-              <button type="submit" class="btn btn-sm btn-outline-danger">
-                Remove
-              </button>
-            </form>
-          </td>
-        </tr>
+    <div class="row">
+      <!-- Left Column: Cart Items (8 columns) -->
+      <div class="col-lg-8 mb-4">
+        <!-- Loop through each photographer's items -->
+        {% for photographer_id, data in items_by_photographer.items() %}
+        <div class="card section_card mb-4">
+          <!-- Photographer Header -->
+          <div
+            class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-4 mb-4 pb-3 border-bottom"
+          >
+            <div class="text-center">
+              {% if data.photographer.user.profile_image %}
+              <img
+                src="{{ url_for('static', filename='uploads/profiles/' ~ data.photographer.user.profile_image) }}"
+                class="rounded-circle"
+                alt="{{ data.photographer.user.full_name }}"
+                style="width: 100px; height: 100px; object-fit: cover"
+              />
+              {% else %}
+              <img
+                src="{{ url_for('static', filename='img/photog-1.jpg') }}"
+                class="rounded-circle"
+                alt="{{ data.photographer.user.full_name }}"
+                style="width: 100px; height: 100px; object-fit: cover"
+              />
+              {% endif %}
+            </div>
+            <div class="flex-grow-1">
+              <h4 class="mb-2">{{ data.photographer.user.full_name }}</h4>
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-geo-alt text-muted"></i>
+                <span class="text-muted">{{ data.photographer.location }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Items for this photographer -->
+          {% for item in data.cart_items %}
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-md-8">
+                  <h5 class="mb-2">{{ item.package_name }} Package</h5>
+                  <p class="text-muted small mb-2">{{ item.inclusions }}</p>
+                  <div class="d-flex flex-wrap gap-3 small text-muted">
+                    <span
+                      ><i class="bi bi-calendar-event me-1"></i>{{
+                      item.event_date }}</span
+                    >
+                    <span
+                      ><i class="bi bi-clock me-1"></i>{{ item.event_time
+                      }}</span
+                    >
+                    <span
+                      ><i class="bi bi-people me-1"></i>{{ item.pax }}
+                      people</span
+                    >
+                    <span
+                      ><i class="bi bi-pin-map me-1"></i>{{ item.event_location
+                      }}</span
+                    >
+                  </div>
+                  {% if item.notes %}
+                  <p class="small text-muted mt-2 mb-0">
+                    <strong>Notes:</strong> {{ item.notes }}
+                  </p>
+                  {% endif %}
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                  <h5 class="text-primary mb-3">
+                    ${{ "%.2f"|format(item.price) }}
+                  </h5>
+                  <div class="d-flex flex-column gap-2">
+                    <a
+                      href="{{ url_for('customer.edit_cart_item', cart_item_id=item.id) }}"
+                      class="btn btn-sm btn-outline-primary"
+                    >
+                      <i class="bi bi-pencil me-1"></i>Edit
+                    </a>
+                    <form
+                      method="POST"
+                      action="{{ url_for('customer.remove_from_cart') }}"
+                      class="d-inline"
+                    >
+                      <input
+                        type="hidden"
+                        name="cart_item_id"
+                        value="{{ item.id }}"
+                      />
+                      <button
+                        type="submit"
+                        class="btn btn-sm btn-outline-danger w-100"
+                        onclick="return confirm('Remove this item from cart?')"
+                      >
+                        <i class="bi bi-trash me-1"></i>Remove
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
         {% endfor %}
-      </tbody>
+      </div>
 
-      <tfoot class="table-secondary fw-semibold">
-        <tr>
-          <th colspan="2" class="text-end">Total</th>
-          <th class="text-end">${{ '%.2f'|format(total|float) }}</th>
-          <th></th>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
+      <!-- Right Column: Cart Summary (4 columns) -->
+      <div class="col-lg-4">
+        <div class="card section_card sticky-top" style="top: 20px">
+          <h5 class="mb-3">Cart Summary</h5>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Subtotal:</span>
+            <span>${{ "%.2f"|format(total) }}</span>
+          </div>
+          <hr />
+          <div class="d-flex justify-content-between mb-3">
+            <strong>Total:</strong>
+            <strong class="text-primary">${{ "%.2f"|format(total) }}</strong>
+          </div>
+          <a
+            href="{{ url_for('customer.checkout') }}"
+            class="btn btn-orange w-100"
+          >
+            <i class="bi bi-credit-card me-2"></i>Proceed to Checkout
+          </a>
+          <a
+            href="{{ url_for('customer.index') }}"
+            class="btn btn-outline-secondary w-100 mt-2"
+          >
+            <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+          </a>
+        </div>
+      </div>
+    </div>
 
-  <div class="d-flex flex-wrap gap-3 mt-3">
-    <a href="{{ url_for('customer.index') }}" class="btn btn-outline-dark px-4">
-      ← Continue Browsing
-    </a>
-    <a
-      href="{{ url_for('customer.checkout') }}"
-      class="btn btn-orange text-dark fw-semibold px-4"
-    >
-      Proceed to Checkout
-    </a>
+    {% endif %}
   </div>
-  {% endif %}
-</div>
+</section>
 {% endblock %}
