@@ -147,10 +147,11 @@
               {% set pax_list = booking.pax_counts.split(', ') if
               booking.pax_counts else [] %} {% set notes_list =
               booking.event_notes.split('|||') if booking.event_notes else [] %}
-              {% for date in dates %}
+              {% set locations_list = booking.event_locations.split(', ') if
+              booking.event_locations else [] %} {% for date in dates %}
               <div class="event-detail-card mb-3 p-3 border rounded">
                 <div class="row g-3">
-                  <div class="col-md-4">
+                  <div class="col-md-3">
                     <small class="text-muted d-block">
                       <i class="bi bi-calendar3"></i> Date
                     </small>
@@ -159,7 +160,7 @@
                       %}
                     </strong>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-2">
                     <small class="text-muted d-block">
                       <i class="bi bi-clock"></i> Time
                     </small>
@@ -175,6 +176,16 @@
                     <strong>
                       {% if pax_list[loop.index0] %} {{ pax_list[loop.index0] }}
                       {% else %} N/A {% endif %}
+                    </strong>
+                  </div>
+                  <div class="col-md-5">
+                    <small class="text-muted d-block">
+                      <i class="bi bi-pin-map"></i> Event Location
+                    </small>
+                    <strong>
+                      {% if locations_list[loop.index0] %} {{
+                      locations_list[loop.index0] }} {% else %} Not specified {%
+                      endif %}
                     </strong>
                   </div>
                   {% if notes_list[loop.index0] and
