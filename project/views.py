@@ -378,6 +378,11 @@ def view_session(photographer_id):
 def add_to_cart_db():
     package_id = request.form.get('package_id')
     photographer_id = request.form.get('photographer_id')
+    event_date = request.form.get('event_date')
+    event_time = request.form.get('event_time')
+    pax = request.form.get('pax')
+    notes = request.form.get('notes')
+    
     user = get_current_user()
     customer = Customer.get_by_user_id(user.get('id'))
 
@@ -392,7 +397,7 @@ def add_to_cart_db():
     if not cart:
         cart = Cart.create(customer_id=customer.id, subtotal=0.0)
 
-    CartItem.create(cart.id, photographer_id, package_id, price)
+    CartItem.create(cart.id, photographer_id, package_id, price, event_date, event_time, pax, notes)
     Cart.update(cart.id, subtotal=cart.subtotal + price)
 
     flash('Item added to your cart.', 'success')
@@ -543,22 +548,15 @@ def create_booking():
 def checkout():
     user = get_current_user()
     customer = Customer.get_by_user_id(user.get('id'))
-    cart = Cart.get_by_customer(customer.id)
+    cart = Cart.get_by_customer(customer.id, status='Pending')
     items = CartItem.get_by_cart(cart.id) if cart else []
 
-    cart_dict = {
-        item.id: {
-            'title': f'Package #{item.package_id}',
-            'price': float(item.price),
-            'qty': 1
-        } for item in items
-    }
-    total = sum(i['price'] * i['qty'] for i in cart_dict.values())
+    total = sum(float(item.price) for item in items)
 
     return render_template(
-        'customer/checkout.html',      # << Checkout ची फाईल
+        'customer/checkout.html',
         title='Checkout',
-        cart=cart_dict,
+        cart_items=items,
         total=total
     )
 

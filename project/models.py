@@ -749,6 +749,10 @@ class CartItem:
             self.photographer_id = cart_item_dict.get('photographer_id')
             self.package_id = cart_item_dict.get('package_id')
             self.price = cart_item_dict.get('price')
+            self.event_date = cart_item_dict.get('event_date')
+            self.event_time = cart_item_dict.get('event_time')
+            self.pax = cart_item_dict.get('pax')
+            self.notes = cart_item_dict.get('notes')
             self.created_at = cart_item_dict.get('created_at')
             
             # Additional fields from JOIN queries
@@ -788,10 +792,10 @@ class CartItem:
         return [CartItem(ci) for ci in cart_items_data]
 
     @staticmethod
-    def create(cart_id, photographer_id, package_id, price):
+    def create(cart_id, photographer_id, package_id, price, event_date=None, event_time=None, pax=None, notes=None):
         cart_item_id = execute_query(
-            "INSERT INTO cart_item (cart_id, photographer_id, package_id, price, created_at) VALUES (%s, %s, %s, %s, %s)",
-            (cart_id, photographer_id, package_id, price, datetime.utcnow())
+            "INSERT INTO cart_item (cart_id, photographer_id, package_id, price, event_date, event_time, pax, notes, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            (cart_id, photographer_id, package_id, price, event_date, event_time, pax, notes, datetime.utcnow())
         )
         return CartItem.get_by_id(cart_item_id)
 

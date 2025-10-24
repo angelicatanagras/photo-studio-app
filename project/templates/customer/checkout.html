@@ -61,20 +61,79 @@
     <div class="col-lg-5 mt-5 mb-md-3 mb-5 booking_summary">
       <div class="section_card mt-5">
         <h5>Booking Summary</h5>
-        {% if cart %}
-          {% for id, it in cart.items() %}
-          <div class="d-flex justify-content-between mb-2">
-            <span>{{ it.title }}</span>
-            <span class="fw-bold">${{ '%.2f'|format(it.price) }}</span>
+        {% if cart_items %}
+          {% for item in cart_items %}
+          <div class="mb-4">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="fw-bold">{{ item.package_name }}</span>
+              <span class="fw-bold">${{ '%.2f'|format(item.price) }}</span>
+            </div>
+            
+            <div class="booking-details">
+              <div class="row mb-2">
+                <div class="col-6">
+                  <small class="text-muted">Photographer:</small><br>
+                  <small>{{ item.photographer_first_name }} {{ item.photographer_last_name }}</small>
+                </div>
+                <div class="col-6">
+                  <small class="text-muted">Location:</small><br>
+                  <small>{{ item.photographer_location or 'TBD' }}</small>
+                </div>
+              </div>
+              
+              {% if item.event_date %}
+              <div class="row mb-2">
+                <div class="col-6">
+                  <small class="text-muted">Date:</small><br>
+                  <small>{{ item.event_date.strftime('%B %d, %Y') }}</small>
+                </div>
+                <div class="col-6">
+                  <small class="text-muted">Time:</small><br>
+                  <small>
+                    {% if item.event_time %}
+                      {% set hours = item.event_time.seconds // 3600 %}
+                      {% set minutes = (item.event_time.seconds % 3600) // 60 %}
+                      {{ "%02d:%02d"|format(hours, minutes) }}
+                    {% else %}
+                      TBD
+                    {% endif %}
+                  </small>
+                </div>
+              </div>
+              {% endif %}
+              
+              {% if item.pax %}
+              <div class="row mb-2">
+                <div class="col-6">
+                  <small class="text-muted">Number of People:</small><br>
+                  <small>{{ item.pax }}</small>
+                </div>
+                <div class="col-6">
+                  <small class="text-muted">Package Includes:</small><br>
+                  <small>{{ item.inclusions or 'Standard package' }}</small>
+                </div>
+              </div>
+              {% endif %}
+              
+              {% if item.notes %}
+              <div class="mb-2">
+                <small class="text-muted">Notes:</small><br>
+                <small>{{ item.notes }}</small>
+              </div>
+              {% endif %}
+            </div>
+            
+            {% if not loop.last %}<hr class="my-3">{% endif %}
           </div>
           {% endfor %}
+          
           <hr/>
           <div class="d-flex justify-content-between">
             <span class="fw-bold">Total</span>
             <span class="fw-bold fs-5">${{ '%.2f'|format(total) }}</span>
           </div>
         {% else %}
-          <div class="text-muted">Your basket is empty.</div>
+          <div class="text-muted">Your cart is empty.</div>
         {% endif %}
       </div>
     </div>
